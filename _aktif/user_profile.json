@@ -1,0 +1,27 @@
+{
+  "last_update_check": "2026-06-27",
+  "session_history": [
+    {
+      "date": "2026-06-27",
+      "tech_stack_decision": "ReactJS frontend + Express.js backend + Firebase database + Gemini API LLM + PWA mobile",
+      "proposal_base": "Proposal_Penelitian_PRIMA_OPSI_2026_ISH_Revisi_RAB_Konkret.docx",
+      "budget": "Rp1.987.100 (Firebase Spark Plan + Gemini Free Tier = gratis)",
+      "full_paper_generated": "Laporan_Penelitian_PRIMA_OPSI_2026_Draf_Full_Paper_v2.docx",
+      "peer_review": "PRIMA_PEER_REVIEW_REPORT.md",
+      "instruments": "5 lampiran: kisi-kisi loyalitas, 20 butir kuesioner, skenario PRIMA+, lembar validasi, angket respons"
+    }
+  ],
+  "research_preferences": {
+    "writing_style": "akademik_sederhana",
+    "target_journal": "Jurnal Sosial Humaniora dan Pendidikan",
+    "tech_stack": {
+      "frontend": "ReactJS",
+      "backend": "Express.js (Node.js)",
+      "database": "Firebase",
+      "llm": "Gemini API",
+      "mobile": "PWA"
+    },
+    "research_domain": "Ilmu Sosial Humaniora - Bahasa dan Sastra",
+    "research_title": "KESADARAN BERBAHASA REMAJA MELALUI MEDIA PRIMA+ UNTUK MENGUATKAN LOYALITAS BAHASA INDONESIA DI LINGKUNGAN SEKOLAH"
+  }
+}

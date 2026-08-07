@@ -1,0 +1,133 @@
+[4] (Normal) PROPOSAL PENELITIAN
+[6] (Normal) PLATFORM “PRIMA+”: MODEL PENGUATAN BERBASIS LANGUAGE AWARENESS UNTUK MENINGKATKAN LOYALITAS BERBAHASA INDONESIA PADA KALANGAN REMAJA DI ERA DIGITAL
+[8] (Normal) Nama Tim Peneliti
+Ketua : Larisa Dianti
+Anggota : Gusti Nazwa Azizah
+[12] (Normal) Bidang Ilmu Sosial Humaniora (ISH) Sub Bidang Bahasa dan Sastra
+[14] (Normal) MAN KOTAWARINGIN TIMUR
+Kotawaringin Timur, Kalimantan Tengah 
+Tahun 2026
+[17] (Normal) DAFTAR ISI
+[23] (Heading 2) DAFTAR TABEL
+[24] (table of figures) Table 1.1 Studi Pustaka	8
+[25] (Caption) Tabel 2.1 Alat penelitian PRIMA+.....................................................................................................9
+[26] (table of figures) Table 2.2 Bahan penelitian PRIMA+	9
+[27] (table of figures) Table 3.1 Alat penelitian PRIMA+	11
+[28] (table of figures) Table 3.2 Jadwal Penelitian	11
+[31] (Heading 2) DAFTAR GAMBAR
+[35] (table of figures) Gambar 1. Rancangan Pengolahan Data	10
+[37] (Heading 1) BAB 1. PENDAHULUAN
+[38] (Heading 3) LATAR BELAKANG
+[39] (Normal (Web)) Bahasa Indonesia memiliki posisi yang sangat penting dalam kehidupan bangsa Indonesia. Selain berfungsi sebagai alat komunikasi, bahasa Indonesia juga menjadi simbol identitas nasional yang menyatukan masyarakat dengan latar belakang budaya, suku, dan bahasa daerah yang beragam. Perkembangan teknologi informasi dan komunikasi pada era digital saat ini juga membawa perubahan besar dalam cara masyarakat berinteraksi. Dalam praktiknya, tidak sedikit remaja yang lebih sering menggunakan bahasa campuran antara bahasa Indonesia dan bahasa asing, terutama bahasa Inggris. Selain itu, penggunaan bahasa gaul atau slang juga semakin dominan dalam percakapan sehari-hari, baik di dunia nyata maupun di ruang digital (Sugono, 2019).
+[41] (Normal (Web)) Fenomena tersebut menunjukkan adanya kecenderungan menurunnya loyalitas berbahasa Indonesia di kalangan remaja. Loyalitas bahasa sendiri dapat dipahami sebagai sikap positif seseorang untuk tetap menggunakan dan mempertahankan bahasa tertentu sebagai bagian dari identitas sosial dan budayanya (Chaer, 2014). Dalam konteks ini, remaja berperan sebagai generasi penerus penggunaan Bahasa Indonesia. Namun, pengaruh globalisasi, budaya populer, serta dominasi bahasa asing dalam berbagai konten digital sering kali membuat remaja kurang menyadari pentingnya menggunakan bahasa Indonesia secara tepat.
+[43] (Normal (Web)) Salah satu keresahan dalam perkembangan bahasa di era digital adalah perubahan cara berbahasa remaja di media sosial. Banyak tren komunikasi digital yang menunjukkan perubahan cara berbahasa remaja. Misalnya dalam penggunaan caption, video bertema get ready with me, hingga unggahan story harian di platform seperti TikTok atau Instagram. Bahasa campuran antara Indonesia dan Inggris sering dianggap lebih modern atau terlihat lebih “keren”. Ungkapan sederhana seperti “aku senang” sering diganti menjadi “aku happy banget”, atau “lagi istirahat” berubah menjadi “lagi healing dulu”. Pola seperti ini secara tidak langsung menunjukkan adanya pergeseran dalam cara remaja memandang dan menggunakan bahasa Indonesia.
+[45] (Normal (Web)) Menanggapi tersebut, diperlukan suatu model penguatan bahasa yang tidak hanya berfokus pada pembelajaran formal di kelas, tetapi juga mampu menumbuhkan kesadaran serta sikap positif terhadap bahasa Indonesia. Salah satu inovasi yang dapat dikembangkan adalah platform PRIMA+ (Penguatan Bahasa Indonesia Melalui language Awareness Plus). Platform ini dirancang sebagai media digital yang mengintegrasikan konsep language awareness dalam berbagai aktivitas berbasis teknologi. Melalui platform ini, diharapkan remaja dapat lebih memahami, menghargai, dan menggunakan bahasa Indonesia secara lebih baik, baik dalam kehidupan sehari-hari maupun dalam interaksi di ruang digital.
+[47] (Heading 3) RUMUSAN MASALAH
+[48] (Body Text) Berdasarkan latar belakang yang telah diuraikan, maka rumusan masalah dalam penelitian ini adalah sebagai berikut:
+[49] (List Paragraph1) Bagaimana model penguatan berbasis language awareness melalui platform PRIMA+
+untuk meningkatkan loyalitas berbahasa Indonesia pada kalangan remaja di era digital?
+[51] (List Paragraph1) Bagaimana efektivitas penggunaan platform PRIMA+ dalam meningkatkan loyalitas berbahasa Indonesia pada kalangan remaja di era digital?
+[52] (Heading 3) TUJUAN PENELITIAN
+[53] (Body Text) Berdasarkan rumusan masalah tersebut, tujuan penelitian ini adalah sebagai berikut:
+[54] (List Paragraph1) Untuk mengembangkan model penguatan berbasis language awareness melalui platform PRIMA+ dalam meningkatkan loyalitas berbahasa Indonesia pada kalangan remaja di era digital.
+[55] (List Paragraph1) Untuk menguatkan loyalitas remaja indonesia dalam berbahasa Indonesia  dengan baik dan benar dengan platform ini
+[56] (Heading 3) MANFAAT PENELITIAN
+[57] (Body Text) Penelitian ini diharapkan dapat memberikan manfaat baik secara teoretis maupun praktis sebagai berikut.
+[58] (List Paragraph1) Manfaat Teoretis
+[59] (Body Text) Secara teoretis, penelitian ini diharapkan dapat memberikan kontribusi dalam pengembangan kajian linguistik, khususnya dalam bidang sosiolinguistik dan pembelajaran bahasa Indonesia yang berkaitan dengan konsep language awareness dan loyalitas berbahasa. Penelitian ini juga diharapkan dapat memperkaya referensi ilmiahmengenai strategi penguatan penggunaan bahasa Indonesia pada kalangan remaja di era digital. Selain itu, hasil penelitian ini dapat menjadi rujukan bagi penelitian selanjutnya yang berkaitan dengan pengembangan model atau media pembelajaran bahasa berbasis teknologi digital dalam meningkatkan sikap positif terhadap bahasa Indonesia (Chaer & Agustina, 2014; Fairclough, 1992).
+[60] (List Paragraph1) Manfaat Praktis
+[61] (List Paragraph1) Bagi Remaja
+[62] (List Paragraph1) Penelitian ini diharapkan dapat meningkatkan kesadaran dan loyalitas remaja dalam menggunakan bahasa Indonesia secara baik dan benar melalui Platform PRIMA+.
+[63] (List Paragraph1) Bagi Pendidik
+[64] (List Paragraph1) Penelitian ini diharapkan menjadi referensi bagi pendidik dalam mengembangkan pembelajaran bahasa Indonesia yang lebih inovatif berbasis teknologi digital.
+[65] (List Paragraph1) Bagi Pengembang Media dan Teknologi Pendidikan
+[66] (List Paragraph1) Penelitian ini dapat menjadi dasar dalam pengembangan media digital yang mendukung pembelajaran bahasa Indonesia berbasis language awareness. Selain itu, penelitian ini juga dapat menjadi contoh model integrasi teknologi digital dengan upaya penguatan bahasa nasional di era digital. Penelitian ini diharapkan menjadi rujukan bagi penelitian terkait loyalitas berbahasa dan pengembangan media pembelajaran bahasa berbasis teknologi
+[68] (Heading 1) BAB 2. TINJAUAN PUSTAKA
+[69] (Normal) Tinjauan pustaka ini merangkum berbagai literatur dan hasil studi yang relevan dengan kedudukan Bahasa Indonesia sebagai identitas nasional. Bagian ini memetakan posisi penelitian di antara kajian yang sudah ada sebelumnya.
+[70] (Heading 3) LANDASAN TEORI
+[71] (Body Text) Platform Digital sebagai Media Penguatan Bahasa
+[72] (Body Text) Pemanfaatan teknologi digital dalam bidang pendidikan telah membuka peluang baru dalam pengembangan media pembelajaran yang lebih inovatif dan interaktif. Platform digital memungkinkan penyampaian materi pembelajaran secara fleksibel serta dapat diakses kapan saja dan di mana saja. Generasi remaja saat ini dikenal sebagai generasi digital atau digital natives, yaitu generasi yang tumbuh dan berkembang bersama teknologi digital. Oleh karena itu, penggunaan platform digital sebagai media pembelajaran dianggap lebih sesuai dengan karakteristik generasi tersebut (Prensky, 2001).
+[73] (List Paragraph1) Language awareness
+[74] (List Paragraph1) Language awareness atau kesadaran berbahasa merupakan konsep yang menekankan pemahaman individu terhadap fungsi, struktur, dan peran sosial bahasa. Konsep ini tidak hanya mencakup aspek linguistik, tetapi juga kesadaran kritis terhadap penggunaan bahasa dalam berbagai konteks sosial dan budaya (Fairclough, 1992). Dalam pendidikan bahasa, pendekatan language awareness bertujuan meningkatkan pemahaman peserta didik terhadap penggunaan bahasa yang tepat sekaligus menumbuhkan sikap positif terhadap bahasa yang dipelajari (Carter, 2023).
+[75] (List Paragraph1) Loyalitas berbahasa
+[76] (List Paragraph1) Loyalitas berbahasa merupakan sikap positif seseorang untuk tetap menggunakan dan mempertahankan bahasa tertentu dalam komunikasi (Chaer, 2014). Menurut Garvin dan Mathiot, loyalitas bahasa merupakan salah satu komponen utama sikap bahasa selain kebanggaan bahasa dan kesadaran terhadap norma bahasa (Chaer, 2014). Dalam konteks bahasa Indonesia, loyalitas berbahasa penting untuk menjaga fungsi bahasa sebagai identitas nasional dan alat pemersatu bangsa. Namun, pengaruh bahasa asing dan penggunaan bahasa gaul di media digital sering memengaruhi pola berbahasa remaja, sehingga diperlukan upaya untuk menumbuhkan kesadaran dan sikap positif terhadap penggunaan bahasa Indonesia (Sugono, 2019).
+[77] (List Paragraph1) Bahasa Indonesia pada kalangan remaja di Era Digital
+[78] (List Paragraph1) Perkembangan teknologi informasi dan komunikasi telah mengubah pola komunikasi masyarakat, terutama pada remaja yang banyak berinteraksi melalui media sosial dan platform digital. Dalam komunikasi digital, penggunaan bahasa sering mengalami variasi seperti singkatan, bahasa informal, serta pencampuran bahasa yang muncul karena kebutuhan komunikasi yang cepat dan praktis (Crystal, 2011). Di Indonesia, fenomena ini terlihat dari maraknya penggunaan bahasa campuran antara bahasa Indonesia dan bahasa asing di media sosial. Kondisi tersebut berpotensi mengurangi penggunaan bahasa Indonesia sesuai kaidah, sehingga diperlukan upaya untuk meningkatkan kesadaran berbahasa pada kalangan remaja (Sugono, 2019).
+[79] (Heading 3) STUDI PUSTAKA
+[80] (Body Text) Beberapa penelitian terdahulu yang relevan sebagai landasan dan pembanding dalam penelitian ini disajikan sebagai berikut :
+[81] (Caption) Tabel 1.1 Studi Pustaka
+[82] (Heading 1) Berdasarkan kajian terhadap penelitian terdahulu, dapat diketahui bahwa pendekatan language awareness berperan penting dalam meningkatkan pemahaman peserta didik terhadap fungsi, struktur, dan penggunaan bahasa secara sadar dalam berbagai konteks komunikasi. Kondisi tersebut menunjukkan bahwa tantangan penggunaan bahasa Indonesia pada generasi muda semakin kompleks di era digital, sehingga diperlukan strategi yang lebih inovatif untuk menumbuhkan kesadaran berbahasa. Oleh karena itu, penelitian ini menghadirkan inovasi melalui pengembangan platform digital PRIMA+ sebagai media pembelajaran interaktif berbasis language awareness yang memanfaatkan unsur gamifikasi untuk meningkatkan kesadaran dan loyalitas remaja dalam menggunakan bahasa Indonesia secara baik dan benar di lingkungan komunikasi digital.
+[85] (Heading 1) BAB 3 METODE PENELITIAN
+[87] (Heading 4) Waktu dan Tempat Penelitian
+[88] (Body Text) Kami akan melakukan penelitian pada bulan April – Agustus di area MAN KOTIIM
+[89] (Body Text) 3.2   Alat dan Bahan
+[90] (Caption) Tabel 2.1 Alat penelitian PRIMA+
+[92] (Caption) Table 2.2 Bahan penelitian PRIMA+
+[94] (List Paragraph1) Rancangan dan Prosedur Penelitian
+[95] (List Paragraph1) a. Studi Literatur dan Merancang Platform
+[96] (Normal) Tahap awal dilakukan dengan mengkaji berbagai referensi ilmiah seperti jurnal, buku, dan penelitian terdahulu yang berkaitan dengan fenomena campur kode, kesadaran berbahasa, serta pemanfaatan media digital dalam pembelajaran bahasa. Tahap ini bertujuan untuk memperoleh dasar teori dalam pengembangan platform PRIMA+.
+[97] (List Paragraph1) Pada tahap ini dilakukan perancangan konsep dan sistem platform PRIMA+ yang meliputi desain fitur, alur penggunaan, serta tampilan antarmuka platform sebagai media interaktif untuk meningkatkan kesadaran penggunaan Bahasa Indonesia.
+[98] (List Paragraph1) c. Percobaan Platform
+[99] (List Paragraph1) Platform yang telah dirancang kemudian diuji untuk memastikan seluruh fitur dan sistem dapat berjalan dengan baik sesuai dengan rancangan yang telah dibuat.
+[100] (List Paragraph1) d. Evaluasi Sistem
+[101] (List Paragraph1) Jika pada tahap percobaan ditemukan kendala atau sistem belum berjalan optimal, maka dilakukan perbaikan dengan kembali pada tahap perancangan hingga sistem dapat berfungsi dengan baik.
+[102] (List Paragraph1) e. Analisis Data dan Kesimpulan
+[103] (List Paragraph1) Apabila sistem telah berjalan dengan baik, data yang diperoleh dari penggunaan platform kemudian dianalisis untuk melihat efektivitas platform PRIMA+. Tahap terakhir adalah menarik kesimpulan berdasarkan hasil analisis data yang diperoleh dari penelitian.Rancangan Pengolahan Data
+[106] (Caption) Gambar 1. Rancangan Pengolahan Data
+[107] (List Paragraph1) Rancangan Pengolahan Data
+[108] (Body Text) Pengolahan data dalam penelitian ini dilakukan untuk mengetahui efektivitas platform PRIMA+ dalam meningkatkan kesadaran penggunaan Bahasa Indonesia. Data diperoleh dari aktivitas pengguna saat menggunakan platform, seperti hasil jawaban pada kuis atau permainan bahasa yang tersedia. Data yang terkumpul kemudian diklasifikasikan berdasarkan kategori jawaban benar dan salah serta tingkat pemahaman pengguna terhadap penggunaan bahasa Indonesia yang tepat.
+[109] (Body Text) Selanjutnya data dianalisis menggunakan teknik analisis deskriptif dengan menghitung persentase tingkat ketepatan jawaban dan perubahan pemahaman pengguna setelah menggunakan platform PRIMA+. Hasil analisis kemudian disajikan dalam bentuk tabel atau grafik dengan bantuan perangkat lunak pengolah data seperti Microsoft Excel untuk memudahkan proses interpretasi dan penarikan kesimpulan penelitian.
+[110] (Heading 1) BAB 4 RANCANGAN ANGGARAN BIAYA DAN JADWAL
+[111] (Heading 1) KEGIATAN
+[112] (Heading 4) Rancangan Anggaran Biaya Penelitian
+[113] (Body Text) Rencana anggaran berikut disusun untuk merinci alokasi pendanaan pengembangan sistem dan operasional penelitian agar berjalan secara efektif, dengan rincian sebagai berikut.
+[114] (Caption) Tabel 3.1 Alat penelitian PRIMA+
+[116] (Normal) 4.2   Jadwal Penelitian
+[117] (Caption) Rencana pelaksanaan penelitian ini disusun sistematis sebagai berikut :
+[118] (Caption) Tabel 3.2 Jadwal Penelitian
+[120] (Table Paragraph) PERNYATAAN PENGGUNAAN ARTIFISIAL (AI)
+[121] (Table Paragraph) Penelitian ini menggunakan bantuan Artificial Intelligence (AI), yaitu Gemini dan ChatGPT, untuk membantu peneliti dalam mencari referensi yang relevan, memperdalam landasan teori tentang kesadaran berbahasa dan fenomena campur kode, serta membantu menyusun kerangka metodologi penulisan proposal. AI juga dimanfaatkan sebagai pendukung dalam perancangan konsep media pembelajaran berbasis permainan digital PRIMA+, khususnya dalam penyusunan alur permainan dan mekanisme kuis bahasa. Namun, proses pengembangan produk, penyusunan instrumen penelitian, analisis data, dan penarikan kesimpulan tetap dilakukan secara mandiri oleh peneliti.
+[123] (Heading 2) DAFTAR PUSTAKA
+[125] (Normal) Alwi, H. , & S. D. (2011). Politik Bahasa Nasional. Badan Pengembangan dan Pembinaan Bahasa. Carter, R. (2023). Language Awareness. ELT Journal, 57(1).
+[126] (Normal) Crystal, D. (2011). Internet Linguistics: A Student Guide. Routledge.
+[127] (Normal) Fairclough, N. (1992). Critical Language Awareness. Logman.
+[128] (Body Text) Prensky, M. (2001). Digital Natives, Digital Immigrants. On the Horizon, 9(5).
+[129] (Normal) Sugono. (2019). Bahasa Indonesia di Era Globalisasi. Badan Pengembangan dan Pembinaan Ban
+
+[TABLE 1]
+No | Nama Peneliti | Judul | Hasil
+1 | Carter (2013) | Language Awareness Approach in Language Learning | Penelitian menunjukkan bahwa pendekatan language awareness mampu meningkatkan pemahaman peserta didik terhadap fungsi dan struktur bahasa. Pendekatan ini juga mendorong siswa lebih kritis dalam menggunakan bahasa sesuai konteks komunikasi, sehingga meningkatkan kemampuan berbahasa secara efektif.
+2 | Sugono (2019) | Tantangan Penggunaan Bahasa Indonesia pada Generasi Muda di Era Digital | Hasil penelitian menunjukkan bahwa perkembangan globalisasi dan media digital memengaruhi pola penggunaan bahasa generasi muda. Banyak terjadi percampuran bahasa yang dapat menurunkan penggunaan Bahasa Indonesia yang baik dan benar, sehingga diperlukan strategi inovatif untuk menumbuhkan kesadaran berbahasa.
+3 | Crystal (2011) | Language and the Internet | Penelitian ini menjelaskan bahwa perkembangan teknologi digital menciptakan bentuk komunikasi baru yang memengaruhi cara masyarakat menggunakan bahasa. Fenomena bahasa digital menunjukkan bahwa teknologi memiliki peran besar dalam perubahan penggunaan bahasa dalam kehidupan sehari-hari.
+
+[TABLE 2]
+No | Nama Alat | Jumlah
+1 | Laptop Pengembang | 1 unit
+2 | Telepon Pintar (Handphone) Responden | 15 unit
+3 | Godot Engine | 1 unit
+4 | Flash Disk | 1 buah
+6 | Headphone | 1 buah
+
+[TABLE 3]
+No | Nama Bahan | Jumlah
+1 | Skenario soal PRIMA+ | 1 domain
+2 | Kuesioner pretest & protest | 1 paket
+3 | Audio Permainan | 1 sistem
+4 | Lisensi plugin kuis interaktif premium | 1 lisensi
+5 | Lisensi plugin gamifikasi premium | 1 lisensi
+6 | Modul edukasi digital | 1 paket
+7 | Aset visual game (karakter, map, item) | 1 paket
+
+[TABLE 4]
+No. | Komponen Pengeluaran | Harga Satuan (Rp)
+1 | Biaya Perangkat Keras / Headset / Flashdisk | Rp. 224.000 /  Rp. 320.000
+2 | Biaya Perangkat Lunak / Game Engine (Godotgame) / Asset visual game (sprite karakter & objek) / Asset audio permainan / Software desain grafis (Canva Satu Bulan) | Rp. 78.000 /  Rp. 50.000 /  Rp. 150.000 /  Rp. 20.000
+3 | Biaya Kebutuhan Pendukung / Akses Internet | Rp. 350.000
+Total | Total | Rp. 1.192.000
+
+[TABLE 5]
+No. | Kegiatan | Tanggal Pelaksanaan
+1 | Studi Literatur | 6 April 2026 – 16 April 2026
+2 | Perancangan Konsep dan desain Platform PRIMA+ | 17 April 2026 – 30 April 2026
+3 | Uji coba penggunaan platform kepada responden | 26 Mei 2026 – 20 Juni 2026
+4 | Analisis data dan penyusunan laporan akhir peneliti | 26 Juli – 20 Agustus 2026
