@@ -154,6 +154,11 @@ def build():
         "1.5 Manfaat Penelitian",
         "BAB 2. LANDASAN TEORI DAN STUDI PUSTAKA",
         "2.1 Landasan Teori",
+        "2.1.1 Kesadaran Berbahasa",
+        "2.1.2 Sikap dan Loyalitas Bahasa",
+        "2.1.3 Bahasa Remaja dalam Media Digital",
+        "2.1.4 Media Pembelajaran, Gamifikasi, dan PRIMA+",
+        "2.1.5 Kerangka Konseptual",
         "2.2 Studi Pustaka",
         "BAB 3. METODE PENELITIAN",
         "3.1 Waktu dan Tempat Penelitian",
@@ -237,15 +242,26 @@ def build():
         add_list(doc, text)
 
     # ── BAB 2. LANDASAN TEORI DAN STUDI PUSTAKA ──
+    doc.add_page_break()
     add_heading(doc, "BAB 2. LANDASAN TEORI DAN STUDI PUSTAKA", 1, size=16)
     add_heading(doc, "2.1 LANDASAN TEORI", 2)
-    for text in [
-        "Kesadaran berbahasa menekankan kemampuan memperhatikan bentuk, fungsi, konteks, dan dampak sosial dari bahasa yang digunakan. Carter (2003) memandang language awareness sebagai kesadaran terhadap bentuk dan fungsi bahasa, sedangkan Fairclough (1992) menekankan pentingnya sikap kritis dalam melihat hubungan bahasa dan kehidupan sosial.",
-        "Loyalitas bahasa merupakan bagian dari sikap bahasa. Garvin dan Mathiot (1968) menempatkan loyalitas bahasa bersama kebanggaan bahasa dan kesadaran norma. Dalam penelitian ini, loyalitas berbahasa Indonesia dimaknai sebagai kemauan siswa untuk menempatkan bahasa Indonesia secara tepat, terutama pada situasi sekolah, komunikasi resmi, dan ruang digital yang berkaitan dengan kegiatan akademik.",
-        "Bahasa remaja di media sosial memperlihatkan perubahan pilihan kata, campur kode, dan ragam santai. Penelitian tentang pengaruh media sosial terhadap bahasa remaja menunjukkan bahwa media digital memengaruhi gaya penulisan bahasa Indonesia (Prasetyaningrum, 2024) dan penggunaan ragam informal di kalangan remaja (Parlindungan Siahaan dkk., 2024). Temuan tersebut menjadi dasar bahwa pembinaan bahasa perlu dekat dengan kebiasaan komunikasi remaja.",
-        "Media digital dalam penelitian ini dipahami sebagai sarana pedagogis untuk menghadirkan kasus bahasa dan refleksi, bukan sebagai objek utama rekayasa komputer. Dengan demikian, pengembangan PRIMA+ tetap ditempatkan dalam kajian sosial-humaniora, terutama pembelajaran bahasa, sikap bahasa, dan perilaku komunikasi remaja.",
-    ]:
-        add_p(doc, text)
+    add_p(doc, "Landasan teori ini menempatkan penelitian dalam kajian sosiolinguistik dan pembelajaran bahasa. Empat pilar teori diuraikan untuk menjelaskan konstruk penelitian, yaitu kesadaran berbahasa, sikap dan loyalitas bahasa, bahasa remaja dalam media digital, serta peran media pembelajaran dan PRIMA+ sebagai sarana penguat loyalitas berbahasa Indonesia.")
+
+    add_heading(doc, "2.1.1 Kesadaran Berbahasa", 3)
+    add_p(doc, "Kesadaran berbahasa menekankan kemampuan penutur untuk memperhatikan bentuk, fungsi, konteks, dan dampak sosial dari bahasa yang digunakannya. Carter (2003) memandang language awareness sebagai kesadaran terhadap bentuk dan fungsi bahasa yang dipakai dalam komunikasi. Sementara itu, Fairclough (1992) memperluasnya menjadi kritik bahasa (critical language awareness), yaitu kesadaran tentang hubungan antara bahasa dan kehidupan sosial. Dalam penelitian ini, kesadaran berbahasa menjadi dasar bagi latihan memilih ragam bahasa: siswa diajak mengenali bentuk tuturan, memahami fungsi setiap ragam, dan mengkaji konteks penggunaan bahasa Indonesia di sekolah serta di ruang digital.")
+
+    add_heading(doc, "2.1.2 Sikap dan Loyalitas Bahasa", 3)
+    add_p(doc, "Sikap bahasa merupakan kecenderungan penutur dalam menilai bahasanya sendiri. Loyalitas bahasa merupakan salah satu wujud sikap bahasa. Garvin dan Mathiot (1968) menempatkan tiga ciri sikap bahasa, yaitu kesetiaan bahasa (language loyalty), kebanggaan bahasa (language pride), dan kesadaran akan norma bahasa. Chaer dan Agustina (2014) menjelaskan bahwa loyalitas berbahasa terlihat dari sikap mempertahankan dan mengutamakan bahasa ibu atau bahasa nasional dalam kehidupan sehari-hari. Dalam penelitian ini, loyalitas berbahasa Indonesia dimaknai sebagai kecenderungan siswa untuk menempatkan bahasa Indonesia secara tepat pada situasi sekolah, komunikasi resmi, dan kegiatan akademik, termasuk memilihnya saat berhadapan dengan ragam bahasa lain.")
+
+    add_heading(doc, "2.1.3 Bahasa Remaja dalam Media Digital", 3)
+    add_p(doc, "Perkembangan komunikasi digital (Crystal, 2011) mengubah praktik berbahasa remaja. Media sosial memunculkan pemakaian kata-asing, campur kode, dan ragam santai. Prasetyaningrum (2024) menunjukkan bahwa media sosial memengaruhi gaya penulisan bahasa Indonesia, sedangkan Parlindungan Siahaan dkk. (2024) menyoroti penggunaan ragam informal di kalangan remaja. Widyaningrum dkk. (2020) menegaskan bahwa konteks lokal, identitas, dan pengalaman sosial perlu dipahami ketika mengkaji remaja Kota Sampit khususnya. Karena itu, pembinaan bahasa yang melekat pada kebiasaan komunikasi remaja lebih mungkin diterima daripada larangan tanpa pemahaman.")
+
+    add_heading(doc, "2.1.4 Media Pembelajaran, Gamifikasi, dan PRIMA+", 3)
+    add_p(doc, "Media pembelajaran merupakan sarana untuk menyampaikan materi dan melatih hasil. Gamifikasi menerapkan elemen permainan untuk mendorong keterlibatan peserta dalam proses belajar. Shortt dkk. (2021) dan Luo (2023) menunjukkan bahwa gamifikasi dapat mendukung pembelajaran bahasa apabila desain dan evaluasinya dirancang secara jelas. PRIMA+ dikembangkan sebagai media kebahasaan yang menghadirkan kasus bahasa, pilihan ragam, kuis kontekstual, refleksi, dan umpan balik. Unsur digital digunakan untuk menghadirkan latihan pilihan berbahasa yang kontekstual, tetapi fokus kajian tetap berada pada kesadaran berbahasa dan loyalitas bahasa Indonesia, bukan semata-mata pada rekayasa perangkat lunak.")
+
+    add_heading(doc, "2.1.5 Kerangka Konseptual", 3)
+    add_p(doc, "Berdasarkan landasan di atas, kerangka konseptual penelitian disusun dalam alur sebagai berikut. Pertama, input (masukan) berupa kesadaran berbahasa yang meliputi kepekaan terhadap bentuk, fungsi, konteks, dan sikap kritis. Kedua, proses berupa penggunaan media PRIMA+, yang melatih siswa memilih ragam bahasa, merefleksikan konteks komunikasi, dan menerima umpan balik. Ketiga, output berupa penguatan loyalitas berbahasa Indonesia siswa, yang dijabarkan ke dalam enam indikator: sikap positif, kesetiaan penggunaan, kesadaran norma, kebanggaan bahasa, kemampuan memilih ragam, dan refleksi kritis. Ketiga indikator ini menjadi dasar penyusunan instrumen pengukuran sebagaimana dipetakan dalam Tabel 3, dan dijadikan variabel terikat yang dianalisis melalui desain pretest-posttest.")
+    add_p(doc, "Hubungan konsep dalam kerangka ini dirangkum dalam bentuk struktural berikut: kesadaran berbahasa sebagai titik berangkat pengembangan media, PRIMA+ sebagai sarana latihan pengambilan keputusan dan refleksi berbahasa, serta loyalitas berbahasa Indonesia sebagai hasil yang ingin dikuatkan. Posisi ini membedakan PRIMA+ dari sekadar media informasi/kebahasaan, karena PRIMA+ mengarahkan siswa untuk aktif memilih ragam dan merefleksikan alasan penggunaan bahasa.")
 
     add_heading(doc, "2.2 STUDI PUSTAKA", 2)
     add_table(
@@ -261,8 +277,10 @@ def build():
         caption="Tabel 1. Studi pustaka terdahulu",
         widths=[0.45, 1.55, 2.35, 2.15],
     )
+    add_p(doc, "Kajian literatur tersebut menunjukkan bahwa belum banyak penelitian yang mengembangkan media berbasis latihan keputusan berbahasa (decision-making) untuk menguatkan loyalitas bahasa Indonesia remaja dalam konteks sekolah madrasah, khususnya di Kotawaringin Timur. Sebagian besar kajian berfokus pada fenomena bahasa digital dan sikap bahasa secara deskriptif, sementara PRIMA+ mengarahkan pengembangan media yang aktif melatih siswa memilih ragam dan merefleksikan alasan berbahasa. Posisi inilah yang menjadi celah kebaruan (research gap) yang dibahas pada BAB 4 dan BAB 5.")
 
     # ── BAB 3. METODE PENELITIAN ──
+    doc.add_page_break()
     add_heading(doc, "BAB 3. METODE PENELITIAN", 1, size=16)
     add_heading(doc, "3.1 WAKTU DAN TEMPAT PENELITIAN", 2)
     add_p(doc, "Penelitian dilaksanakan pada April hingga Agustus 2026 di MAN Kotawaringin Timur, Sampit, Kabupaten Kotawaringin Timur, Kalimantan Tengah. Kegiatan penelitian meliputi analisis kebutuhan, perancangan media PRIMA+, penyusunan instrumen, validasi, uji coba terbatas, pengolahan data, revisi media, dan penyusunan laporan.")
@@ -338,6 +356,7 @@ def build():
     )
 
     # ── BAB 4. HASIL DAN PEMBAHASAN (kerangka; data belum terkumpul) ──
+    doc.add_page_break()
     add_heading(doc, "BAB 4. HASIL DAN PEMBAHASAN", 1)
     add_p(doc, "Bab ini menyajikan hasil penelitian dan pembahasan berdasarkan tiga rumusan masalah yang telah ditetapkan. Data diperoleh melalui validasi ahli, uji coba terbatas kepada 30 siswa MAN Kotawaringin Timur, serta analisis pretest-posttest loyalitas berbahasa Indonesia. Bagian ini masih berupa kerangka; angka hasil akan diisi setelah pengumpulan dan pengolahan data.")
 
@@ -383,6 +402,7 @@ def build():
     add_p(doc, "[Diisi nanti: pembahasan hasil penelitian dikaitkan dengan teori dan studi pustaka Bab 2; perbandingan dengan penelitian terdahulu; implikasi temuan terhadap penguatan loyalitas berbahasa Indonesia remaja.]")
 
     # ── BAB 5. ANGGARAN BIAYA DAN KEGIATAN ──
+    doc.add_page_break()
     add_heading(doc, "BAB 5. ANGGARAN BIAYA DAN KEGIATAN", 1, size=14)
     add_heading(doc, "5.1 ANGGARAN BIAYA PENELITIAN", 2)
     add_p(doc, "Bagian ini menyajikan rencana dan realisasi anggaran biaya penelitian. Anggaran rencana disusun sesuai batas yang ditetapkan, sedangkan kolom realisasi diisi setelah seluruh kegiatan penelitian terlaksana.")
