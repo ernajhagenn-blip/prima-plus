@@ -9,6 +9,12 @@
       "full_paper_generated": "Laporan_Penelitian_PRIMA_OPSI_2026_Draf_Full_Paper_v2.docx",
       "peer_review": "PRIMA_PEER_REVIEW_REPORT.md",
       "instruments": "5 lampiran: kisi-kisi loyalitas, 20 butir kuesioner, skenario PRIMA+, lembar validasi, angket respons"
+    },
+    {
+      "date": "2026-08-18",
+      "web_app_tech_stack": "Next.js 16.3.1 (App Router) + node:sqlite (SQLite) di D:/opsi2026/prima-web — menggantikan rencana ReactJS/Express/Firebase/Gemini (tanpa dependensi cloud/LLM)",
+      "education_module": "Tahap Edukasi (/edukasi) disisipkan antara pretest dan kuis; 5 modul seed dari riset; CRUD via panel admin (tambah/ubah/hapus)",
+      "status": "App jalan di http://localhost:3100; alur penuh register->pretest->edukasi->kuis->posttest->respons->selesai teruji E2E; export CSV admin aktif"
     }
   ],
   "research_preferences": {
@@ -20,6 +26,12 @@
       "database": "Firebase",
       "llm": "Gemini API",
       "mobile": "PWA"
+    },
+    "web_app_impl": {
+      "framework": "Next.js 16.3.1",
+      "database": "node:sqlite (SQLite, file data/prima.db)",
+      "auth": "cookie prima_admin (kata sandi di .env.local ADMIN_PASSWORD)",
+      "no_cloud": true
     },
     "research_domain": "Ilmu Sosial Humaniora - Bahasa dan Sastra",
     "research_title": "KESADARAN BERBAHASA REMAJA MELALUI MEDIA PRIMA+ UNTUK MENGUATKAN LOYALITAS BAHASA INDONESIA DI LINGKUNGAN SEKOLAH"
