@@ -10,7 +10,7 @@ export default async function WorldPage() {
   const p = await currentParticipant();
   if (!p) redirect("/");
 
-  const prog = getWorldProgress(p.id);
+  const prog = await getWorldProgress(p.id);
   const total = EPISODES.length;
   const episodesDone = prog.episodesDone.length;
 

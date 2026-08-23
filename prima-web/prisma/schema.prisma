@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Participant {
+  id            Int      @id @default(autoincrement())
+  code          String   @unique
+  name          String
+  kelas         String
+  stage         String   @default("registered")
+  pretestTotal  Int?     @map("pretest_total")
+  posttestTotal Int?     @map("posttest_total")
+  gameScore     Int?     @map("game_score")
+  gameMax       Int?     @map("game_max")
+  reflection    String?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  worldProgress      WorldProgress?
+  pretestAnswers     PretestAnswer[]
+  gameAnswers        GameAnswer[]
+  posttestAnswers    PosttestAnswer[]
+  responseAnswers    ResponseAnswer[]
+
+  @@map("participants")
+}
+
+model WorldProgress {
+  participantId Int      @id @map("participant_id")
+  episodesDone  String   @default("[]") @map("episodes_done")
+  cards         String   @default("[]")
+  skills        String   @default("[]")
+  gameScores    String   @default("{}") @map("game_scores")
+  bossDefeated  Boolean  @default(false) @map("boss_defeated")
+
+  participant Participant @relation(fields: [participantId], references: [id])
+
+  @@map("world_progress")
+}
+
+model PretestAnswer {
+  id            Int    @id @default(autoincrement())
+  participantId Int    @map("participant_id")
+  itemId        Int    @map("item_id")
+  dimension     String
+  answer        String
+  score         Int
+
+  participant Participant @relation(fields: [participantId], references: [id])
+
+  @@map("pretest_answers")
+}
+
+model GameAnswer {
+  id            Int     @id @default(autoincrement())
+  participantId Int     @map("participant_id")
+  scenarioId    Int     @map("scenario_id")
+  construct     String
+  chosen        String?
+  isCorrect     Int?    @map("is_correct")
+
+  participant Participant @relation(fields: [participantId], references: [id])
+
+  @@map("game_answers")
+}
+
+model PosttestAnswer {
+  id            Int    @id @default(autoincrement())
+  participantId Int    @map("participant_id")
+  itemId        Int    @map("item_id")
+  dimension     String
+  answer        String
+  score         Int
+
+  participant Participant @relation(fields: [participantId], references: [id])
+
+  @@map("posttest_answers")
+}
+
+model ResponseAnswer {
+  id            Int    @id @default(autoincrement())
+  participantId Int    @map("participant_id")
+  itemId        Int    @map("item_id")
+  answer        String
+  score         Int
+
+  participant Participant @relation(fields: [participantId], references: [id])
+
+  @@map("response_answers")
+}
+
+model EduModule {
+  id        Int    @id @default(autoincrement())
+  sortOrder Int    @default(0) @map("sort_order")
+  title     String
+  dimension String @default("")
+  body      String
+
+  @@map("edu_modules")
+}
+
+model PretestItem {
+  id        Int    @id @default(autoincrement())
+  sortOrder Int    @default(0) @map("sort_order")
+  dimension String
+  statement String
+
+  @@map("pretest_items")
+}
+
+model GameScenario {
+  id          Int    @id @default(autoincrement())
+  sortOrder   Int    @default(0) @map("sort_order")
+  construct   String
+  caseType    String @map("case_type")
+  task        String
+  situation   String
+  optionsJson String @map("options_json")
+  feedback    String
+
+  @@map("game_scenarios")
+}
+
+model GameReflectionQuestion {
+  id        Int    @id @default(autoincrement())
+  sortOrder Int    @default(0) @map("sort_order")
+  question  String
+
+  @@map("game_reflection_questions")
+}
+
+model ResponseItem {
+  id        Int    @id @default(autoincrement())
+  sortOrder Int    @default(0) @map("sort_order")
+  statement String
+
+  @@map("response_items")
+}

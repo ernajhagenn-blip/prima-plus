@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { isAdminAuthed } from "@/lib/session";
-import { getDb } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 
 function csvEscape(value: unknown): string {
   const s = String(value ?? "");
@@ -20,36 +20,102 @@ function toCsv(rows: Record<string, unknown>[]): string {
   return lines.join("\n") + "\n";
 }
 
-const DATASETS = {
-  participants: `SELECT p.id, p.code, p.name, p.kelas, p.stage, p.pretest_total, p.posttest_total, p.game_score, p.game_max, p.reflection, p.created_at
-    FROM participants p ORDER BY p.id`,
-  pretest: `SELECT p.code, p.name, p.kelas, a.item_id, a.dimension, a.answer, a.score
-    FROM pretest_answers a JOIN participants p ON p.id = a.participant_id ORDER BY a.participant_id, a.item_id`,
-  game: `SELECT p.code, p.name, p.kelas, a.scenario_id, a.construct, a.chosen, a.is_correct
-    FROM game_answers a JOIN participants p ON p.id = a.participant_id ORDER BY a.participant_id, a.scenario_id`,
-  posttest: `SELECT p.code, p.name, p.kelas, a.item_id, a.dimension, a.answer, a.score
-    FROM posttest_answers a JOIN participants p ON p.id = a.participant_id ORDER BY a.participant_id, a.item_id`,
-  respons: `SELECT p.code, p.name, p.kelas, a.item_id, a.answer, a.score
-    FROM response_answers a JOIN participants p ON p.id = a.participant_id ORDER BY a.participant_id, a.item_id`,
-} as const;
+type DatasetKey = "participants" | "pretest" | "game" | "posttest" | "respons";
+
+async function fetchDataset(dataset: DatasetKey): Promise<Record<string, unknown>[]> {
+  switch (dataset) {
+    case "participants": {
+      const rows = await prisma.participant.findMany({ orderBy: { id: "asc" } });
+      return rows.map((r: typeof rows[0]) => ({
+        id: r.id,
+        code: r.code,
+        name: r.name,
+        kelas: r.kelas,
+        stage: r.stage,
+        pretest_total: r.pretestTotal,
+        posttest_total: r.posttestTotal,
+        game_score: r.gameScore,
+        game_max: r.gameMax,
+        reflection: r.reflection,
+        created_at: r.createdAt,
+      }));
+    }
+    case "pretest": {
+      const rows = await prisma.pretestAnswer.findMany({
+        orderBy: [{ participantId: "asc" }, { itemId: "asc" }],
+        include: { participant: { select: { code: true, name: true, kelas: true } } },
+      });
+      return rows.map((a: typeof rows[0]) => ({
+        code: a.participant.code,
+        name: a.participant.name,
+        kelas: a.participant.kelas,
+        item_id: a.itemId,
+        dimension: a.dimension,
+        answer: a.answer,
+        score: a.score,
+      }));
+    }
+    case "game": {
+      const rows = await prisma.gameAnswer.findMany({
+        orderBy: [{ participantId: "asc" }, { scenarioId: "asc" }],
+        include: { participant: { select: { code: true, name: true, kelas: true } } },
+      });
+      return rows.map((a: typeof rows[0]) => ({
+        code: a.participant.code,
+        name: a.participant.name,
+        kelas: a.participant.kelas,
+        scenario_id: a.scenarioId,
+        construct: a.construct,
+        chosen: a.chosen,
+        is_correct: a.isCorrect,
+      }));
+    }
+    case "posttest": {
+      const rows = await prisma.posttestAnswer.findMany({
+        orderBy: [{ participantId: "asc" }, { itemId: "asc" }],
+        include: { participant: { select: { code: true, name: true, kelas: true } } },
+      });
+      return rows.map((a: typeof rows[0]) => ({
+        code: a.participant.code,
+        name: a.participant.name,
+        kelas: a.participant.kelas,
+        item_id: a.itemId,
+        dimension: a.dimension,
+        answer: a.answer,
+        score: a.score,
+      }));
+    }
+    case "respons": {
+      const rows = await prisma.responseAnswer.findMany({
+        orderBy: [{ participantId: "asc" }, { itemId: "asc" }],
+        include: { participant: { select: { code: true, name: true, kelas: true } } },
+      });
+      return rows.map((a: typeof rows[0]) => ({
+        code: a.participant.code,
+        name: a.participant.name,
+        kelas: a.participant.kelas,
+        item_id: a.itemId,
+        answer: a.answer,
+        score: a.score,
+      }));
+    }
+  }
+}
 
 export async function GET(req: NextRequest) {
   if (!(await isAdminAuthed())) {
     return Response.json({ error: "Tidak berwenang" }, { status: 401 });
   }
 
-  const dataset = req.nextUrl.searchParams.get("dataset") as keyof typeof DATASETS | null;
-  const sql = dataset && dataset in DATASETS ? DATASETS[dataset] : DATASETS.participants;
+  const dataset = (req.nextUrl.searchParams.get("dataset") as DatasetKey | null) ?? "participants";
+  const rows = await fetchDataset(dataset);
 
-  const rows = getDb().prepare(sql).all() as Record<string, unknown>[];
-
-  const filename = dataset && dataset in DATASETS ? dataset : "participants";
   const body = "\uFEFF" + toCsv(rows);
 
   return new Response(body, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="prima_${filename}.csv"`,
+      "Content-Disposition": `attachment; filename="prima_${dataset}.csv"`,
     },
   });
 }

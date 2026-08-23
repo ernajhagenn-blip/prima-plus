@@ -4,7 +4,7 @@ import { completeEdu } from "@/app/actions";
 
 export default async function EdukasiPage() {
   const p = await requireParticipantAt("/edukasi");
-  const modules = getEduModules();
+  const modules = await getEduModules();
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">

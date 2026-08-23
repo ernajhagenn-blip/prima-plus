@@ -12,7 +12,7 @@ const RESPONSE_OPTIONS = [
 
 export default async function ResponsPage() {
   const p = await requireParticipantAt("/respons");
-  const items = getResponseItems();
+  const items = await getResponseItems();
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
