@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default async function CardsPage() {
   const p = await currentParticipant();
-  const progress = p ? await getWorldProgress(p.id) : null;
+  const progress = p ? getWorldProgress(p.id) : null;
   const owned = new Set(progress?.cards ?? []);
 
   const byCat = new Map<string, typeof LANGUAGE_CARDS>();

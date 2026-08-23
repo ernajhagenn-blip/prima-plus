@@ -1,19 +1,18 @@
 import { isAdminAuthed } from "@/lib/session";
-import { getEduModules, getPretestItems, getGameScenarios, getGameReflectionQuestions, getResponseItems } from "@/lib/db";
-import { prisma } from "@/lib/prisma";
+import { getDb, getEduModules, getPretestItems, getGameScenarios, getGameReflectionQuestions, getResponseItems } from "@/lib/db";
 import { AdminLogin } from "@/components/AdminLogin";
 import {
   adminLogout,
-  createEduModuleAction,
-  updateEduModuleAction,
-  createPretestItemAction,
-  updatePretestItemAction,
-  createGameScenarioAction,
-  updateGameScenarioAction,
-  createReflectionQuestionAction,
-  updateReflectionQuestionAction,
-  createResponseItemAction,
-  updateResponseItemAction,
+  createEduModule,
+  updateEduModule,
+  createPretestItem,
+  updatePretestItem,
+  createGameScenario,
+  updateGameScenario,
+  createReflectionQuestion,
+  updateReflectionQuestion,
+  createResponseItem,
+  updateResponseItem,
   adminDelete,
 } from "@/app/actions";
 import { GAME_CONSTRUCTS, LOYALTY_DIMENSIONS } from "@/lib/data";
@@ -40,37 +39,24 @@ export default async function AdminPage() {
     );
   }
 
-  const participants = await prisma.participant.findMany({ orderBy: { id: "asc" } });
-  const rows = participants.map((r: typeof participants[0]) => ({
-    id: r.id,
-    code: r.code,
-    name: r.name,
-    kelas: r.kelas,
-    stage: r.stage,
-    pretest_total: r.pretestTotal,
-    posttest_total: r.posttestTotal,
-    game_score: r.gameScore,
-    game_max: r.gameMax,
-    created_at: r.createdAt,
-  }));
+  const db = getDb();
+  const rows = db
+    .prepare(
+      `SELECT id, code, name, kelas, stage, pretest_total, posttest_total, game_score, game_max, created_at
+       FROM participants ORDER BY id`,
+    )
+    .all() as Record<string, unknown>[];
 
-  const summaryRow = await prisma.participant.aggregate({
-    _count: { id: true },
-    _avg: { pretestTotal: true, posttestTotal: true },
-  });
-  const doneCount = await prisma.participant.count({ where: { stage: "done" } });
-  const summary = {
-    total: summaryRow._count.id,
-    selesai: doneCount,
-    avg_pre: summaryRow._avg.pretestTotal,
-    avg_post: summaryRow._avg.posttestTotal,
-  };
-
-  const eduModules = await getEduModules();
-  const pretestItems = await getPretestItems();
-  const gameScenarios = await getGameScenarios();
-  const reflectionQuestions = await getGameReflectionQuestions();
-  const responseItems = await getResponseItems();
+  const summary = db
+    .prepare(
+      `SELECT
+         COUNT(*) AS total,
+         SUM(CASE WHEN stage = 'done' THEN 1 ELSE 0 END) AS selesai,
+         AVG(pretest_total) AS avg_pre,
+         AVG(posttest_total) AS avg_post
+       FROM participants`,
+    )
+    .get() as Record<string, unknown>;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
@@ -78,7 +64,7 @@ export default async function AdminPage() {
         <div>
           <h1 className="text-xl font-black text-gray-900">Panel Admin PRIMA+</h1>
           <p className="text-sm text-gray-600">
-            Data responden tersimpan di database PostgreSQL (sisi server).
+            Data responden tersimpan di database SQLite (sisi server).
           </p>
         </div>
         <form action={adminLogout}>
@@ -142,7 +128,7 @@ export default async function AdminPage() {
           <summary className="cursor-pointer text-sm font-semibold text-red-700">
             + Tambah modul baru
           </summary>
-          <form action={createEduModuleAction} className="mt-3 space-y-3">
+          <form action={createEduModule} className="mt-3 space-y-3">
             <input
               name="title"
               placeholder="Judul modul"
@@ -171,7 +157,7 @@ export default async function AdminPage() {
         </details>
 
         <div className="mt-4 space-y-3">
-          {eduModules.map((m, i) => (
+          {getEduModules().map((m, i) => (
             <div key={m.id} className="rounded-lg border border-gray-200 p-4">
               <p className="text-xs font-bold uppercase tracking-wide text-red-800">
                 Modul {i + 1} · {m.dimension}
@@ -181,7 +167,7 @@ export default async function AdminPage() {
                 <summary className="cursor-pointer text-sm font-medium text-gray-500 underline">
                   Ubah modul ini
                 </summary>
-                <form action={updateEduModuleAction} className="mt-3 space-y-3">
+                <form action={updateEduModule} className="mt-3 space-y-3">
                   <input type="hidden" name="id" value={String(m.id)} />
                   <input
                     name="title"
@@ -234,7 +220,7 @@ export default async function AdminPage() {
           <summary className="cursor-pointer text-sm font-semibold text-red-700">
             + Tambah butir baru
           </summary>
-          <form action={createPretestItemAction} className="mt-3 space-y-3">
+          <form action={createPretestItem} className="mt-3 space-y-3">
             <select
               name="dimension"
               required
@@ -264,7 +250,7 @@ export default async function AdminPage() {
         </details>
 
         <div className="mt-4 space-y-3">
-          {pretestItems.map((it, i) => (
+          {getPretestItems().map((it, i) => (
             <div key={it.id} className="rounded-lg border border-gray-200 p-4">
               <p className="text-xs font-bold uppercase tracking-wide text-red-800">
                 Butir {i + 1} · {it.dimension}
@@ -274,7 +260,7 @@ export default async function AdminPage() {
                 <summary className="cursor-pointer text-sm font-medium text-gray-500 underline">
                   Ubah butir ini
                 </summary>
-                <form action={updatePretestItemAction} className="mt-3 space-y-3">
+                <form action={updatePretestItem} className="mt-3 space-y-3">
                   <input type="hidden" name="id" value={String(it.id)} />
                   <select
                     name="dimension"
@@ -329,7 +315,7 @@ export default async function AdminPage() {
           <summary className="cursor-pointer text-sm font-semibold text-red-700">
             + Tambah kasus baru
           </summary>
-          <form action={createGameScenarioAction} className="mt-3 space-y-3">
+          <form action={createGameScenario} className="mt-3 space-y-3">
             <select
               name="construct"
               required
@@ -385,7 +371,7 @@ export default async function AdminPage() {
         </details>
 
         <div className="mt-4 space-y-3">
-          {gameScenarios.map((s, i) => (
+          {getGameScenarios().map((s, i) => (
             <div key={s.id} className="rounded-lg border border-gray-200 p-4">
               <p className="text-xs font-bold uppercase tracking-wide text-red-800">
                 Kasus {i + 1} · {s.construct} · {s.caseType}
@@ -395,7 +381,7 @@ export default async function AdminPage() {
                 <summary className="cursor-pointer text-sm font-medium text-gray-500 underline">
                   Ubah kasus ini
                 </summary>
-                <form action={updateGameScenarioAction} className="mt-3 space-y-3">
+                <form action={updateGameScenario} className="mt-3 space-y-3">
                   <input type="hidden" name="id" value={String(s.id)} />
                   <select
                     name="construct"
@@ -475,7 +461,7 @@ export default async function AdminPage() {
           <summary className="cursor-pointer text-sm font-semibold text-red-700">
             + Tambah pertanyaan
           </summary>
-          <form action={createReflectionQuestionAction} className="mt-3 space-y-3">
+          <form action={createReflectionQuestion} className="mt-3 space-y-3">
             <textarea
               name="question"
               placeholder="Pertanyaan refleksi"
@@ -493,7 +479,7 @@ export default async function AdminPage() {
         </details>
 
         <div className="mt-4 space-y-3">
-          {reflectionQuestions.map((q, i) => (
+          {getGameReflectionQuestions().map((q, i) => (
             <div key={q.id} className="rounded-lg border border-gray-200 p-4">
               <p className="text-xs font-bold uppercase tracking-wide text-red-800">Refleksi {i + 1}</p>
               <p className="font-semibold text-gray-900">{q.question}</p>
@@ -501,7 +487,7 @@ export default async function AdminPage() {
                 <summary className="cursor-pointer text-sm font-medium text-gray-500 underline">
                   Ubah pertanyaan ini
                 </summary>
-                <form action={updateReflectionQuestionAction} className="mt-3 space-y-3">
+                <form action={updateReflectionQuestion} className="mt-3 space-y-3">
                   <input type="hidden" name="id" value={String(q.id)} />
                   <textarea
                     name="question"
@@ -543,7 +529,7 @@ export default async function AdminPage() {
           <summary className="cursor-pointer text-sm font-semibold text-red-700">
             + Tambah butir baru
           </summary>
-          <form action={createResponseItemAction} className="mt-3 space-y-3">
+          <form action={createResponseItem} className="mt-3 space-y-3">
             <textarea
               name="statement"
               placeholder="Pernyataan angket respons"
@@ -561,7 +547,7 @@ export default async function AdminPage() {
         </details>
 
         <div className="mt-4 space-y-3">
-          {responseItems.map((it, i) => (
+          {getResponseItems().map((it, i) => (
             <div key={it.id} className="rounded-lg border border-gray-200 p-4">
               <p className="text-xs font-bold uppercase tracking-wide text-red-800">Butir {i + 1}</p>
               <p className="font-semibold text-gray-900">{it.statement}</p>
@@ -569,7 +555,7 @@ export default async function AdminPage() {
                 <summary className="cursor-pointer text-sm font-medium text-gray-500 underline">
                   Ubah butir ini
                 </summary>
-                <form action={updateResponseItemAction} className="mt-3 space-y-3">
+                <form action={updateResponseItem} className="mt-3 space-y-3">
                   <input type="hidden" name="id" value={String(it.id)} />
                   <textarea
                     name="statement"

@@ -12,10 +12,12 @@ const HookScene = dynamic(() => import("@/components/game/HookScene"), {
 });
 
 const LINES = [
-  { who: "RAGA", text: "Guys, nanti habis kelas kita meeting ya." },
-  { who: "KIRA", text: "Sure, tapi aku belum finish tugas." },
-  { who: "ALYA", text: "Yaudah, nanti aku update." },
-  { who: "MENTOR", text: "Eh. Kamu sadar nggak? Barusan kita ngomong kayak gimana?" },
+  { who: "RAGA", text: "Guys, nanti habis kelas kita meeting di kafe ya. Jangan lupa bawa laptop." },
+  { who: "KIRA", text: "Sure, tapi aku belum finish tugasnya. Deadline-nya kapan sih?" },
+  { who: "ALYA", text: "Yaudah, nanti aku update jadwalnya di grup. Santai aja." },
+  { who: "NARA", text: "Eh. Tunggu. Kamu sadar nggak? Barusan kita ngomong kayak gimana?" },
+  { who: "RAGA", text: "Hah? Normal kan? Emangnya kenapa?" },
+  { who: "NARA", text: "Coba dengerin lagi: 'meeting', 'finish', 'deadline', 'update'. Satu kalimat, empat bahasa asing. Kamu pilih itu karena butuh, atau karena kebiasaan?" },
 ];
 
 export default function HookScreen() {
@@ -35,6 +37,7 @@ export default function HookScreen() {
             </p>
             <p className="mt-4 text-sm text-white/70">
               Bahasa bukan cuma soal kata. Cara kita bicara bentuk siapa kita — dan ke siapa kita lagi bicara.
+              Pertanyaannya: kamu MEMILIH, atau cuma IKUT KEBIASAAN?
             </p>
           <motion.button
             whileHover={{ scale: 1.06 }}

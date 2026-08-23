@@ -14,7 +14,7 @@ export async function currentParticipant(): Promise<SessionParticipant | null> {
   const cookieStore = await cookies();
   const id = Number(cookieStore.get(PARTICIPANT_COOKIE)?.value ?? 0);
   if (id <= 0) return null;
-  const row = await getParticipant(id);
+  const row = getParticipant(id);
   if (!row) return null;
   return row as unknown as SessionParticipant;
 }

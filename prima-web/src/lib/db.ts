@@ -1,4 +1,6 @@
-import { prisma } from "@/lib/prisma";
+import { DatabaseSync } from "node:sqlite";
+import fs from "node:fs";
+import path from "node:path";
 import {
   EDU_SEED,
   LOYALTY_ITEMS,
@@ -8,7 +10,22 @@ import {
 } from "@/lib/data";
 import type { Scenario, ScenarioOption } from "@/lib/data";
 
-export { prisma as getDb };
+const PRIMA_ROOT = process.env.PRIMA_ROOT || "D:\\opsi2026\\prima-web";
+const DATA_DIR = path.join(PRIMA_ROOT, "data");
+const DB_PATH = path.join(DATA_DIR, "prima.db");
+
+function ensureDir() {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+}
+
+function toPlainList<T>(rows: any[]): T[] {
+  return rows.map((r) => ({ ...r })) as T[];
+}
+function toPlainOne<T>(row: any): T {
+  return row ? ({ ...row } as T) : (row as T);
+}
 
 export type Stage =
   | "registered"
@@ -18,71 +35,157 @@ export type Stage =
   | "posttest_done"
   | "done";
 
-let seeded = false;
+function createTables(db: DatabaseSync) {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS participants (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      code TEXT UNIQUE NOT NULL,
+      name TEXT NOT NULL,
+      kelas TEXT NOT NULL,
+      stage TEXT NOT NULL DEFAULT 'registered',
+      pretest_total INTEGER,
+      posttest_total INTEGER,
+      game_score INTEGER,
+      game_max INTEGER,
+      reflection TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+    );
 
-export async function ensureSeeded() {
-  if (seeded) return;
-  const [eduCount, pretestCount, scenarioCount, reflectionCount, responseCount] =
-    await Promise.all([
-      prisma.eduModule.count(),
-      prisma.pretestItem.count(),
-      prisma.gameScenario.count(),
-      prisma.gameReflectionQuestion.count(),
-      prisma.responseItem.count(),
-    ]);
+    CREATE TABLE IF NOT EXISTS world_progress (
+      participant_id INTEGER PRIMARY KEY,
+      episodes_done TEXT NOT NULL DEFAULT '[]',
+      cards TEXT NOT NULL DEFAULT '[]',
+      skills TEXT NOT NULL DEFAULT '[]',
+      game_scores TEXT NOT NULL DEFAULT '{}',
+      boss_defeated INTEGER NOT NULL DEFAULT 0,
+      FOREIGN KEY (participant_id) REFERENCES participants(id)
+    );
 
-  if (eduCount === 0) {
-    await prisma.eduModule.createMany({
-      data: EDU_SEED.map((m, i) => ({
-        sortOrder: i + 1,
-        title: m.title,
-        dimension: m.dimension,
-        body: m.body,
-      })),
-    });
-  }
-  if (pretestCount === 0) {
-    await prisma.pretestItem.createMany({
-      data: LOYALTY_ITEMS.map((it, i) => ({
-        sortOrder: i + 1,
-        dimension: it.dimension,
-        statement: it.statement,
-      })),
-    });
-  }
-  if (scenarioCount === 0) {
-    await prisma.gameScenario.createMany({
-      data: SCENARIOS.map((s, i) => ({
-        sortOrder: i + 1,
-        construct: s.construct,
-        caseType: s.caseType,
-        task: s.task,
-        situation: s.situation,
-        optionsJson: JSON.stringify(s.options),
-        feedback: s.feedback,
-      })),
-    });
-  }
-  if (reflectionCount === 0) {
-    await prisma.gameReflectionQuestion.createMany({
-      data: GAME_REFLECTION_QUESTIONS.map((q, i) => ({
-        sortOrder: i + 1,
-        question: q,
-      })),
-    });
-  }
-  if (responseCount === 0) {
-    await prisma.responseItem.createMany({
-      data: RESPONSE_ITEMS.map((it, i) => ({
-        sortOrder: i + 1,
-        statement: it.statement,
-      })),
-    });
-  }
-  seeded = true;
+    CREATE TABLE IF NOT EXISTS pretest_answers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      participant_id INTEGER NOT NULL,
+      item_id INTEGER NOT NULL,
+      dimension TEXT NOT NULL,
+      answer TEXT NOT NULL,
+      score INTEGER NOT NULL,
+      FOREIGN KEY (participant_id) REFERENCES participants(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS game_answers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      participant_id INTEGER NOT NULL,
+      scenario_id INTEGER NOT NULL,
+      construct TEXT NOT NULL,
+      chosen TEXT,
+      is_correct INTEGER,
+      FOREIGN KEY (participant_id) REFERENCES participants(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS posttest_answers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      participant_id INTEGER NOT NULL,
+      item_id INTEGER NOT NULL,
+      dimension TEXT NOT NULL,
+      answer TEXT NOT NULL,
+      score INTEGER NOT NULL,
+      FOREIGN KEY (participant_id) REFERENCES participants(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS response_answers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      participant_id INTEGER NOT NULL,
+      item_id INTEGER NOT NULL,
+      answer TEXT NOT NULL,
+      score INTEGER NOT NULL,
+      FOREIGN KEY (participant_id) REFERENCES participants(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS edu_modules (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      title TEXT NOT NULL,
+      dimension TEXT NOT NULL DEFAULT '',
+      body TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS pretest_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      dimension TEXT NOT NULL,
+      statement TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS game_scenarios (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      construct TEXT NOT NULL,
+      case_type TEXT NOT NULL,
+      task TEXT NOT NULL,
+      situation TEXT NOT NULL,
+      options_json TEXT NOT NULL,
+      feedback TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS game_reflection_questions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      question TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS response_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      statement TEXT NOT NULL
+    );
+  `);
 }
 
-// ---- Interfaces ----
+function seedEduModules(db: DatabaseSync) {
+  const { n } = db.prepare("SELECT COUNT(*) AS n FROM edu_modules").get() as { n: number };
+  if (n > 0) return;
+  const ins = db.prepare(
+    "INSERT INTO edu_modules (sort_order, title, dimension, body) VALUES (?, ?, ?, ?)",
+  );
+  EDU_SEED.forEach((m, i) => ins.run(i + 1, m.title, m.dimension, m.body));
+}
+
+function seedContentTables(db: DatabaseSync) {
+  if ((db.prepare("SELECT COUNT(*) AS n FROM pretest_items").get() as { n: number }).n === 0) {
+    const ins = db.prepare("INSERT INTO pretest_items (sort_order, dimension, statement) VALUES (?, ?, ?)");
+    LOYALTY_ITEMS.forEach((it, i) => ins.run(i + 1, it.dimension, it.statement));
+  }
+  if ((db.prepare("SELECT COUNT(*) AS n FROM game_scenarios").get() as { n: number }).n === 0) {
+    const ins = db.prepare(
+      "INSERT INTO game_scenarios (sort_order, construct, case_type, task, situation, options_json, feedback) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    );
+    SCENARIOS.forEach((s, i) =>
+      ins.run(i + 1, s.construct, s.caseType, s.task, s.situation, JSON.stringify(s.options), s.feedback),
+    );
+  }
+  if ((db.prepare("SELECT COUNT(*) AS n FROM game_reflection_questions").get() as { n: number }).n === 0) {
+    const ins = db.prepare("INSERT INTO game_reflection_questions (sort_order, question) VALUES (?, ?)");
+    GAME_REFLECTION_QUESTIONS.forEach((q, i) => ins.run(i + 1, q));
+  }
+  if ((db.prepare("SELECT COUNT(*) AS n FROM response_items").get() as { n: number }).n === 0) {
+    const ins = db.prepare("INSERT INTO response_items (sort_order, statement) VALUES (?, ?)");
+    RESPONSE_ITEMS.forEach((it, i) => ins.run(i + 1, it.statement));
+  }
+}
+
+let db: DatabaseSync | null = null;
+
+export function getDb(): DatabaseSync {
+  if (!db) {
+    ensureDir();
+    db = new DatabaseSync(DB_PATH);
+    db.exec("PRAGMA journal_mode = WAL;");
+    db.exec("PRAGMA foreign_keys = ON;");
+    createTables(db);
+    seedEduModules(db);
+    seedContentTables(db);
+  }
+  return db;
+}
 
 export interface EduModuleRow {
   id: number;
@@ -92,13 +195,67 @@ export interface EduModuleRow {
   body: string;
 }
 
+export function getEduModules(): EduModuleRow[] {
+  return toPlainList<EduModuleRow>(
+    getDb()
+      .prepare("SELECT id, sort_order, title, dimension, body FROM edu_modules ORDER BY sort_order, id")
+      .all() as any,
+  );
+}
+
+export function getEduModule(id: number): EduModuleRow | undefined {
+  return toPlainOne<EduModuleRow | undefined>(
+    getDb()
+      .prepare("SELECT id, sort_order, title, dimension, body FROM edu_modules WHERE id = ?")
+      .get(id) as any,
+  );
+}
+
+export function createEduModule(title: string, dimension: string, body: string): number {
+  const info = getDb()
+    .prepare("INSERT INTO edu_modules (sort_order, title, dimension, body) VALUES ((SELECT COALESCE(MAX(sort_order),0)+1 FROM edu_modules), ?, ?, ?)")
+    .run(title, dimension, body);
+  return Number(info.lastInsertRowid);
+}
+
+export function updateEduModule(id: number, title: string, dimension: string, body: string): void {
+  getDb()
+    .prepare("UPDATE edu_modules SET title = ?, dimension = ?, body = ? WHERE id = ?")
+    .run(title, dimension, body, id);
+}
+
+export function deleteEduModule(id: number): void {
+  getDb().prepare("DELETE FROM edu_modules WHERE id = ?").run(id);
+}
+
+// ---- Pretest / posttest items (instrumen Likert, dipakai pretest & posttest) ----
 export interface PretestItemRow {
   id: number;
   sort_order: number;
   dimension: string;
   statement: string;
 }
+export function getPretestItems(): PretestItemRow[] {
+  return toPlainList<PretestItemRow>(
+    getDb()
+      .prepare("SELECT id, sort_order, dimension, statement FROM pretest_items ORDER BY sort_order, id")
+      .all() as any,
+  );
+}
+export function createPretestItem(dimension: string, statement: string): number {
+  const info = getDb()
+    .prepare("INSERT INTO pretest_items (sort_order, dimension, statement) VALUES ((SELECT COALESCE(MAX(sort_order),0)+1 FROM pretest_items), ?, ?)")
+    .run(dimension, statement);
+  return Number(info.lastInsertRowid);
+}
+export function updatePretestItem(id: number, dimension: string, statement: string): void {
+  getDb().prepare("UPDATE pretest_items SET dimension = ?, statement = ? WHERE id = ?").run(dimension, statement, id);
+}
+export function deletePretestItem(id: number): void {
+  getDb().prepare("DELETE FROM pretest_items WHERE id = ?").run(id);
+}
 
+// ---- Game scenarios (CHOOSE) ----
 export interface GameScenarioRow {
   id: number;
   sort_order: number;
@@ -109,34 +266,9 @@ export interface GameScenarioRow {
   options: ScenarioOption[];
   feedback: string;
 }
-
-export interface ReflectionQuestionRow {
-  id: number;
-  sort_order: number;
-  question: string;
-}
-
-export interface ResponseItemRow {
-  id: number;
-  sort_order: number;
-  statement: string;
-}
-
-export interface WorldProgress {
-  participantId: number;
-  episodesDone: number[];
-  cards: string[];
-  skills: string[];
-  gameScores: Record<string, number>;
-  bossDefeated: boolean;
-}
-
-// ---- Helper functions (unchanged) ----
-
 export function gameOptionsToText(options: ScenarioOption[]): string {
   return options.map((o) => `${o.key}|${o.text}|${o.correct}`).join("\n");
 }
-
 export function textToGameOptions(text: string): ScenarioOption[] {
   return text
     .split("\n")
@@ -151,119 +283,34 @@ export function textToGameOptions(text: string): ScenarioOption[] {
       return { key, text: body, correct: correct === "true" };
     });
 }
-
-// ---- EduModule CRUD ----
-
-export async function getEduModules(): Promise<EduModuleRow[]> {
-  await ensureSeeded();
-  const rows = await prisma.eduModule.findMany({ orderBy: [{ sortOrder: "asc" }, { id: "asc" }] });
-  return rows.map((r) => ({
-    id: r.id,
-    sort_order: r.sortOrder,
-    title: r.title,
-    dimension: r.dimension,
-    body: r.body,
-  }));
-}
-
-export async function getEduModule(id: number): Promise<EduModuleRow | undefined> {
-  await ensureSeeded();
-  const r = await prisma.eduModule.findUnique({ where: { id } });
-  if (!r) return undefined;
-  return {
-    id: r.id,
-    sort_order: r.sortOrder,
-    title: r.title,
-    dimension: r.dimension,
-    body: r.body,
-  };
-}
-
-export async function createEduModule(title: string, dimension: string, body: string): Promise<number> {
-  const max = await prisma.eduModule.aggregate({ _max: { sortOrder: true } });
-  const r = await prisma.eduModule.create({
-    data: { sortOrder: (max._max.sortOrder ?? 0) + 1, title, dimension, body },
-  });
-  return r.id;
-}
-
-export async function updateEduModule(id: number, title: string, dimension: string, body: string): Promise<void> {
-  await prisma.eduModule.update({ where: { id }, data: { title, dimension, body } });
-}
-
-export async function deleteEduModule(id: number): Promise<void> {
-  await prisma.eduModule.delete({ where: { id } });
-}
-
-// ---- Pretest Items (instrumen Likert) ----
-
-export async function getPretestItems(): Promise<PretestItemRow[]> {
-  await ensureSeeded();
-  const rows = await prisma.pretestItem.findMany({ orderBy: [{ sortOrder: "asc" }, { id: "asc" }] });
-  return rows.map((r) => ({
-    id: r.id,
-    sort_order: r.sortOrder,
-    dimension: r.dimension,
-    statement: r.statement,
-  }));
-}
-
-export async function createPretestItem(dimension: string, statement: string): Promise<number> {
-  const max = await prisma.pretestItem.aggregate({ _max: { sortOrder: true } });
-  const r = await prisma.pretestItem.create({
-    data: { sortOrder: (max._max.sortOrder ?? 0) + 1, dimension, statement },
-  });
-  return r.id;
-}
-
-export async function updatePretestItem(id: number, dimension: string, statement: string): Promise<void> {
-  await prisma.pretestItem.update({ where: { id }, data: { dimension, statement } });
-}
-
-export async function deletePretestItem(id: number): Promise<void> {
-  await prisma.pretestItem.delete({ where: { id } });
-}
-
-// ---- Game Scenarios ----
-
-export async function getGameScenarios(): Promise<Scenario[]> {
-  await ensureSeeded();
-  const rows = await prisma.gameScenario.findMany({ orderBy: [{ sortOrder: "asc" }, { id: "asc" }] });
+export function getGameScenarios(): Scenario[] {
+  const rows = getDb()
+    .prepare("SELECT id, sort_order, construct, case_type, task, situation, options_json, feedback FROM game_scenarios ORDER BY sort_order, id")
+    .all() as unknown as { id: number; sort_order: number; construct: string; case_type: string; task: string; situation: string; options_json: string; feedback: string }[];
   return rows.map((r) => ({
     id: r.id,
     construct: r.construct,
-    caseType: r.caseType,
+    caseType: r.case_type,
     task: r.task,
     situation: r.situation,
-    options: JSON.parse(r.optionsJson) as ScenarioOption[],
+    options: JSON.parse(r.options_json) as ScenarioOption[],
     feedback: r.feedback,
   }));
 }
-
-export async function createGameScenario(
+export function createGameScenario(
   construct: string,
   case_type: string,
   task: string,
   situation: string,
   options: ScenarioOption[],
   feedback: string,
-): Promise<number> {
-  const max = await prisma.gameScenario.aggregate({ _max: { sortOrder: true } });
-  const r = await prisma.gameScenario.create({
-    data: {
-      sortOrder: (max._max.sortOrder ?? 0) + 1,
-      construct,
-      caseType: case_type,
-      task,
-      situation,
-      optionsJson: JSON.stringify(options),
-      feedback,
-    },
-  });
-  return r.id;
+): number {
+  const info = getDb()
+    .prepare("INSERT INTO game_scenarios (sort_order, construct, case_type, task, situation, options_json, feedback) VALUES ((SELECT COALESCE(MAX(sort_order),0)+1 FROM game_scenarios), ?, ?, ?, ?, ?, ?)")
+    .run(construct, case_type, task, situation, JSON.stringify(options), feedback);
+  return Number(info.lastInsertRowid);
 }
-
-export async function updateGameScenario(
+export function updateGameScenario(
   id: number,
   construct: string,
   case_type: string,
@@ -271,175 +318,164 @@ export async function updateGameScenario(
   situation: string,
   options: ScenarioOption[],
   feedback: string,
-): Promise<void> {
-  await prisma.gameScenario.update({
-    where: { id },
-    data: { construct, caseType: case_type, task, situation, optionsJson: JSON.stringify(options), feedback },
-  });
+): void {
+  getDb()
+    .prepare("UPDATE game_scenarios SET construct = ?, case_type = ?, task = ?, situation = ?, options_json = ?, feedback = ? WHERE id = ?")
+    .run(construct, case_type, task, situation, JSON.stringify(options), feedback, id);
+}
+export function deleteGameScenario(id: number): void {
+  getDb().prepare("DELETE FROM game_scenarios WHERE id = ?").run(id);
 }
 
-export async function deleteGameScenario(id: number): Promise<void> {
-  await prisma.gameScenario.delete({ where: { id } });
+// ---- Game reflection questions (D.6) ----
+export interface ReflectionQuestionRow {
+  id: number;
+  sort_order: number;
+  question: string;
+}
+export function getGameReflectionQuestions(): ReflectionQuestionRow[] {
+  return toPlainList<ReflectionQuestionRow>(
+    getDb()
+      .prepare("SELECT id, sort_order, question FROM game_reflection_questions ORDER BY sort_order, id")
+      .all() as any,
+  );
+}
+export function createReflectionQuestion(question: string): number {
+  const info = getDb()
+    .prepare("INSERT INTO game_reflection_questions (sort_order, question) VALUES ((SELECT COALESCE(MAX(sort_order),0)+1 FROM game_reflection_questions), ?)")
+    .run(question);
+  return Number(info.lastInsertRowid);
+}
+export function updateReflectionQuestion(id: number, question: string): void {
+  getDb().prepare("UPDATE game_reflection_questions SET question = ? WHERE id = ?").run(question, id);
+}
+export function deleteReflectionQuestion(id: number): void {
+  getDb().prepare("DELETE FROM game_reflection_questions WHERE id = ?").run(id);
 }
 
-// ---- Game Reflection Questions ----
-
-export async function getGameReflectionQuestions(): Promise<ReflectionQuestionRow[]> {
-  await ensureSeeded();
-  const rows = await prisma.gameReflectionQuestion.findMany({ orderBy: [{ sortOrder: "asc" }, { id: "asc" }] });
-  return rows.map((r) => ({
-    id: r.id,
-    sort_order: r.sortOrder,
-    question: r.question,
-  }));
+// ---- Response items (angket respons) ----
+export interface ResponseItemRow {
+  id: number;
+  sort_order: number;
+  statement: string;
+}
+export function getResponseItems(): ResponseItemRow[] {
+  return toPlainList<ResponseItemRow>(
+    getDb()
+      .prepare("SELECT id, sort_order, statement FROM response_items ORDER BY sort_order, id")
+      .all() as any,
+  );
+}
+export function createResponseItem(statement: string): number {
+  const info = getDb()
+    .prepare("INSERT INTO response_items (sort_order, statement) VALUES ((SELECT COALESCE(MAX(sort_order),0)+1 FROM response_items), ?)")
+    .run(statement);
+  return Number(info.lastInsertRowid);
+}
+export function updateResponseItem(id: number, statement: string): void {
+  getDb().prepare("UPDATE response_items SET statement = ? WHERE id = ?").run(statement, id);
+}
+export function deleteResponseItem(id: number): void {
+  getDb().prepare("DELETE FROM response_items WHERE id = ?").run(id);
 }
 
-export async function createReflectionQuestion(question: string): Promise<number> {
-  const max = await prisma.gameReflectionQuestion.aggregate({ _max: { sortOrder: true } });
-  const r = await prisma.gameReflectionQuestion.create({
-    data: { sortOrder: (max._max.sortOrder ?? 0) + 1, question },
-  });
-  return r.id;
+export function getParticipant(id: number) {
+  const row = getDb()
+    .prepare("SELECT * FROM participants WHERE id = ?")
+    .get(id);
+  return toPlainOne<Record<string, unknown> | undefined>(row as any);
 }
 
-export async function updateReflectionQuestion(id: number, question: string): Promise<void> {
-  await prisma.gameReflectionQuestion.update({ where: { id }, data: { question } });
+export function getParticipantByCode(code: string) {
+  const row = getDb()
+    .prepare("SELECT * FROM participants WHERE code = ?")
+    .get(code);
+  return toPlainOne<Record<string, unknown> | undefined>(row as any);
 }
 
-export async function deleteReflectionQuestion(id: number): Promise<void> {
-  await prisma.gameReflectionQuestion.delete({ where: { id } });
+export function runTx(db: DatabaseSync, fn: () => void) {
+  db.exec("BEGIN");
+  try {
+    fn();
+    db.exec("COMMIT");
+  } catch (err) {
+    db.exec("ROLLBACK");
+    throw err;
+  }
 }
-
-// ---- Response Items (angket respons) ----
-
-export async function getResponseItems(): Promise<ResponseItemRow[]> {
-  await ensureSeeded();
-  const rows = await prisma.responseItem.findMany({ orderBy: [{ sortOrder: "asc" }, { id: "asc" }] });
-  return rows.map((r) => ({
-    id: r.id,
-    sort_order: r.sortOrder,
-    statement: r.statement,
-  }));
-}
-
-export async function createResponseItem(statement: string): Promise<number> {
-  const max = await prisma.responseItem.aggregate({ _max: { sortOrder: true } });
-  const r = await prisma.responseItem.create({
-    data: { sortOrder: (max._max.sortOrder ?? 0) + 1, statement },
-  });
-  return r.id;
-}
-
-export async function updateResponseItem(id: number, statement: string): Promise<void> {
-  await prisma.responseItem.update({ where: { id }, data: { statement } });
-}
-
-export async function deleteResponseItem(id: number): Promise<void> {
-  await prisma.responseItem.delete({ where: { id } });
-}
-
-// ---- Participants ----
-
-export async function getParticipant(id: number) {
-  return prisma.participant.findUnique({ where: { id } });
-}
-
-export async function getParticipantByCode(code: string) {
-  return prisma.participant.findUnique({ where: { code } });
-}
-
-// ---- Transactions ----
-
-export async function runTx<T>(fn: (tx: any) => Promise<T>): Promise<T> {
-  return prisma.$transaction(fn);
-}
-
-// ---- Reset (no-op with Prisma) ----
 
 export function resetDb() {
-  // no-op
-}
-
-// ---- World Progress ----
-
-function parseJson<T>(s: string, fallback: T): T {
-  try {
-    return JSON.parse(s) as T;
-  } catch {
-    return fallback;
+  if (db) {
+    db.close();
+    db = null;
   }
 }
 
-export async function getWorldProgress(pid: number): Promise<WorldProgress> {
-  const row = await prisma.worldProgress.findUnique({ where: { participantId: pid } });
+export interface WorldProgress {
+  participantId: number;
+  episodesDone: number[];
+  cards: string[];
+  skills: string[];
+  gameScores: Record<string, number>;
+  bossDefeated: boolean;
+}
+
+export function getWorldProgress(pid: number): WorldProgress {
+  const row = getDb()
+    .prepare("SELECT episodes_done, cards, skills, game_scores, boss_defeated FROM world_progress WHERE participant_id = ?")
+    .get(pid) as
+    | { episodes_done: string; cards: string; skills: string; game_scores: string; boss_defeated: number }
+    | undefined;
   if (!row) {
-    await prisma.worldProgress.upsert({
-      where: { participantId: pid },
-      create: { participantId: pid },
-      update: {},
-    });
-    return {
-      participantId: pid,
-      episodesDone: [],
-      cards: [],
-      skills: [],
-      gameScores: {},
-      bossDefeated: false,
-    };
+    getDb()
+      .prepare("INSERT OR IGNORE INTO world_progress (participant_id) VALUES (?)")
+      .run(pid);
+    return { participantId: pid, episodesDone: [], cards: [], skills: [], gameScores: {}, bossDefeated: false };
   }
+  const j = (s: string, d: unknown) => {
+    try { return JSON.parse(s); } catch { return d; }
+  };
   return {
     participantId: pid,
-    episodesDone: parseJson<number[]>(row.episodesDone, []),
-    cards: parseJson<string[]>(row.cards, []),
-    skills: parseJson<string[]>(row.skills, []),
-    gameScores: parseJson<Record<string, number>>(row.gameScores, {}),
-    bossDefeated: row.bossDefeated,
+    episodesDone: j(row.episodes_done, []) as number[],
+    cards: j(row.cards, []) as string[],
+    skills: j(row.skills, []) as string[],
+    gameScores: j(row.game_scores, {}) as Record<string, number>,
+    bossDefeated: row.boss_defeated === 1,
   };
 }
 
-async function saveProgress(p: WorldProgress): Promise<void> {
-  await prisma.worldProgress.upsert({
-    where: { participantId: p.participantId },
-    create: {
-      participantId: p.participantId,
-      episodesDone: JSON.stringify(p.episodesDone),
-      cards: JSON.stringify(p.cards),
-      skills: JSON.stringify(p.skills),
-      gameScores: JSON.stringify(p.gameScores),
-      bossDefeated: p.bossDefeated,
-    },
-    update: {
-      episodesDone: JSON.stringify(p.episodesDone),
-      cards: JSON.stringify(p.cards),
-      skills: JSON.stringify(p.skills),
-      gameScores: JSON.stringify(p.gameScores),
-      bossDefeated: p.bossDefeated,
-    },
-  });
+function saveProgress(p: WorldProgress) {
+  getDb()
+    .prepare(
+      "INSERT INTO world_progress (participant_id, episodes_done, cards, skills, game_scores, boss_defeated) VALUES (?, ?, ?, ?, ?, ?) " +
+        "ON CONFLICT(participant_id) DO UPDATE SET episodes_done=excluded.episodes_done, cards=excluded.cards, skills=excluded.skills, game_scores=excluded.game_scores, boss_defeated=excluded.boss_defeated",
+    )
+    .run(p.participantId, JSON.stringify(p.episodesDone), JSON.stringify(p.cards), JSON.stringify(p.skills), JSON.stringify(p.gameScores), p.bossDefeated ? 1 : 0);
 }
 
-export async function awardEpisode(pid: number, episodeId: number, card: string, skill: string): Promise<void> {
-  const p = await getWorldProgress(pid);
+export function awardEpisode(pid: number, episodeId: number, card: string, skill: string) {
+  const p = getWorldProgress(pid);
   if (!p.episodesDone.includes(episodeId)) p.episodesDone.push(episodeId);
   if (card && !p.cards.includes(card)) p.cards.push(card);
   if (skill && !p.skills.includes(skill)) p.skills.push(skill);
-  await saveProgress(p);
+  saveProgress(p);
 }
 
-export async function awardCard(pid: number, card: string): Promise<void> {
-  const p = await getWorldProgress(pid);
+export function awardCard(pid: number, card: string) {
+  const p = getWorldProgress(pid);
   if (card && !p.cards.includes(card)) p.cards.push(card);
-  await saveProgress(p);
+  saveProgress(p);
 }
 
-export async function recordGameScore(pid: number, game: string, score: number): Promise<void> {
-  const p = await getWorldProgress(pid);
+export function recordGameScore(pid: number, game: string, score: number) {
+  const p = getWorldProgress(pid);
   p.gameScores[game] = Math.max(p.gameScores[game] ?? 0, score);
-  await saveProgress(p);
+  saveProgress(p);
 }
 
-export async function setBossDefeated(pid: number, defeated = true): Promise<void> {
-  const p = await getWorldProgress(pid);
+export function setBossDefeated(pid: number, defeated = true) {
+  const p = getWorldProgress(pid);
   p.bossDefeated = defeated;
-  await saveProgress(p);
+  saveProgress(p);
 }

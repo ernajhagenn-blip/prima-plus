@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import {
+  getDb,
   getParticipant,
   runTx,
   type Stage,
@@ -14,6 +15,8 @@ import {
   createEduModule as createEduModuleDb,
   updateEduModule as updateEduModuleDb,
   deleteEduModule as deleteEduModuleDb,
+} from "@/lib/db";
+import {
   createPretestItem as createPretestItemDb,
   updatePretestItem as updatePretestItemDb,
   deletePretestItem as deletePretestItemDb,
@@ -27,21 +30,16 @@ import {
   updateResponseItem as updateResponseItemDb,
   deleteResponseItem as deleteResponseItemDb,
   textToGameOptions,
-  awardEpisode as awardEpisodeDb,
-  recordGameScore as recordGameScoreDb,
-  awardCard as awardCardDb,
-  setBossDefeated as setBossDefeatedDb,
 } from "@/lib/db";
-import { prisma } from "@/lib/prisma";
 import { PARTICIPANT_COOKIE, ADMIN_COOKIE } from "@/lib/constants";
-import { LIKERT_OPTIONS, EPISODES } from "@/lib/data";
+import { LIKERT_OPTIONS } from "@/lib/data";
 import { pageForStage } from "@/lib/flow";
 import { isAdminAuthed } from "@/lib/session";
 
 async function requireParticipant() {
   const cookieStore = await cookies();
   const id = Number(cookieStore.get(PARTICIPANT_COOKIE)?.value ?? 0);
-  const p = id > 0 ? await getParticipant(id) : undefined;
+  const p = id > 0 ? getParticipant(id) : undefined;
   if (!p) return null;
   return p as { id: number; name: string; kelas: string; stage: Stage };
 }
@@ -51,6 +49,8 @@ function scoreValue(answer: string | null): number {
   return opt?.score ?? 0;
 }
 
+
+
 export async function registerParticipant(prevState: unknown, formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const kelas = String(formData.get("kelas") ?? "").trim();
@@ -58,14 +58,21 @@ export async function registerParticipant(prevState: unknown, formData: FormData
     return { error: "Nama dan kelas wajib diisi." };
   }
 
-  const count = await prisma.participant.count();
+  const db = getDb();
+  const count = (
+    db.prepare("SELECT COUNT(*) AS n FROM participants").get() as { n: number }
+  ).n;
   const code = `PRIMA-${String(count + 1).padStart(3, "0")}`;
-  const created = await prisma.participant.create({
-    data: { code, name, kelas, stage: "registered" },
-  });
+
+  const info = db
+    .prepare(
+      "INSERT INTO participants (code, name, kelas, stage) VALUES (?, ?, ?, 'registered')",
+    )
+    .run(code, name, kelas);
+  const id = Number(info.lastInsertRowid);
 
   const cookieStore = await cookies();
-  cookieStore.set(PARTICIPANT_COOKIE, String(created.id), {
+  cookieStore.set(PARTICIPANT_COOKIE, String(id), {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
@@ -82,14 +89,16 @@ export async function startJourney(prevState: unknown, formData: FormData) {
     return { error: "Nama dan kelas wajib diisi." };
   }
 
-  const count = await prisma.participant.count();
+  const db = getDb();
+  const count = (db.prepare("SELECT COUNT(*) AS n FROM participants").get() as { n: number }).n;
   const code = `PRIMA-${String(count + 1).padStart(3, "0")}`;
-  const created = await prisma.participant.create({
-    data: { code, name, kelas, stage: "registered" },
-  });
+  const info = db
+    .prepare("INSERT INTO participants (code, name, kelas, stage) VALUES (?, ?, ?, 'registered')")
+    .run(code, name, kelas);
+  const id = Number(info.lastInsertRowid);
 
   const cookieStore = await cookies();
-  cookieStore.set(PARTICIPANT_COOKIE, String(created.id), {
+  cookieStore.set(PARTICIPANT_COOKIE, String(id), {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
@@ -103,9 +112,9 @@ export async function submitPretest(prevState: unknown, formData: FormData) {
   const p = await requireParticipant();
   if (!p) return { error: "Sesi tidak ditemukan. Silakan daftar ulang." };
 
-  const answers: { item_id: number; dimension: string; answer: string; score: number }[] = [];
-  const pretestItems = await getPretestItems();
-  for (const item of pretestItems) {
+  const answers: { item_id: number; dimension: string; answer: string; score: number }[] =
+    [];
+  for (const item of getPretestItems()) {
     const value = String(formData.get(`q${item.id}`) ?? "");
     if (!value) {
       return { error: `Pertanyaan nomor ${item.id} belum dijawab.` };
@@ -118,28 +127,26 @@ export async function submitPretest(prevState: unknown, formData: FormData) {
     });
   }
 
-  const existing = await prisma.pretestAnswer.count({ where: { participantId: p.id } });
-  if (existing > 0) {
+  const db = getDb();
+  const existing = db
+    .prepare("SELECT COUNT(*) AS n FROM pretest_answers WHERE participant_id = ?")
+    .get(p.id) as { n: number };
+  if (existing.n > 0) {
     return { error: "Pretest sudah dikerjakan." };
   }
 
-  await runTx(async (tx) => {
+  const insert = db.prepare(
+    "INSERT INTO pretest_answers (participant_id, item_id, dimension, answer, score) VALUES (?, ?, ?, ?, ?)",
+  );
+  runTx(db, () => {
     for (const a of answers) {
-      await tx.pretestAnswer.create({
-        data: {
-          participantId: p.id,
-          itemId: a.item_id,
-          dimension: a.dimension,
-          answer: a.answer,
-          score: a.score,
-        },
-      });
+      insert.run(p.id, a.item_id, a.dimension, a.answer, a.score);
     }
     const total = answers.reduce((s, a) => s + a.score, 0);
-    await tx.participant.update({
-      where: { id: p.id },
-      data: { stage: "pretest_done", pretestTotal: total },
-    });
+    db.prepare("UPDATE participants SET stage = 'pretest_done', pretest_total = ? WHERE id = ?").run(
+      total,
+      p.id,
+    );
   });
 
   redirect("/edukasi");
@@ -149,15 +156,19 @@ export async function submitGame(formData: FormData) {
   const p = await requireParticipant();
   if (!p) return { error: "Sesi tidak ditemukan. Silakan daftar ulang." };
 
-  const existing = await prisma.gameAnswer.count({ where: { participantId: p.id } });
-  if (existing > 0) {
+  const db = getDb();
+  const existing = db
+    .prepare("SELECT COUNT(*) AS n FROM game_answers WHERE participant_id = ?")
+    .get(p.id) as { n: number };
+  if (existing.n > 0) {
     return { error: "Kuis PRIMA+ sudah dikerjakan." };
   }
 
   let score = 0;
-  const scenarios = await getGameScenarios();
+  const scenarios = getGameScenarios();
   const max = scenarios.length;
-  const rows: { scenario_id: number; construct: string; chosen: string | null; is_correct: number | null }[] = [];
+  const rows: { scenario_id: number; construct: string; chosen: string | null; is_correct: number | null }[] =
+    [];
 
   for (const scenario of scenarios) {
     if (scenario.options.length === 0) continue;
@@ -178,22 +189,16 @@ export async function submitGame(formData: FormData) {
     return { error: "Refleksi pada kasus terakhir wajib diisi." };
   }
 
-  await runTx(async (tx) => {
+  const insert = db.prepare(
+    "INSERT INTO game_answers (participant_id, scenario_id, construct, chosen, is_correct) VALUES (?, ?, ?, ?, ?)",
+  );
+  runTx(db, () => {
     for (const r of rows) {
-      await tx.gameAnswer.create({
-        data: {
-          participantId: p.id,
-          scenarioId: r.scenario_id,
-          construct: r.construct,
-          chosen: r.chosen,
-          isCorrect: r.is_correct,
-        },
-      });
+      insert.run(p.id, r.scenario_id, r.construct, r.chosen, r.is_correct);
     }
-    await tx.participant.update({
-      where: { id: p.id },
-      data: { stage: "game_done", gameScore: score, gameMax: max, reflection },
-    });
+    db.prepare(
+      "UPDATE participants SET stage = 'game_done', game_score = ?, game_max = ?, reflection = ? WHERE id = ?",
+    ).run(score, max, reflection, p.id);
   });
 
   redirect("/posttest");
@@ -203,9 +208,9 @@ export async function submitPosttest(prevState: unknown, formData: FormData) {
   const p = await requireParticipant();
   if (!p) return { error: "Sesi tidak ditemukan. Silakan daftar ulang." };
 
-  const answers: { item_id: number; dimension: string; answer: string; score: number }[] = [];
-  const pretestItems = await getPretestItems();
-  for (const item of pretestItems) {
+  const answers: { item_id: number; dimension: string; answer: string; score: number }[] =
+    [];
+  for (const item of getPretestItems()) {
     const value = String(formData.get(`q${item.id}`) ?? "");
     if (!value) {
       return { error: `Pertanyaan nomor ${item.id} belum dijawab.` };
@@ -218,28 +223,25 @@ export async function submitPosttest(prevState: unknown, formData: FormData) {
     });
   }
 
-  const existing = await prisma.posttestAnswer.count({ where: { participantId: p.id } });
-  if (existing > 0) {
+  const db = getDb();
+  const existing = db
+    .prepare("SELECT COUNT(*) AS n FROM posttest_answers WHERE participant_id = ?")
+    .get(p.id) as { n: number };
+  if (existing.n > 0) {
     return { error: "Posttest sudah dikerjakan." };
   }
 
-  await runTx(async (tx) => {
+  const insert = db.prepare(
+    "INSERT INTO posttest_answers (participant_id, item_id, dimension, answer, score) VALUES (?, ?, ?, ?, ?)",
+  );
+  runTx(db, () => {
     for (const a of answers) {
-      await tx.posttestAnswer.create({
-        data: {
-          participantId: p.id,
-          itemId: a.item_id,
-          dimension: a.dimension,
-          answer: a.answer,
-          score: a.score,
-        },
-      });
+      insert.run(p.id, a.item_id, a.dimension, a.answer, a.score);
     }
     const total = answers.reduce((s, a) => s + a.score, 0);
-    await tx.participant.update({
-      where: { id: p.id },
-      data: { stage: "posttest_done", posttestTotal: total },
-    });
+    db.prepare(
+      "UPDATE participants SET stage = 'posttest_done', posttest_total = ? WHERE id = ?",
+    ).run(total, p.id);
   });
 
   redirect("/respons");
@@ -250,8 +252,7 @@ export async function submitRespons(prevState: unknown, formData: FormData) {
   if (!p) return { error: "Sesi tidak ditemukan. Silakan daftar ulang." };
 
   const answers: { item_id: number; answer: string; score: number }[] = [];
-  const responseItems = await getResponseItems();
-  for (const item of responseItems) {
+  for (const item of getResponseItems()) {
     const value = String(formData.get(`r${item.id}`) ?? "");
     if (!value) {
       return { error: `Pernyataan nomor ${item.id} belum dijawab.` };
@@ -262,26 +263,22 @@ export async function submitRespons(prevState: unknown, formData: FormData) {
     answers.push({ item_id: item.id, answer: value, score });
   }
 
-  const existing = await prisma.responseAnswer.count({ where: { participantId: p.id } });
-  if (existing > 0) {
+  const db = getDb();
+  const existing = db
+    .prepare("SELECT COUNT(*) AS n FROM response_answers WHERE participant_id = ?")
+    .get(p.id) as { n: number };
+  if (existing.n > 0) {
     return { error: "Angket respons sudah dikerjakan." };
   }
 
-  await runTx(async (tx) => {
+  const insert = db.prepare(
+    "INSERT INTO response_answers (participant_id, item_id, answer, score) VALUES (?, ?, ?, ?)",
+  );
+  runTx(db, () => {
     for (const a of answers) {
-      await tx.responseAnswer.create({
-        data: {
-          participantId: p.id,
-          itemId: a.item_id,
-          answer: a.answer,
-          score: a.score,
-        },
-      });
+      insert.run(p.id, a.item_id, a.answer, a.score);
     }
-    await tx.participant.update({
-      where: { id: p.id },
-      data: { stage: "done" },
-    });
+    db.prepare("UPDATE participants SET stage = 'done' WHERE id = ?").run(p.id);
   });
 
   redirect("/selesai");
@@ -314,64 +311,61 @@ export async function completeEdu(_formData: FormData) {
   const p = await requireParticipant();
   if (!p) redirect("/");
   if (p.stage !== "pretest_done") redirect(pageForStage(p.stage));
-  await prisma.participant.update({
-    where: { id: p.id },
-    data: { stage: "educated" },
-  });
+  getDb().prepare("UPDATE participants SET stage = 'educated' WHERE id = ?").run(p.id);
   redirect("/game");
 }
 
-export async function createEduModuleAction(formData: FormData): Promise<void> {
+export async function createEduModule(formData: FormData): Promise<void> {
   if (!(await isAdminAuthed())) redirect("/admin");
   const title = String(formData.get("title") ?? "").trim();
   const dimension = String(formData.get("dimension") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
-  if (title && body) await createEduModuleDb(title, dimension, body);
+  if (title && body) createEduModuleDb(title, dimension, body);
   redirect("/admin");
 }
 
-export async function updateEduModuleAction(formData: FormData): Promise<void> {
+export async function updateEduModule(formData: FormData): Promise<void> {
   if (!(await isAdminAuthed())) redirect("/admin");
   const id = Number(formData.get("id") ?? 0);
   const title = String(formData.get("title") ?? "").trim();
   const dimension = String(formData.get("dimension") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
-  if (id && title && body) await updateEduModuleDb(id, title, dimension, body);
+  if (id && title && body) updateEduModuleDb(id, title, dimension, body);
   redirect("/admin");
 }
 
-export async function deleteEduModuleAction(formData: FormData) {
+export async function deleteEduModule(formData: FormData) {
   if (!(await isAdminAuthed())) redirect("/admin");
   const id = Number(formData.get("id") ?? 0);
-  if (id > 0) await deleteEduModuleDb(id);
+  if (id > 0) deleteEduModuleDb(id);
   redirect("/admin");
 }
 
 // ---- Pretest / posttest items ----
-export async function createPretestItemAction(formData: FormData): Promise<void> {
+export async function createPretestItem(formData: FormData): Promise<void> {
   if (!(await isAdminAuthed())) redirect("/admin");
   const dimension = String(formData.get("dimension") ?? "").trim();
   const statement = String(formData.get("statement") ?? "").trim();
-  if (dimension && statement) await createPretestItemDb(dimension, statement);
+  if (dimension && statement) createPretestItemDb(dimension, statement);
   redirect("/admin");
 }
-export async function updatePretestItemAction(formData: FormData): Promise<void> {
+export async function updatePretestItem(formData: FormData): Promise<void> {
   if (!(await isAdminAuthed())) redirect("/admin");
   const id = Number(formData.get("id") ?? 0);
   const dimension = String(formData.get("dimension") ?? "").trim();
   const statement = String(formData.get("statement") ?? "").trim();
-  if (id && dimension && statement) await updatePretestItemDb(id, dimension, statement);
+  if (id && dimension && statement) updatePretestItemDb(id, dimension, statement);
   redirect("/admin");
 }
-export async function deletePretestItemAction(formData: FormData): Promise<void> {
+export async function deletePretestItem(formData: FormData): Promise<void> {
   if (!(await isAdminAuthed())) redirect("/admin");
   const id = Number(formData.get("id") ?? 0);
-  if (id > 0) await deletePretestItemDb(id);
+  if (id > 0) deletePretestItemDb(id);
   redirect("/admin");
 }
 
 // ---- Game scenarios ----
-export async function createGameScenarioAction(formData: FormData): Promise<void> {
+export async function createGameScenario(formData: FormData): Promise<void> {
   if (!(await isAdminAuthed())) redirect("/admin");
   const construct = String(formData.get("construct") ?? "").trim();
   const case_type = String(formData.get("case_type") ?? "").trim();
@@ -381,11 +375,11 @@ export async function createGameScenarioAction(formData: FormData): Promise<void
   const feedback = String(formData.get("feedback") ?? "").trim();
   const options = textToGameOptions(optionsText);
   if (construct && case_type && task && situation && options.length > 0 && feedback) {
-    await createGameScenarioDb(construct, case_type, task, situation, options, feedback);
+    createGameScenarioDb(construct, case_type, task, situation, options, feedback);
   }
   redirect("/admin");
 }
-export async function updateGameScenarioAction(formData: FormData): Promise<void> {
+export async function updateGameScenario(formData: FormData): Promise<void> {
   if (!(await isAdminAuthed())) redirect("/admin");
   const id = Number(formData.get("id") ?? 0);
   const construct = String(formData.get("construct") ?? "").trim();
@@ -396,56 +390,56 @@ export async function updateGameScenarioAction(formData: FormData): Promise<void
   const feedback = String(formData.get("feedback") ?? "").trim();
   const options = textToGameOptions(optionsText);
   if (id && construct && case_type && task && situation && options.length > 0 && feedback) {
-    await updateGameScenarioDb(id, construct, case_type, task, situation, options, feedback);
+    updateGameScenarioDb(id, construct, case_type, task, situation, options, feedback);
   }
   redirect("/admin");
 }
-export async function deleteGameScenarioAction(formData: FormData): Promise<void> {
+export async function deleteGameScenario(formData: FormData): Promise<void> {
   if (!(await isAdminAuthed())) redirect("/admin");
   const id = Number(formData.get("id") ?? 0);
-  if (id > 0) await deleteGameScenarioDb(id);
+  if (id > 0) deleteGameScenarioDb(id);
   redirect("/admin");
 }
 
 // ---- Game reflection questions ----
-export async function createReflectionQuestionAction(formData: FormData): Promise<void> {
+export async function createReflectionQuestion(formData: FormData): Promise<void> {
   if (!(await isAdminAuthed())) redirect("/admin");
   const question = String(formData.get("question") ?? "").trim();
-  if (question) await createReflectionQuestionDb(question);
+  if (question) createReflectionQuestionDb(question);
   redirect("/admin");
 }
-export async function updateReflectionQuestionAction(formData: FormData): Promise<void> {
+export async function updateReflectionQuestion(formData: FormData): Promise<void> {
   if (!(await isAdminAuthed())) redirect("/admin");
   const id = Number(formData.get("id") ?? 0);
   const question = String(formData.get("question") ?? "").trim();
-  if (id && question) await updateReflectionQuestionDb(id, question);
+  if (id && question) updateReflectionQuestionDb(id, question);
   redirect("/admin");
 }
-export async function deleteReflectionQuestionAction(formData: FormData): Promise<void> {
+export async function deleteReflectionQuestion(formData: FormData): Promise<void> {
   if (!(await isAdminAuthed())) redirect("/admin");
   const id = Number(formData.get("id") ?? 0);
-  if (id > 0) await deleteReflectionQuestionDb(id);
+  if (id > 0) deleteReflectionQuestionDb(id);
   redirect("/admin");
 }
 
 // ---- Response items ----
-export async function createResponseItemAction(formData: FormData): Promise<void> {
+export async function createResponseItem(formData: FormData): Promise<void> {
   if (!(await isAdminAuthed())) redirect("/admin");
   const statement = String(formData.get("statement") ?? "").trim();
-  if (statement) await createResponseItemDb(statement);
+  if (statement) createResponseItemDb(statement);
   redirect("/admin");
 }
-export async function updateResponseItemAction(formData: FormData): Promise<void> {
+export async function updateResponseItem(formData: FormData): Promise<void> {
   if (!(await isAdminAuthed())) redirect("/admin");
   const id = Number(formData.get("id") ?? 0);
   const statement = String(formData.get("statement") ?? "").trim();
-  if (id && statement) await updateResponseItemDb(id, statement);
+  if (id && statement) updateResponseItemDb(id, statement);
   redirect("/admin");
 }
-export async function deleteResponseItemAction(formData: FormData): Promise<void> {
+export async function deleteResponseItem(formData: FormData): Promise<void> {
   if (!(await isAdminAuthed())) redirect("/admin");
   const id = Number(formData.get("id") ?? 0);
-  if (id > 0) await deleteResponseItemDb(id);
+  if (id > 0) deleteResponseItemDb(id);
   redirect("/admin");
 }
 
@@ -455,11 +449,11 @@ export async function adminDelete(formData: FormData): Promise<void> {
   const kind = String(formData.get("kind") ?? "");
   const id = Number(formData.get("id") ?? 0);
   if (id > 0) {
-    if (kind === "edu") await deleteEduModuleDb(id);
-    else if (kind === "pretest") await deletePretestItemDb(id);
-    else if (kind === "game") await deleteGameScenarioDb(id);
-    else if (kind === "reflection") await deleteReflectionQuestionDb(id);
-    else if (kind === "response") await deleteResponseItemDb(id);
+    if (kind === "edu") deleteEduModuleDb(id);
+    else if (kind === "pretest") deletePretestItemDb(id);
+    else if (kind === "game") deleteGameScenarioDb(id);
+    else if (kind === "reflection") deleteReflectionQuestionDb(id);
+    else if (kind === "response") deleteResponseItemDb(id);
   }
   redirect("/admin");
 }
@@ -467,6 +461,13 @@ export async function adminDelete(formData: FormData): Promise<void> {
 // ============================================================================
 // PRIMA WORLD — progres pemain (terpisah dari instrumen penelitian)
 // ============================================================================
+import {
+  awardEpisode as awardEpisodeDb,
+  recordGameScore as recordGameScoreDb,
+  awardCard as awardCardDb,
+  setBossDefeated as setBossDefeatedDb,
+} from "@/lib/db";
+import { EPISODES } from "@/lib/data";
 
 export async function awardEpisodeAction(formData: FormData): Promise<void> {
   const p = await requireParticipant();
@@ -474,8 +475,8 @@ export async function awardEpisodeAction(formData: FormData): Promise<void> {
   const epId = Number(formData.get("episodeId") ?? 0);
   const card = String(formData.get("card") ?? "");
   const skill = String(formData.get("skill") ?? "");
-  await awardEpisodeDb(p.id, epId, card, skill);
-  if (card) await awardCardDb(p.id, card);
+  awardEpisodeDb(p.id, epId, card, skill);
+  if (card) awardCardDb(p.id, card);
   const next = EPISODES.find((e) => e.id === epId + 1);
   if (next) redirect(`/journey/${next.id}`);
   redirect("/world");
@@ -487,21 +488,21 @@ export async function recordGameAction(formData: FormData): Promise<void> {
   const game = String(formData.get("game") ?? "");
   const score = Number(formData.get("score") ?? 0);
   const card = String(formData.get("card") ?? "");
-  if (game) await recordGameScoreDb(p.id, game, score);
-  if (card) await awardCardDb(p.id, card);
+  if (game) recordGameScoreDb(p.id, game, score);
+  if (card) awardCardDb(p.id, card);
 }
 
 export async function defeatBossAction(formData: FormData): Promise<void> {
   const p = await requireParticipant();
   if (!p) return;
-  await setBossDefeatedDb(p.id, true);
-  await awardCardDb(p.id, "Bahasa sebagai Jembatan");
+  setBossDefeatedDb(p.id, true);
+  awardCardDb(p.id, "Bahasa sebagai Jembatan");
 }
 
 export async function submitFinalQuiz(formData: FormData): Promise<void> {
   const p = await requireParticipant();
   if (!p) redirect("/world");
   const score = Number(formData.get("score") ?? 0);
-  await recordGameScoreDb(p.id, "final_quiz", score);
+  recordGameScoreDb(p.id, "final_quiz", score);
   redirect("/feedback");
 }

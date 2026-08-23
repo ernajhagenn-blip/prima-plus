@@ -8,9 +8,9 @@ export const dynamic = "force-dynamic";
 
 export default async function PenelitianPage() {
   const p = await currentParticipant();
-  const pre = await getPretestItems();
+  const pre = getPretestItems();
   const post = LOYALTY_ITEMS;
-  const resp = await getResponseItems();
+  const resp = getResponseItems();
 
   const steps = [
     { n: 1, name: "Pretest", desc: `Kuesioner awal (${pre.length} pernyataan)` },

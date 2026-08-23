@@ -6,7 +6,7 @@ import { QuestionnaireForm } from "@/components/QuestionnaireForm";
 
 export default async function PosttestPage() {
   const p = await requireParticipantAt("/posttest");
-  const items = await getPretestItems();
+  const items = getPretestItems();
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
