@@ -8,12 +8,7 @@ export default function OpeningScreen() {
   const [pressed, setPressed] = useState(false);
 
   return (
-    <div
-      className="fixed inset-0 overflow-hidden"
-      style={{
-        background: "linear-gradient(180deg, #4FC3F7 0%, #81D4FA 25%, #B3E5FC 50%, #C8E6C9 75%, #81C784 100%)",
-      }}
-    >
+    <div className="relative overflow-hidden">
       {/* Floating CSS Clouds */}
       <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 1 }}>
         <div className="cloud cloud-1" />

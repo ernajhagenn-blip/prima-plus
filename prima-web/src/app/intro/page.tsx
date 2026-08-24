@@ -25,12 +25,7 @@ export default function IntroPage() {
   const currentClasses = JENJANG_LIST.find((j) => j.key === jenjang)?.classes ?? [];
 
   return (
-    <main
-      className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden px-4 py-8"
-      style={{
-        background: "linear-gradient(180deg, #4FC3F7 0%, #81D4FA 25%, #B3E5FC 50%, #C8E6C9 75%, #81C784 100%)",
-      }}
-    >
+    <main className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-4 py-8">
       {/* Floating clouds */}
       <div className="pointer-events-none absolute inset-0" style={{ zIndex: 0 }}>
         <div className="cloud c1" /><div className="cloud c2" /><div className="cloud c3" />

@@ -109,12 +109,7 @@ export default function WorldHub({
   const stars = Object.values(gameScores).reduce((a, b) => a + b, 0) + cards * 5;
 
   return (
-    <div
-      className="relative min-h-dvh overflow-hidden"
-      style={{
-        background: "linear-gradient(180deg, #4FC3F7 0%, #81D4FA 20%, #B3E5FC 45%, #C8E6C9 70%, #A5D6A7 85%, #81C784 100%)",
-      }}
-    >
+    <div className="relative min-h-dvh overflow-hidden">
       {/* Floating CSS Clouds */}
       <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 1 }}>
         <div className="hub-cloud hc1" />

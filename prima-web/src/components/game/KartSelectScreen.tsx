@@ -54,12 +54,7 @@ export default function KartSelectScreen() {
   const selected = KARTS.find((k) => k.key === kartKey) ?? KARTS[0];
 
   return (
-    <div
-      className="fixed inset-0 flex flex-col overflow-hidden"
-      style={{
-        background: "linear-gradient(180deg, #4FC3F7 0%, #81D4FA 30%, #B3E5FC 60%, #E1F5FE 100%)",
-      }}
-    >
+    <div className="relative flex min-h-dvh flex-col overflow-hidden">
       <div className="relative z-10 flex items-center justify-between px-4 pt-4 pb-2">
         <button
           onClick={() => router.back()}

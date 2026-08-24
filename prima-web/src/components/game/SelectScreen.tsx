@@ -29,12 +29,7 @@ export default function SelectScreen() {
   const selected = HEROES.find((h) => h.key === characterKey) ?? HEROES[0];
 
   return (
-    <div
-      className="fixed inset-0 flex flex-col overflow-hidden"
-      style={{
-        background: "linear-gradient(180deg, #4FC3F7 0%, #81D4FA 30%, #B3E5FC 60%, #E1F5FE 100%)",
-      }}
-    >
+    <div className="relative flex min-h-dvh flex-col overflow-hidden">
       {/* Floating Clouds */}
       <div className="pointer-events-none absolute inset-0" style={{ zIndex: 1 }}>
         <div className="sel-cloud sc1" />

@@ -19,12 +19,7 @@ export default function HookScreen() {
 
   if (freeze) {
     return (
-      <div
-        className="fixed inset-0 flex items-center justify-center px-6 text-center"
-        style={{
-          background: "linear-gradient(180deg, #4FC3F7 0%, #81D4FA 30%, #B3E5FC 60%, #E1F5FE 100%)",
-        }}
-      >
+      <div className="relative flex min-h-dvh items-center justify-center px-6 text-center">
         <div style={{ animation: "freezeIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both", position: "relative", zIndex: 10 }}>
           <p
             className="text-4xl font-black leading-tight sm:text-6xl"
@@ -64,12 +59,7 @@ export default function HookScreen() {
   const line = LINES[i];
 
   return (
-    <div
-      className="fixed inset-0 overflow-hidden"
-      style={{
-        background: "linear-gradient(180deg, #4FC3F7 0%, #81D4FA 25%, #B3E5FC 50%, #E1F5FE 75%, #C8E6C9 100%)",
-      }}
-    >
+    <div className="relative overflow-hidden">
       {/* Floating star particles */}
       <div className="pointer-events-none absolute inset-0" style={{ zIndex: 1 }}>
         <div className="star-particle sp1">✦</div>
