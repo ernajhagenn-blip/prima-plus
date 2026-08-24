@@ -163,10 +163,13 @@ export default function KartRace3D({
     ];
   }, [dims]);
 
+  const answeringRef = useRef(false);
+
   // Quiz logic
   const startQuiz = useCallback(() => {
     const s = S.current;
     if (s.quizPaused || s.over) return;
+    answeringRef.current = false;
     // Pick unused question
     const available = CHALLENGES.map((_, i) => i).filter(i => !s.usedQuestions.has(i));
     if (available.length === 0) { s.usedQuestions.clear(); }
@@ -184,7 +187,8 @@ export default function KartRace3D({
 
   const answerQuiz = useCallback((optIdx: number) => {
     const s = S.current;
-    if (quizAnswered) return;
+    if (answeringRef.current) return;
+    answeringRef.current = true;
     setQuizAnswered(true);
     setSelectedOpt(optIdx);
     const ch = CHALLENGES[s.quizIdx];
@@ -208,31 +212,45 @@ export default function KartRace3D({
       setCombo(0);
       s.popups.push({ x: s.px, y: s.py, z: 25, text: optIdx < 0 ? "WAKTU HABIS!" : "-5 SALAH", color: "#f43f5e", life: 60 });
     }
-  }, [quizAnswered]);
+  }, []);
 
   const continueQuiz = useCallback(() => {
     const s = S.current;
     s.quizPaused = false;
+    s.pv = Math.max(s.pv, 0.3);
+    answeringRef.current = false;
     setQuizActive(false);
     setQuizAnswered(false);
     setQuizCorrect(false);
     setSelectedOpt(-1);
   }, []);
 
-  // Quiz timer
+  // Quiz timer — no side effects inside state updater
   useEffect(() => {
     if (!quizActive || quizAnswered) return;
-    const t = setInterval(() => {
-      setQuizTimer(prev => {
-        if (prev <= 1) {
-          answerQuiz(-1);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(t);
-  }, [quizActive, quizAnswered, answerQuiz]);
+    if (quizTimer <= 0) {
+      const to = setTimeout(() => answerQuiz(-1), 50);
+      return () => clearTimeout(to);
+    }
+    const t = setTimeout(() => setQuizTimer(quizTimer - 1), 1000);
+    return () => clearTimeout(t);
+  }, [quizActive, quizAnswered, quizTimer, answerQuiz]);
+
+  // Quiz keyboard: 1-4 jawab, Enter/Spasi lanjut
+  useEffect(() => {
+    if (!quizActive) return;
+    const h = (e: KeyboardEvent) => {
+      if (["1", "2", "3", "4"].includes(e.key) && !quizAnswered) {
+        e.preventDefault();
+        answerQuiz(parseInt(e.key) - 1);
+      } else if ((e.key === "Enter" || e.key === " ") && quizAnswered) {
+        e.preventDefault();
+        continueQuiz();
+      }
+    };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [quizActive, quizAnswered, answerQuiz, continueQuiz]);
 
   // Game loop
   useEffect(() => {
@@ -704,9 +722,9 @@ export default function KartRace3D({
   const ch = CHALLENGES[quizQ];
 
   return (
-    <div ref={containerRef} style={{ width: "100vw", height: "100vh", position: "relative", overflow: "hidden", touchAction: "none" }}
-      onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
-      <canvas ref={canvasRef} width={dims.w} height={dims.h} style={{ width: "100%", height: "100%", display: "block" }} />
+    <div ref={containerRef} style={{ width: "100vw", height: "100vh", position: "relative", overflow: "hidden", touchAction: "none" }}>
+      <canvas ref={canvasRef} width={dims.w} height={dims.h} style={{ width: "100%", height: "100%", display: "block", touchAction: "none" }}
+        onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} />
 
       {/* INSTRUCTIONS OVERLAY */}
       {showInstructions && (
@@ -844,7 +862,7 @@ export default function KartRace3D({
                   <p style={{ fontFamily: "Arial", fontSize: 13, color: "rgba(255,255,255,0.6)", margin: "6px 0 0", lineHeight: 1.4 }}>{ch.tip}</p>
                 </div>
                 <button onClick={continueQuiz} style={{ marginTop: 14, width: "100%", padding: "14px 0", borderRadius: 12, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "white", fontFamily: "'Arial Black'", fontSize: 15, fontWeight: 900, cursor: "pointer", letterSpacing: "0.05em" }}>
-                  LANJUTKAN →
+                  LANJUTKAN → (atau tekan Enter)
                 </button>
               </>
             )}
