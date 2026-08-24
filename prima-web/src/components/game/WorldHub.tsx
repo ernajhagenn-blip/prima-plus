@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 
 const ZONES = [
   {
@@ -81,24 +80,6 @@ const DIMENSIONS = [
   { key: "kesadaran", label: "Kesadaran", value: 65, color: "#f59e0b" },
 ];
 
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.08 },
-  },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 30, scale: 0.9 },
-  show: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { type: "spring" as const, stiffness: 260, damping: 20 },
-  },
-};
-
 function ZoneCard({
   zone,
   onClick,
@@ -109,14 +90,11 @@ function ZoneCard({
   const [hovered, setHovered] = useState(false);
 
   return (
-    <motion.button
-      variants={item}
+    <button
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={onClick}
-      whileHover={{ y: -8, scale: 1.03 }}
-      whileTap={{ scale: 0.97 }}
-      className="group relative overflow-hidden text-left transition-all duration-300"
+      className="group relative overflow-hidden text-left transition-all duration-300 hover:-translate-y-2 hover:scale-[1.03] active:scale-[0.97] animate-slide-up"
       style={{
         borderRadius: 20,
         background: zone.gradient,
@@ -145,7 +123,7 @@ function ZoneCard({
           <span className="transition-transform group-hover:translate-x-1">→</span>
         </div>
       </div>
-    </motion.button>
+    </button>
   );
 }
 
@@ -201,12 +179,9 @@ function ProfileCard({
                 <span className="text-[11px] font-bold text-white">{d.value}%</span>
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-white/20">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${d.value}%` }}
-                  transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
-                  className="h-full rounded-full"
-                  style={{ backgroundColor: d.color }}
+                <div
+                  className="h-full rounded-full transition-all duration-1000 ease-out"
+                  style={{ width: `${d.value}%`, backgroundColor: d.color }}
                 />
               </div>
             </div>
@@ -331,11 +306,8 @@ export default function WorldHub({
       {/* Main content */}
       <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6">
         {/* Header */}
-        <motion.header
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center"
+        <header
+          className="animate-slide-down text-center"
         >
           <p className="text-[11px] font-black uppercase tracking-[0.5em] text-white/70">
             PRIMA+ World Hub
@@ -347,40 +319,33 @@ export default function WorldHub({
             PRIMA CITY
           </h1>
           <p className="mt-1 text-sm font-semibold text-white/80">PILIH PETUALANGANMU!</p>
-        </motion.header>
+        </header>
 
         {/* Main layout: Zones + Profile */}
         <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-4">
           {/* Zone Grid - left side */}
-          <motion.div
-            variants={container}
-            initial="hidden"
-            animate="show"
+          <div
             className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-3 lg:grid-cols-3"
           >
             {ZONES.map((zone) => (
               <ZoneCard key={zone.id} zone={zone} onClick={() => router.push(zone.href)} />
             ))}
-          </motion.div>
+          </div>
 
           {/* Profile Card - right sidebar */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-            className="lg:col-span-1"
+          <div
+            className="animate-slide-in-right lg:col-span-1"
+            style={{ animationDelay: "400ms" }}
           >
             <ProfileCard name={playerName} level={level} stars={stars} />
-          </motion.div>
+          </div>
         </div>
 
         {/* Bottom Progress Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="mt-8 overflow-hidden rounded-3xl"
+        <div
+          className="mt-8 animate-slide-up overflow-hidden rounded-3xl"
           style={{
+            animationDelay: "700ms",
             background: "linear-gradient(135deg, #f97316 0%, #ef4444 50%, #ec4899 100%)",
             border: "3px solid rgba(255,255,255,0.35)",
             boxShadow: "0 6px 0 #9f1239, 0 10px 20px rgba(0,0,0,0.2)",
@@ -397,14 +362,11 @@ export default function WorldHub({
                 <span className="text-2xl font-black text-white drop-shadow-md">{pct}%</span>
               </div>
 
-              <div className="mt-3 h-4 w-full overflow-hidden rounded-full bg-white/25">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${pct}%` }}
-                  transition={{ duration: 1.2, delay: 0.4, ease: "easeOut" }}
-                  className="h-full rounded-full bg-white"
-                  style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}
-                />
+                <div className="h-4 w-full overflow-hidden rounded-full bg-white/25">
+                  <div
+                    className="h-full rounded-full bg-white transition-all duration-1000 ease-out"
+                    style={{ width: `${pct}%`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}
+                  />
               </div>
 
               <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
@@ -420,19 +382,17 @@ export default function WorldHub({
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Footer branding */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="mt-6 text-center"
+        <div
+          className="mt-6 animate-fade-in text-center"
+          style={{ animationDelay: "1000ms" }}
         >
           <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/40">
             PRIMA+ · BAHASA KITA. PILIHAN KITA.
           </p>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface WordPrompt {
   word: string;
@@ -90,11 +89,7 @@ export default function RapidResponsePage() {
   if (phase === "start") {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center bg-[#060b1e] px-4 text-white">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md text-center"
-        >
+        <div className="animate-scale-in w-full max-w-md text-center">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-fuchsia-500 to-rose-600 text-4xl shadow-lg shadow-fuchsia-500/20">
             ⚡
           </div>
@@ -117,21 +112,19 @@ export default function RapidResponsePage() {
               <span>Setiap jawaban relevan = +{XP_PER_WORD} XP</span>
             </div>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
+          <button
             onClick={() => setPhase("play")}
-            className="mt-8 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 to-rose-600 py-4 text-lg font-black text-white shadow-lg shadow-fuchsia-500/20"
+            className="mt-8 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 to-rose-600 py-4 text-lg font-black text-white shadow-lg shadow-fuchsia-500/20 transition hover:scale-104 active:scale-96"
           >
             MULAI ▶
-          </motion.button>
+          </button>
           <button
             onClick={() => router.push("/games")}
             className="mt-3 text-xs text-white/25 transition hover:text-white/50"
           >
             ← Kembali ke Arcade
           </button>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -139,11 +132,7 @@ export default function RapidResponsePage() {
   if (phase === "result") {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center bg-[#060b1e] px-4 text-white">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md text-center"
-        >
+        <div className="animate-scale-in w-full max-w-md text-center">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-fuchsia-500/20 to-rose-600/20 text-4xl">
             🏆
           </div>
@@ -182,9 +171,7 @@ export default function RapidResponsePage() {
           </div>
 
           <div className="mt-6 flex gap-3">
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
+            <button
               onClick={() => {
                 setPhase("play");
                 setCurrentQ(0);
@@ -194,20 +181,18 @@ export default function RapidResponsePage() {
                 setAnswers([]);
                 setUserInput("");
               }}
-              className="flex-1 rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-bold text-white transition hover:bg-white/10"
+              className="flex-1 rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-bold text-white transition hover:bg-white/10 hover:scale-103 active:scale-97"
             >
               Main Lagi
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
+            </button>
+            <button
               onClick={() => router.push("/games")}
-              className="flex-1 rounded-xl bg-gradient-to-r from-fuchsia-500 to-rose-600 py-3 text-sm font-bold text-white"
+              className="flex-1 rounded-xl bg-gradient-to-r from-fuchsia-500 to-rose-600 py-3 text-sm font-bold text-white transition hover:scale-103 active:scale-97"
             >
               ke Arcade →
-            </motion.button>
+            </button>
           </div>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -236,99 +221,82 @@ export default function RapidResponsePage() {
 
       {/* Timer */}
       <div className="mx-4 mt-2 h-1.5 overflow-hidden rounded-full bg-white/5">
-        <motion.div
-          animate={{ width: `${timerPct}%` }}
-          transition={{ duration: 0.5 }}
-          className={`h-full rounded-full transition-colors ${
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${
             timerPct > 50
               ? "bg-gradient-to-r from-fuchsia-500 to-rose-500"
               : timerPct > 25
               ? "bg-gradient-to-r from-amber-500 to-orange-500"
               : "bg-gradient-to-r from-rose-500 to-red-500"
           }`}
+          style={{ width: `${timerPct}%` }}
         />
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-6">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentQ}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="w-full max-w-md text-center"
-          >
-            {/* Category badge */}
-            <span className="inline-block rounded-full bg-fuchsia-500/10 px-3 py-1 text-[11px] font-bold text-fuchsia-400">
-              {prompt.category}
-            </span>
+        <div key={currentQ} className="animate-scale-in w-full max-w-md text-center">
+          {/* Category badge */}
+          <span className="inline-block rounded-full bg-fuchsia-500/10 px-3 py-1 text-[11px] font-bold text-fuchsia-400">
+            {prompt.category}
+          </span>
 
-            {/* Word prompt */}
-            <motion.div
-              initial={{ y: 20 }}
-              animate={{ y: 0 }}
-              className="mt-6"
+          {/* Word prompt */}
+          <div className="mt-6">
+            <h2 className="text-6xl font-black text-white" style={{ textShadow: "0 0 40px rgba(217,70,239,0.4)" }}>
+              {prompt.word}
+            </h2>
+          </div>
+
+          {/* Timer display */}
+          <div className="mt-6">
+            <span
+              className={`text-4xl font-black ${
+                timer <= 2 ? "text-rose-400" : timer <= 4 ? "text-amber-400" : "text-fuchsia-400"
+              }`}
             >
-              <h2 className="text-6xl font-black text-white" style={{ textShadow: "0 0 40px rgba(217,70,239,0.4)" }}>
-                {prompt.word}
-              </h2>
-            </motion.div>
+              {timer}
+            </span>
+            <p className="mt-1 text-xs text-white/30">detik tersisa</p>
+          </div>
 
-            {/* Timer display */}
-            <div className="mt-6">
-              <span
-                className={`text-4xl font-black ${
-                  timer <= 2 ? "text-rose-400" : timer <= 4 ? "text-amber-400" : "text-fuchsia-400"
-                }`}
-              >
-                {timer}
-              </span>
-              <p className="mt-1 text-xs text-white/30">detik tersisa</p>
+          {/* Input */}
+          <div className="mt-6">
+            <input
+              ref={inputRef}
+              type="text"
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && userInput.trim().length > 0 && lastResult === null) {
+                  handleSubmit(userInput);
+                }
+              }}
+              disabled={lastResult !== null}
+              placeholder="Ketik asosiasimu..."
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-5 py-4 text-center text-lg font-bold text-white placeholder-white/20 outline-none transition focus:border-fuchsia-500/50 focus:bg-white/10 disabled:opacity-50"
+            />
+            <button
+              onClick={() => userInput.trim().length > 0 && handleSubmit(userInput)}
+              disabled={userInput.trim().length === 0 || lastResult !== null}
+              className="mt-3 w-full rounded-xl bg-gradient-to-r from-fuchsia-500 to-rose-600 py-3 text-sm font-bold text-white transition hover:scale-103 active:scale-97 disabled:opacity-30"
+            >
+              KIRIM ⏎
+            </button>
+          </div>
+
+          {/* Feedback flash */}
+          {lastResult !== null && (
+            <div
+              className={`mt-4 animate-scale-in rounded-xl p-3 text-sm font-bold ${
+                lastResult === "correct"
+                  ? "border border-emerald-400/30 bg-emerald-500/15 text-emerald-400"
+                  : "border border-rose-400/30 bg-rose-500/15 text-rose-400"
+              }`}
+            >
+              {lastResult === "correct" ? "✓ Relevan! +8 XP" : "✗ Kurang tepat"}
             </div>
-
-            {/* Input */}
-            <div className="mt-6">
-              <input
-                ref={inputRef}
-                type="text"
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && userInput.trim().length > 0 && lastResult === null) {
-                    handleSubmit(userInput);
-                  }
-                }}
-                disabled={lastResult !== null}
-                placeholder="Ketik asosiasimu..."
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-5 py-4 text-center text-lg font-bold text-white placeholder-white/20 outline-none transition focus:border-fuchsia-500/50 focus:bg-white/10 disabled:opacity-50"
-              />
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => userInput.trim().length > 0 && handleSubmit(userInput)}
-                disabled={userInput.trim().length === 0 || lastResult !== null}
-                className="mt-3 w-full rounded-xl bg-gradient-to-r from-fuchsia-500 to-rose-600 py-3 text-sm font-bold text-white transition disabled:opacity-30"
-              >
-                KIRIM ⏎
-              </motion.button>
-            </div>
-
-            {/* Feedback flash */}
-            {lastResult !== null && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className={`mt-4 rounded-xl p-3 text-sm font-bold ${
-                  lastResult === "correct"
-                    ? "border border-emerald-400/30 bg-emerald-500/15 text-emerald-400"
-                    : "border border-rose-400/30 bg-rose-500/15 text-rose-400"
-                }`}
-              >
-                {lastResult === "correct" ? "✓ Relevan! +8 XP" : "✗ Kurang tepat"}
-              </motion.div>
-            )}
-          </motion.div>
-        </AnimatePresence>
+          )}
+        </div>
       </div>
     </div>
   );

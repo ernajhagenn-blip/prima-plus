@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { submitFinalQuiz } from "@/app/actions";
 
 type Q = {
@@ -98,14 +97,7 @@ export default function QuizPage() {
           “Bukan tentang seberapa banyak kata yang kamu hafal. Tentang seberapa sadar kamu memilihnya.”
         </p>
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={idx}
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -30 }}
-            className="mt-6 rounded-3xl border border-purple-200 bg-white/70 p-6 backdrop-blur-md"
-          >
+        <div key={idx} className="mt-6 animate-slide-in-left rounded-3xl border border-purple-200 bg-white/70 p-6 backdrop-blur-md">
             <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-bold text-purple-600">
               {q.type}
             </span>
@@ -164,8 +156,7 @@ export default function QuizPage() {
                 </button>
               )
             )}
-          </motion.div>
-        </AnimatePresence>
+          </div>
 
         <p className="mt-3 text-center text-xs text-gray-400">
           {idx + 1}/{QUIZ.length}

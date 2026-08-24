@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import KaraAvatar from "@/components/KaraAvatar";
 
 export default function WorldHub({
@@ -67,11 +66,10 @@ export default function WorldHub({
         <p className="mt-6 text-xs font-bold uppercase tracking-wide text-white/50">ATAU MAIN LANGSUNG</p>
         <div className="mt-2 grid grid-cols-2 gap-3">
           {PORTALS.map((p, i) => (
-            <motion.div
+            <div
               key={p.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
+              className="animate-slide-up"
+              style={{ animationDelay: `${i * 80}ms` }}
             >
               <Link href={p.href} className="block">
                 <div className={`flex h-28 flex-col items-center justify-center rounded-2xl bg-gradient-to-br ${p.color} p-3 shadow-md`}>
@@ -80,7 +78,7 @@ export default function WorldHub({
                   <span className="text-[10px] text-white/80">{p.desc}</span>
                 </div>
               </Link>
-            </motion.div>
+            </div>
           ))}
         </div>
 

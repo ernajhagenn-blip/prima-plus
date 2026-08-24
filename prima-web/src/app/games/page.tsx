@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 
 const MINI_GAMES = [
   {
@@ -66,21 +65,6 @@ const MINI_GAMES = [
   },
 ];
 
-const container = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.07 } },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 24, scale: 0.95 },
-  show: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { type: "spring" as const, stiffness: 260, damping: 22 },
-  },
-};
-
 function DifficultyStars({ count }: { count: number }) {
   return (
     <div className="flex gap-0.5">
@@ -108,10 +92,8 @@ export default function GamesPage() {
 
       <div className="relative mx-auto max-w-5xl px-4 pb-16 pt-6">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between"
+        <div
+          className="animate-slide-down flex items-center justify-between"
         >
           <div>
             <Link
@@ -133,17 +115,14 @@ export default function GamesPage() {
           <div className="hidden h-16 w-16 items-center justify-center rounded-2xl border border-gray-200 bg-white/70 text-3xl backdrop-blur-md sm:flex shadow-sm">
             🎮
           </div>
-        </motion.div>
+        </div>
 
         {/* Game Grid */}
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="show"
+        <div
           className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {MINI_GAMES.map((game) => (
-            <motion.div key={game.href} variants={item}>
+          {MINI_GAMES.map((game, i) => (
+            <div key={game.href} className="animate-slide-up" style={{ animationDelay: `${i * 70}ms` }}>
               <Link
                 href={game.href}
                 className="group relative block overflow-hidden rounded-2xl border border-gray-200 bg-white/70 backdrop-blur-md transition-all duration-300 hover:border-gray-300 hover:shadow-lg"
@@ -193,18 +172,16 @@ export default function GamesPage() {
                   className={`absolute bottom-0 left-0 h-[2px] w-0 bg-gradient-to-r ${game.gradient} transition-all duration-600 group-hover:w-full`}
                 />
               </Link>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="mt-10 text-center text-[11px] text-gray-400"
+        <p
+          className="mt-10 animate-fade-in text-center text-[11px] text-gray-400"
+          style={{ animationDelay: "800ms" }}
         >
           Skor dan XP tersimpan otomatis. Main bebas tanpa urutan.
-        </motion.p>
+        </p>
       </div>
     </div>
   );

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useActionState } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
 import { startJourney } from "@/app/actions";
 import KaraAvatar from "@/components/KaraAvatar";
 
@@ -35,13 +34,10 @@ export default function IntroPage() {
           </div>
 
           <form action={formAction} className="rounded-3xl border border-blue-200 bg-white/70 p-6 shadow-lg backdrop-blur-md">
-          <AnimatePresence mode="wait">
             {step === 1 && (
-              <motion.div
+              <div
                 key="1"
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -30 }}
+                className="animate-slide-in-left"
               >
                 <p className="text-lg font-bold text-gray-900">Pertama, siapa namamu?</p>
                 <input
@@ -58,15 +54,13 @@ export default function IntroPage() {
                 >
                   LANJUT
                 </button>
-              </motion.div>
+              </div>
             )}
 
             {step === 2 && (
-              <motion.div
+              <div
                 key="2"
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -30 }}
+                className="animate-slide-in-left"
               >
                 <p className="text-lg font-bold text-gray-900">Terus, kelas berapa sekarang?</p>
                 <div className="mt-3 grid grid-cols-3 gap-2">
@@ -103,15 +97,13 @@ export default function IntroPage() {
                     LANJUT
                   </button>
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {step === 3 && (
-              <motion.div
+              <div
                 key="3"
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -30 }}
+                className="animate-slide-in-left"
               >
                 <p className="text-lg font-bold text-gray-900">Terakhir, sekolahnya di mana?</p>
                 <input
@@ -138,19 +130,18 @@ export default function IntroPage() {
                     MASUK PRIMA WORLD →
                   </button>
                 </div>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
 
           <input type="hidden" name="name" value={name} />
           <input type="hidden" name="kelas" value={kelas} />
           <input type="hidden" name="school" value={school} />
-        </form>
+          </form>
 
-        <p className="mt-4 text-center text-xs text-gray-400">
-          Nice. Mulai sekarang, dunia ini bakal berubah sesuai perjalananmu.
-        </p>
-      </div>
-    </main>
+          <p className="mt-4 text-center text-xs text-gray-400">
+            Nice. Mulai sekarang, dunia ini bakal berubah sesuai perjalananmu.
+          </p>
+        </div>
+      </main>
   );
 }

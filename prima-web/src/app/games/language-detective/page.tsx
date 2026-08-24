@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface Question {
   paragraph: string;
@@ -149,11 +148,7 @@ export default function LanguageDetectivePage() {
   if (phase === "start") {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center bg-[#060b1e] px-4 text-white">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md text-center"
-        >
+        <div className="animate-scale-in w-full max-w-md text-center">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-600 text-4xl shadow-lg shadow-emerald-500/20">
             🔍
           </div>
@@ -175,21 +170,19 @@ export default function LanguageDetectivePage() {
               <span>Setiap jawaban benar = +{XP_PER_CORRECT} XP</span>
             </div>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
+          <button
             onClick={() => setPhase("play")}
-            className="mt-8 w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 py-4 text-lg font-black text-white shadow-lg shadow-emerald-500/20"
+            className="mt-8 w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 py-4 text-lg font-black text-white shadow-lg shadow-emerald-500/20 transition hover:scale-104 active:scale-96"
           >
             MULAI ▶
-          </motion.button>
+          </button>
           <button
             onClick={() => router.push("/games")}
             className="mt-3 text-xs text-white/25 transition hover:text-white/50"
           >
             ← Kembali ke Arcade
           </button>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -197,11 +190,7 @@ export default function LanguageDetectivePage() {
   if (phase === "result") {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center bg-[#060b1e] px-4 text-white">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md text-center"
-        >
+        <div className="animate-scale-in w-full max-w-md text-center">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-500/20 to-teal-600/20 text-4xl">
             🏆
           </div>
@@ -224,9 +213,7 @@ export default function LanguageDetectivePage() {
             </div>
           </div>
           <div className="mt-6 flex gap-3">
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
+            <button
               onClick={() => {
                 setPhase("play");
                 setCurrentQ(0);
@@ -235,20 +222,18 @@ export default function LanguageDetectivePage() {
                 setShowFeedback(false);
                 setAnswers([]);
               }}
-              className="flex-1 rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-bold text-white transition hover:bg-white/10"
+              className="flex-1 rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-bold text-white transition hover:bg-white/10 hover:scale-103 active:scale-97"
             >
               Main Lagi
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
+            </button>
+            <button
               onClick={() => router.push("/games")}
-              className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 py-3 text-sm font-bold text-white"
+              className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 py-3 text-sm font-bold text-white transition hover:scale-103 active:scale-97"
             >
               ke Arcade →
-            </motion.button>
+            </button>
           </div>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -276,63 +261,49 @@ export default function LanguageDetectivePage() {
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-6">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentQ}
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
-            className="w-full max-w-lg"
-          >
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-md">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-bold uppercase tracking-wider text-emerald-400/60">
-                  Temukan kesalahan
-                </p>
-                <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-400">
-                  🔍 {q.errorType}
-                </span>
-              </div>
-              <p className="mt-3 text-sm text-white/80 leading-relaxed">
-                {highlightError(q.paragraph, q.errorHighlight)}
+        <div key={currentQ} className="animate-slide-in-left w-full max-w-lg">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-md">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold uppercase tracking-wider text-emerald-400/60">
+                Temukan kesalahan
               </p>
+              <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-400">
+                🔍 {q.errorType}
+              </span>
             </div>
+            <p className="mt-3 text-sm text-white/80 leading-relaxed">
+              {highlightError(q.paragraph, q.errorHighlight)}
+            </p>
+          </div>
 
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              {q.options.map((opt) => {
-                const isCorrect = opt === q.correctCorrection;
-                const isSelected = opt === selected;
-                let btnStyle = "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]";
-                if (showFeedback && isCorrect) btnStyle = "border-emerald-400/60 bg-emerald-500/15";
-                if (showFeedback && isSelected && !isCorrect) btnStyle = "border-rose-400/60 bg-rose-500/15";
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            {q.options.map((opt) => {
+              const isCorrect = opt === q.correctCorrection;
+              const isSelected = opt === selected;
+              let btnStyle = "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]";
+              if (showFeedback && isCorrect) btnStyle = "border-emerald-400/60 bg-emerald-500/15";
+              if (showFeedback && isSelected && !isCorrect) btnStyle = "border-rose-400/60 bg-rose-500/15";
 
-                return (
-                  <motion.button
-                    key={opt}
-                    whileHover={!showFeedback ? { scale: 1.03 } : undefined}
-                    whileTap={!showFeedback ? { scale: 0.97 } : undefined}
-                    onClick={() => !showFeedback && handleAnswer(opt)}
-                    disabled={showFeedback}
-                    className={`rounded-xl border p-4 text-center text-sm font-bold transition-all ${btnStyle}`}
-                  >
-                    {opt}
-                  </motion.button>
-                );
-              })}
+              return (
+                <button
+                  key={opt}
+                  onClick={() => !showFeedback && handleAnswer(opt)}
+                  disabled={showFeedback}
+                  className={`rounded-xl border p-4 text-center text-sm font-bold transition-all ${btnStyle} ${!showFeedback ? "hover:scale-103 active:scale-97" : ""}`}
+                >
+                  {opt}
+                </button>
+              );
+            })}
+          </div>
+
+          {showFeedback && (
+            <div className="mt-4 animate-fade-in rounded-xl border border-white/10 bg-white/5 p-4">
+              <p className="text-xs font-bold text-white/50">Penjelasan:</p>
+              <p className="mt-1 text-sm text-white/70">{q.explanation}</p>
             </div>
-
-            {showFeedback && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-4 rounded-xl border border-white/10 bg-white/5 p-4"
-              >
-                <p className="text-xs font-bold text-white/50">Penjelasan:</p>
-                <p className="mt-1 text-sm text-white/70">{q.explanation}</p>
-              </motion.div>
-            )}
-          </motion.div>
-        </AnimatePresence>
+          )}
+        </div>
       </div>
     </div>
   );

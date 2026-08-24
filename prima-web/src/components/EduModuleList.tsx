@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface Module {
   id: number;
@@ -80,11 +79,9 @@ export default function EduModuleList({ modules }: { modules: Module[] }) {
           </span>
         </div>
         <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-100">
-          <motion.div
-            className="h-full rounded-full bg-gradient-to-r from-red-600 to-rose-500"
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-red-600 to-rose-500 transition-all duration-400 ease-out"
+            style={{ width: `${progress}%` }}
           />
         </div>
         {progress === 100 && (
@@ -102,17 +99,14 @@ export default function EduModuleList({ modules }: { modules: Module[] }) {
         const icon = DIMENSION_ICONS[m.dimension] || "📖";
 
         return (
-          <motion.div
+          <div
             key={m.id}
-            layout
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className={`group relative overflow-hidden rounded-2xl border shadow-sm backdrop-blur-sm transition-all ${
+            className={`group relative overflow-hidden rounded-2xl border shadow-sm backdrop-blur-sm transition-all animate-slide-up ${
               isRead
                 ? "border-emerald-200 bg-emerald-50/50"
                 : "border-gray-200 bg-white/80 hover:border-gray-300 hover:shadow-md"
             }`}
+            style={{ animationDelay: `${i * 50}ms` }}
           >
             {/* Gradient top bar */}
             <div
@@ -149,25 +143,18 @@ export default function EduModuleList({ modules }: { modules: Module[] }) {
                     {m.dimension}
                   </p>
                 </div>
-                <motion.span
-                  animate={{ rotate: isExpanded ? 180 : 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="mt-1 text-gray-400"
+                <span
+                  className={`mt-1 text-gray-400 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
                 >
                   ▼
-                </motion.span>
+                </span>
               </button>
 
               {/* Body */}
-              <AnimatePresence>
-                {isExpanded && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="overflow-hidden"
-                  >
+              {isExpanded && (
+                <div
+                  className="overflow-hidden"
+                >
                     <div className="mt-4 border-t border-gray-100 pt-4 text-sm leading-relaxed text-gray-700">
                       {renderBody(m.body)}
                     </div>
@@ -189,11 +176,10 @@ export default function EduModuleList({ modules }: { modules: Module[] }) {
                         {isRead ? "✓ Sudah dibaca" : "Saya sudah baca modul ini"}
                       </button>
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                </div>
+              )}
             </div>
-          </motion.div>
+          </div>
         );
       })}
     </div>

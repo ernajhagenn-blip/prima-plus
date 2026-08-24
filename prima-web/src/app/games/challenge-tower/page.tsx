@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
 
 const FLOORS = [
   {
@@ -163,23 +162,23 @@ export default function ChallengeTowerPage() {
           <div className="absolute top-1/4 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-amber-300/15 blur-[150px]" />
         </div>
         <div className="relative mx-auto flex max-w-lg flex-col items-center justify-center px-4 py-16 text-center">
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200, damping: 15 }} className="text-7xl">
+          <div className="animate-bounce-in text-7xl">
             🏆
-          </motion.div>
-          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mt-6 text-3xl font-black text-gray-900">
+          </div>
+          <h1 className="mt-6 animate-slide-up text-3xl font-black text-gray-900">
             Tower Selesai!
-          </motion.h1>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="mt-2 text-lg text-gray-500">
+          </h1>
+          <p className="mt-2 animate-fade-in text-lg text-gray-500">
             Skor: <span className="font-bold text-amber-600">{totalScore}</span> / {maxScore}
-          </motion.p>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="mt-6 flex gap-3">
+          </p>
+          <div className="mt-6 flex gap-3">
             <button onClick={() => window.location.reload()} className="rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-orange-300/30 transition hover:shadow-orange-400/40">
               Main Lagi
             </button>
             <Link href="/world" className="rounded-xl border border-gray-200 bg-white/70 px-6 py-3 text-sm font-bold text-gray-500 backdrop-blur-md transition hover:bg-white/90">
               Kembali ke City
             </Link>
-          </motion.div>
+          </div>
         </div>
       </div>
     );
@@ -221,17 +220,15 @@ export default function ChallengeTowerPage() {
                   }`}
                 >
                   {state === "completed" && (
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: "100%" }}
+                    <div
                       className={`absolute inset-0 bg-gradient-to-r ${f.gradient}`}
+                      style={{ width: "100%" }}
                     />
                   )}
                   {isActive && (
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${((currentQ + 1) / f.questions.length) * 100}%` }}
-                      className={`absolute inset-0 bg-gradient-to-r ${f.gradient}`}
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-r ${f.gradient} transition-all duration-500`}
+                      style={{ width: `${((currentQ + 1) / f.questions.length) * 100}%` }}
                     />
                   )}
                 </div>
@@ -244,11 +241,9 @@ export default function ChallengeTowerPage() {
         </div>
 
         {/* Current floor info */}
-        <motion.div
+        <div
           key={currentFloor}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-8 text-center"
+          className="mt-8 animate-slide-up text-center"
         >
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-white/70 text-4xl shadow-lg backdrop-blur-md border border-gray-200" style={{ boxShadow: `0 20px 60px -10px ${floor.glow}` }}>
             {floor.icon}
@@ -258,66 +253,60 @@ export default function ChallengeTowerPage() {
           </p>
           <h2 className="mt-1 text-2xl font-black text-gray-900">{floor.title}</h2>
           <p className="mt-1 text-sm text-gray-500">{floor.desc}</p>
-        </motion.div>
+        </div>
 
         {/* Question */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={`${currentFloor}-${currentQ}`}
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -30 }}
-            transition={{ duration: 0.3 }}
-            className="mt-8 rounded-2xl border border-gray-200 bg-white/70 p-6 backdrop-blur-md"
-          >
-            <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
-              Pertanyaan {currentQ + 1} / {floor.questions.length}
-            </p>
-            <p className="mt-3 text-base font-semibold text-gray-800 leading-relaxed">{question.q}</p>
+        <div
+          key={`${currentFloor}-${currentQ}`}
+          className="mt-8 animate-slide-in-left rounded-2xl border border-gray-200 bg-white/70 p-6 backdrop-blur-md"
+        >
+          <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
+            Pertanyaan {currentQ + 1} / {floor.questions.length}
+          </p>
+          <p className="mt-3 text-base font-semibold text-gray-800 leading-relaxed">{question.q}</p>
 
-            <div className="mt-5 space-y-2.5">
-              {question.options.map((opt, i) => {
-                const isSelected = selected === i;
-                const isCorrect = i === question.answer;
-                let borderColor = "border-gray-200";
-                let bgColor = "bg-white/80";
-                let textColor = "text-gray-700";
+          <div className="mt-5 space-y-2.5">
+            {question.options.map((opt, i) => {
+              const isSelected = selected === i;
+              const isCorrect = i === question.answer;
+              let borderColor = "border-gray-200";
+              let bgColor = "bg-white/80";
+              let textColor = "text-gray-700";
 
-                if (answerState !== "unanswered") {
-                  if (isCorrect) {
-                    borderColor = "border-emerald-500/50";
-                    bgColor = "bg-emerald-500/10";
-                    textColor = "text-emerald-400";
-                  } else if (isSelected && !isCorrect) {
-                    borderColor = "border-rose-500/50";
-                    bgColor = "bg-rose-500/10";
-                    textColor = "text-rose-400";
-                  }
+              if (answerState !== "unanswered") {
+                if (isCorrect) {
+                  borderColor = "border-emerald-500/50";
+                  bgColor = "bg-emerald-500/10";
+                  textColor = "text-emerald-400";
+                } else if (isSelected && !isCorrect) {
+                  borderColor = "border-rose-500/50";
+                  bgColor = "bg-rose-500/10";
+                  textColor = "text-rose-400";
                 }
+              }
 
-                return (
-                  <button
-                    key={i}
-                    onClick={() => handleAnswer(i)}
-                    disabled={selected !== null}
-                    className={`w-full rounded-xl border ${borderColor} ${bgColor} px-4 py-3 text-left text-sm font-medium ${textColor} transition-all duration-200 hover:border-gray-300 hover:bg-white disabled:cursor-not-allowed`}
-                  >
-                    <span className="mr-3 inline-flex h-6 w-6 items-center justify-center rounded-md bg-gray-100 text-[11px] font-bold text-gray-500">
-                      {String.fromCharCode(65 + i)}
-                    </span>
-                    {opt}
-                    {answerState !== "unanswered" && isCorrect && (
-                      <span className="ml-2 text-emerald-400">✓</span>
-                    )}
-                    {isSelected && !isCorrect && answerState !== "unanswered" && (
-                      <span className="ml-2 text-rose-400">✗</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </motion.div>
-        </AnimatePresence>
+              return (
+                <button
+                  key={i}
+                  onClick={() => handleAnswer(i)}
+                  disabled={selected !== null}
+                  className={`w-full rounded-xl border ${borderColor} ${bgColor} px-4 py-3 text-left text-sm font-medium ${textColor} transition-all duration-200 hover:border-gray-300 hover:bg-white disabled:cursor-not-allowed`}
+                >
+                  <span className="mr-3 inline-flex h-6 w-6 items-center justify-center rounded-md bg-gray-100 text-[11px] font-bold text-gray-500">
+                    {String.fromCharCode(65 + i)}
+                  </span>
+                  {opt}
+                  {answerState !== "unanswered" && isCorrect && (
+                    <span className="ml-2 text-emerald-400">✓</span>
+                  )}
+                  {isSelected && !isCorrect && answerState !== "unanswered" && (
+                    <span className="ml-2 text-rose-400">✗</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         {/* Floor completion mini-badge */}
         <div className="mt-6 flex justify-center gap-2">
