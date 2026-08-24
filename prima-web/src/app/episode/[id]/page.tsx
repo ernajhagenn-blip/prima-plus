@@ -35,7 +35,7 @@ export default async function EpisodePage({
   const next = EPISODES.find((e) => e.id === epId + 1);
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-4 sm:px-6 lg:px-8">
+    <div className="w-full px-3 py-3 sm:px-5 lg:px-8 max-w-7xl mx-auto">
       {/* Top nav */}
       <div className="mb-3 flex items-center justify-between">
         <Link href="/world" className="inline-flex items-center gap-1.5 rounded-xl bg-white/60 px-3 py-1.5 text-xs font-black text-blue-600 shadow-sm backdrop-blur-sm transition hover:bg-white/80">

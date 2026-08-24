@@ -117,7 +117,7 @@ export default function WorldHub({
         <div className="hub-cloud hc3" />
       </div>
 
-      <div className="relative mx-auto max-w-5xl px-4 pb-10 pt-6 sm:px-6" style={{ zIndex: 10 }}>
+      <div className="relative mx-auto max-w-7xl px-3 pb-10 pt-6 sm:px-5" style={{ zIndex: 10 }}>
         <header className="text-center" style={{ animation: "slideDown 0.5s ease-out both" }}>
           <p className="text-[11px] font-black uppercase tracking-[0.5em] text-white/80">
             PRIMA+ World Hub
