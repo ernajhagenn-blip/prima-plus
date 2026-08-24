@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useActionState } from "react";
@@ -10,7 +10,7 @@ const JENJANG_LIST = [
   { key: "SMA", label: "SMA/MA", classes: ["X", "XI", "XII"], icon: "🎓" },
 ];
 
-const STEP_ICONS = ["✏️", "📚", "🏛️"];
+const STEP_ICONS = ["👤", "🏫", "✅"];
 
 export default function IntroPage() {
   const router = useRouter();

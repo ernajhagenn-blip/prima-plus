@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { CHALLENGES as EXTERNAL_CHALLENGES } from "@/lib/challenges";
@@ -452,8 +452,8 @@ export default function KartRace3D({
     };
 
     const skyG = ctx.createLinearGradient(0, 0, 0, horizon);
-    skyG.addColorStop(0, "#4aa8ff");
-    skyG.addColorStop(1, "#cfeeff");
+    skyG.addColorStop(0, "#2f9bff");
+    skyG.addColorStop(1, "#d8f3ff");
     ctx.fillStyle = skyG;
     ctx.fillRect(0, 0, d.w, horizon);
 
@@ -484,10 +484,30 @@ export default function KartRace3D({
     }
 
     const grassG = ctx.createLinearGradient(0, horizon, 0, d.h);
-    grassG.addColorStop(0, "#4dbd68");
-    grassG.addColorStop(1, "#2f9149");
+    grassG.addColorStop(0, "#54c96f");
+    grassG.addColorStop(1, "#2fa04f");
     ctx.fillStyle = grassG;
     ctx.fillRect(0, horizon, d.w, d.h - horizon);
+
+    const fseed = [0.13, 0.29, 0.41, 0.58, 0.67, 0.81, 0.92, 0.22, 0.37, 0.74];
+    for (let i = 0; i < fseed.length; i++) {
+      const fa = fseed[i] * Math.PI * 2;
+      const fr = i % 2 === 0 ? RO + 55 : RI - 55;
+      const fp = proj(Math.cos(fa) * fr, Math.sin(fa) * fr, 0);
+      if (!fp) continue;
+      const fs = Math.max(1.5, 2.2 * fp.sc);
+      ctx.fillStyle = i % 3 === 0 ? "#ff8fb3" : i % 3 === 1 ? "#ffe066" : "#ffffff";
+      for (let pi = 0; pi < 5; pi++) {
+        const pa = (pi / 5) * Math.PI * 2 + now * 0.0004;
+        ctx.beginPath();
+        ctx.arc(fp.x + Math.cos(pa) * fs, fp.y + Math.sin(pa) * fs * 0.6, fs * 0.7, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = "#f59e0b";
+      ctx.beginPath();
+      ctx.arc(fp.x, fp.y, fs * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     interface Quad { depth: number; pts: { x: number; y: number }[]; color: string; }
     const quads: Quad[] = [];
@@ -734,6 +754,41 @@ export default function KartRace3D({
       });
     }
 
+    for (let i = 0; i < 3; i++) {
+      const ba = 1.1 + i * 2.1;
+      const bx = Math.cos(ba) * (RO + 120), by = Math.sin(ba) * (RO + 120);
+      const p = proj(bx, by, 55 + Math.sin(now * 0.001 + i * 2) * 6);
+      if (!p) continue;
+      const depth = Math.hypot(bx - camx, by - camy);
+      bills.push({
+        depth, draw: () => {
+          const s = 14 * p.sc;
+          if (s < 2) return;
+          const cols2 = [["#ef4444", "#f97316"], ["#a855f7", "#ec4899"], ["#0ea5e9", "#22d3ee"]][i];
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, s, 0, Math.PI * 2);
+          const bg2 = ctx.createRadialGradient(p.x - s * 0.3, p.y - s * 0.3, s * 0.1, p.x, p.y, s);
+          bg2.addColorStop(0, cols2[1]);
+          bg2.addColorStop(1, cols2[0]);
+          ctx.fillStyle = bg2;
+          ctx.fill();
+          ctx.strokeStyle = "rgba(255,255,255,0.5)";
+          ctx.lineWidth = Math.max(1, s * 0.08);
+          ctx.stroke();
+          ctx.strokeStyle = "rgba(80,60,40,0.7)";
+          ctx.lineWidth = Math.max(1, s * 0.05);
+          ctx.beginPath();
+          ctx.moveTo(p.x - s * 0.5, p.y + s * 0.8);
+          ctx.lineTo(p.x - s * 0.2, p.y + s * 1.5);
+          ctx.moveTo(p.x + s * 0.5, p.y + s * 0.8);
+          ctx.lineTo(p.x + s * 0.2, p.y + s * 1.5);
+          ctx.stroke();
+          ctx.fillStyle = "#8b5e34";
+          ctx.fillRect(p.x - s * 0.25, p.y + s * 1.5, s * 0.5, s * 0.4);
+        },
+      });
+    }
+
     for (let i = 0; i < 26; i++) {
       const ta = (i / 26) * Math.PI * 2 + 0.12;
       const tx = Math.cos(ta) * (RO + 42), ty = Math.sin(ta) * (RO + 42);
@@ -777,6 +832,20 @@ export default function KartRace3D({
             ctx.fillStyle = "#e11d48";
             ctx.fillRect(pilL.x - pw / 2, pilL.y - ph, pw, ph * 0.12);
             ctx.fillRect(pilR.x - pw / 2, pilR.y - ph, pw, ph * 0.12);
+            const flagH = ph * 0.3;
+            ctx.fillStyle = "#FFD34D";
+            ctx.beginPath();
+            ctx.moveTo(pilL.x + pw / 2, pilL.y - ph);
+            ctx.lineTo(pilL.x + pw / 2 + flagH * 0.9, pilL.y - ph + flagH * 0.25);
+            ctx.lineTo(pilL.x + pw / 2, pilL.y - ph + flagH * 0.5);
+            ctx.closePath();
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(pilR.x + pw / 2, pilR.y - ph);
+            ctx.lineTo(pilR.x + pw / 2 + flagH * 0.9, pilR.y - ph + flagH * 0.25);
+            ctx.lineTo(pilR.x + pw / 2, pilR.y - ph + flagH * 0.5);
+            ctx.closePath();
+            ctx.fill();
             const bw = Math.hypot(pilR.x - pilL.x, pilR.y - pilL.y);
             const ang = Math.atan2(pilR.y - pilL.y, pilR.x - pilL.x);
             ctx.save();

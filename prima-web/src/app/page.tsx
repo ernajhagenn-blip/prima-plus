@@ -212,7 +212,7 @@ export default function CinematicOpening() {
   const go = () => {
     leaveRef.current = performance.now();
     setLeaving(true);
-    setTimeout(() => router.push("/story"), 550);
+    setTimeout(() => router.push("/intro"), 550);
   };
 
   return (

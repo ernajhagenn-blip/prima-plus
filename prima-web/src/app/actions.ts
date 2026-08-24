@@ -105,7 +105,7 @@ export async function startJourney(prevState: unknown, formData: FormData) {
     maxAge: 60 * 60 * 24 * 14,
   });
 
-  redirect("/hook");
+  redirect("/story");
 }
 
 export async function submitPretest(prevState: unknown, formData: FormData) {
