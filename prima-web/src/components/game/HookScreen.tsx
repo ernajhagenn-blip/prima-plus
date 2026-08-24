@@ -8,12 +8,12 @@ import SceneErrorBoundary from "./SceneErrorBoundary";
 const HookScene = dynamic(() => import("./HookScene"), { ssr: false });
 
 const LINES = [
-  { who: "RAGA", text: "Guys, nanti habis kelas kita meeting di kafe ya. Jangan lupa bawa laptop.", color: "#FF8A2A" },
-  { who: "KIRA", text: "Sure, tapi aku belum finish tugasnya. Deadline-nya kapan sih?", color: "#E83E9F" },
-  { who: "ALYA", text: "Yaudah, nanti aku update jadwalnya di grup. Santai aja.", color: "#19BFEA" },
-  { who: "NARA", text: "Eh. Tunggu. Kamu sadar nggak? Barusan kita ngomong kayak gimana?", color: "#173B8F" },
-  { who: "RAGA", text: "Hah? Normal kan? Emangnya kenapa?", color: "#FF8A2A" },
-  { who: "NARA", text: "Coba dengerin lagi: 'meeting', 'finish', 'deadline', 'update'. Satu kalimat, empat bahasa asing. Kamu pilih itu karena butuh, atau karena kebiasaan?", color: "#173B8F" },
+  { who: "RAGA", text: "Eh, tadi aku dengerin obrolan kita.", color: "#FF8A2A" },
+  { who: "KIRA", text: "Terus?", color: "#E83E9F" },
+  { who: "RAGA", text: "Kita campur-campur terus. Bahasa Indonesia, Inggris, sedikit Sunda.", color: "#FF8A2A" },
+  { who: "ALYA", text: "Memangnya kenapa?", color: "#19BFEA" },
+  { who: "RAGA", text: "Nggak kenapa. Cuma… pernah nggak kita mikir, kenapa?", color: "#FF8A2A" },
+  { who: "MENTOR", text: "Menarik. Kapan terakhir kali kamu sadar memilih kata?", color: "#173B8F" },
 ];
 
 export default function HookScreen() {
@@ -41,11 +41,11 @@ export default function HookScreen() {
               textShadow: "0 2px 0 #FFD54F, 0 4px 12px rgba(0,0,0,0.15)",
             }}
           >
-            PERNAH NGGAK KAMU BICARA KAYAK GITU?
+            KAMU BICARA KAYAK GITU?
           </p>
           <p className="mt-4 text-sm text-gray-700 max-w-lg mx-auto">
-            Bahasa bukan cuma soal kata. Cara kita bicara bentuk siapa kita — dan ke siapa kita lagi bicara.
-            Pertanyaannya: kamu MEMILIH, atau cuma IKUT KEBIASAAN?
+            Bahasa kita beda tiap situasi. Nggak selalu sadar, tapi selalu memilih.
+            Sekarang coba tanya: kamu milih karena butuh, atau karena udah kebiasaan?
           </p>
           <button
             onClick={() => router.push("/journey/1")}

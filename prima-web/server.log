@@ -1,5 +1,5 @@
 ▲ Next.js 16.3.1
 - Local:         http://localhost:3100
-- Network:       http://192.168.1.12:3100
-✓ Ready in 465ms
-✓ Running next.config.ts took 211ms
+- Network:       http://192.168.1.36:3100
+✓ Ready in 522ms
+✓ Running next.config.ts took 229ms

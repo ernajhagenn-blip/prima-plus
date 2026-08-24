@@ -21,22 +21,21 @@ export default function FeedbackPage() {
             className="animate-slide-up rounded-3xl border border-blue-200 bg-white/70 p-6 backdrop-blur-md"
           >
             <p className="text-xs uppercase tracking-[0.3em] text-blue-400/80">
-              Reflection
+              Curhat
             </p>
-            <h1 className="mt-2 text-xl font-black">Sekarang giliranmu.</h1>
+            <h1 className="mt-2 text-xl font-black">Giliranmu ngomong.</h1>
             <p className="mt-2 text-sm text-gray-500">
-              Setelah perjalananmu di PRIMA WORLD, apa yang menurutmu perlu
-              diperbaiki?
+              Setelah main di PRIMA WORLD, ada yang perlu diubah? Tulis aja.
             </p>
 
             <textarea
               value={saran}
               onChange={(e) => setSaran(e.target.value)}
-              placeholder="Tulis saranmu…"
+              placeholder="Tulis di sini…"
               className="mt-4 h-28 w-full rounded-xl border border-gray-300 bg-white/80 p-3 text-sm text-gray-800 outline-none placeholder:text-gray-400 focus:border-blue-400"
             />
 
-            <p className="mt-4 text-sm font-bold text-gray-800">Bagian mana yang paling kamu suka?</p>
+            <p className="mt-4 text-sm font-bold text-gray-800">Paling suka bagian mana?</p>
             <div className="mt-2 flex flex-wrap justify-center gap-2">
               {PARTS.map((p) => (
                 <button
@@ -57,7 +56,7 @@ export default function FeedbackPage() {
               onClick={() => setStep(2)}
               className="mt-5 w-full rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 py-3 text-sm font-bold text-white shadow-md transition hover:shadow-lg"
             >
-              KIRIM SARAN
+              KIRIM
             </button>
           </div>
         )}
@@ -71,17 +70,17 @@ export default function FeedbackPage() {
               K
             </div>
             <p className="mt-3 text-sm text-gray-600">
-              &quot;Terima kasih. PRIMA WORLD berkembang dari pengalaman penggunanya.&quot;
+              Makasih! Masukanmu bantu PRIMA+ jadi lebih baik.
             </p>
 
             <div className="mt-6 rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50 p-5 text-left">
               <p className="text-sm font-bold text-gray-800">PRIMA+</p>
               <p className="mt-2 text-sm leading-relaxed text-gray-700">
-                Gunakan bahasa lain ketika kamu membutuhkannya.
+                Pakai bahasa lain saat kamu butuh.
                 <br />
-                Gunakan Bahasa Indonesia ketika itu adalah pilihanmu.
+                Pakai Bahasa Indonesia saat itu pilihanmu.
                 <br />
-                Yang terpenting: sadari mengapa kamu memilih.
+                Yang penting: sadar kenapa kamu milih.
               </p>
             </div>
 

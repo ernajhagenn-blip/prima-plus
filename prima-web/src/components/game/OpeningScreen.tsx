@@ -113,11 +113,11 @@ export default function OpeningScreen() {
           className="cta-btn"
           style={{ animation: "fadeUp 0.7s 0.8s ease-out both" }}
         >
-          ▶ MULAI PETUALANGAN
+          ▶ MULAI
         </button>
 
         <p className="footer-label" style={{ animation: "fadeIn 0.8s 1.2s ease-out both" }}>
-          PRIMA+ · OPSI 2026 · SMA
+          OPSI 2026
         </p>
       </div>
 

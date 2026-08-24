@@ -29,8 +29,8 @@ export default function IntroPage() {
           </div>
 
           <div className="mb-3 text-center">
-            <p className="text-sm font-black text-blue-600">HEI, RACER.</p>
-            <p className="text-xs text-gray-500">Kalau mau masuk arena, kenalan dulu.</p>
+            <p className="text-sm font-black text-blue-600">Hei! Selamat datang di PRIMA+.</p>
+            <p className="text-xs text-gray-500">Sebelum mulai, kenalan dulu, ya.</p>
           </div>
 
           <form action={formAction} className="rounded-3xl border border-blue-200 bg-white/70 p-6 shadow-lg backdrop-blur-md">
@@ -39,7 +39,7 @@ export default function IntroPage() {
                 key="1"
                 className="animate-slide-in-left"
               >
-                <p className="text-lg font-bold text-gray-900">Pertama, siapa namamu?</p>
+                <p className="text-lg font-bold text-gray-900">Siapa kamu?</p>
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -62,7 +62,7 @@ export default function IntroPage() {
                 key="2"
                 className="animate-slide-in-left"
               >
-                <p className="text-lg font-bold text-gray-900">Terus, kelas berapa sekarang?</p>
+                <p className="text-lg font-bold text-gray-900">Kelas berapa sekarang?</p>
                 <div className="mt-3 grid grid-cols-3 gap-2">
                   {CLASSES.map((c) => (
                     <button
@@ -105,7 +105,7 @@ export default function IntroPage() {
                 key="3"
                 className="animate-slide-in-left"
               >
-                <p className="text-lg font-bold text-gray-900">Terakhir, sekolahnya di mana?</p>
+                <p className="text-lg font-bold text-gray-900">Sekolah mana?</p>
                 <input
                   value={school}
                   onChange={(e) => setSchool(e.target.value)}
@@ -139,7 +139,7 @@ export default function IntroPage() {
           </form>
 
           <p className="mt-4 text-center text-xs text-gray-400">
-            Nice. Mulai sekarang, dunia ini bakal berubah sesuai perjalananmu.
+            Dunia ini bakal beda tiap orang. Yuk mulai.
           </p>
         </div>
       </main>

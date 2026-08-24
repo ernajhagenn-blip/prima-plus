@@ -7,7 +7,7 @@ const MINI_GAMES = [
     href: "/games/context-match",
     name: "Context Match",
     icon: "🎯",
-    desc: "Pilih ragam bahasa yang tepat untuk setiap situasi dan audiens.",
+    desc: "Pilih ragam bahasa yang pas buat tiap situasi.",
     gradient: "from-cyan-500 to-blue-600",
     glow: "rgba(6,182,212,0.35)",
     difficulty: 3,
@@ -17,7 +17,7 @@ const MINI_GAMES = [
     href: "/games/chat-repair",
     name: "Chat Repair",
     icon: "💬",
-    desc: "Perbaiki pesan chat yang ambigu atau canggung menjadi lebih jelas.",
+    desc: "Perbaiki chat yang canggung biar jelas dan enak dibaca.",
     gradient: "from-rose-500 to-pink-600",
     glow: "rgba(244,63,94,0.35)",
     difficulty: 2,
@@ -27,7 +27,7 @@ const MINI_GAMES = [
     href: "/games/word-switch",
     name: "Word Switch",
     icon: "🔤",
-    desc: "Ganti kata informal/salah dengan padanan yang benar dan baku.",
+    desc: "Ganti kata yang salah dengan padanan yang bener.",
     gradient: "from-amber-500 to-orange-600",
     glow: "rgba(245,158,11,0.35)",
     difficulty: 2,
@@ -37,7 +37,7 @@ const MINI_GAMES = [
     href: "/games/code-mix-lab",
     name: "Code-Mix Lab",
     icon: "🧪",
-    desc: "Analisis campuran bahasa Indonesia dan Inggris dalam percakapan.",
+    desc: "Bedah campuran bahasa Indonesia dan Inggris.",
     gradient: "from-violet-500 to-purple-600",
     glow: "rgba(139,92,246,0.35)",
     difficulty: 4,
@@ -47,7 +47,7 @@ const MINI_GAMES = [
     href: "/games/language-detective",
     name: "Language Detective",
     icon: "🔍",
-    desc: "Temukan dan koreksi kesalahan bahasa tersembunyi di setiap paragraf.",
+    desc: "Cari dan koreksi kesalahan bahasa yang tersembunyi.",
     gradient: "from-emerald-500 to-teal-600",
     glow: "rgba(16,185,129,0.35)",
     difficulty: 3,
@@ -57,7 +57,7 @@ const MINI_GAMES = [
     href: "/games/rapid-response",
     name: "Rapid Response",
     icon: "⚡",
-    desc: "Jawab asosiasi kata dalam 5 detik — uji kecepatan berpikir bahasa.",
+    desc: "Asosiasi kata dalam 5 detik. Cepat atau gagal!",
     gradient: "from-fuchsia-500 to-rose-600",
     glow: "rgba(217,70,239,0.35)",
     difficulty: 5,
@@ -109,7 +109,7 @@ export default function GamesPage() {
               </span>
             </h1>
             <p className="mt-1.5 text-sm text-gray-500">
-              6 tantangan untuk melatih kesadaran berbahasa Indonesia.
+              6 game seru buat ngasah otak bahasa.
             </p>
           </div>
           <div className="hidden h-16 w-16 items-center justify-center rounded-2xl border border-gray-200 bg-white/70 text-3xl backdrop-blur-md sm:flex shadow-sm">
@@ -180,7 +180,7 @@ export default function GamesPage() {
           className="mt-10 animate-fade-in text-center text-[11px] text-gray-400"
           style={{ animationDelay: "800ms" }}
         >
-          Skor dan XP tersimpan otomatis. Main bebas tanpa urutan.
+          Skor tersimpan otomatis. Main kapan aja, urutan bebas.
         </p>
       </div>
     </div>

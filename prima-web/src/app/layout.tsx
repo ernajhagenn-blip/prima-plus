@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "PRIMA+ — Kesadaran Berbahasa Remaja",
   description:
-    "Media pembelajaran berbasis kesadaran berbahasa untuk menguatkan loyalitas bahasa Indonesia remaja di lingkungan sekolah.",
+    "Platform kesadaran berbahasa untuk remaja. Pahami pilihanmu, kuatkan bahasamu.",
 };
 
 export default function RootLayout({
@@ -46,10 +46,10 @@ export default function RootLayout({
             </div>
             <div>
               <p className="text-sm font-black leading-tight text-white drop-shadow-sm">
-                PRIMA+ — Kesadaran Berbahasa Remaja
+                PRIMA+
               </p>
               <p className="text-xs font-semibold text-white/80">
-                Penguatan Loyalitas Bahasa Indonesia
+                Bahasa Kita. Pilihan Kita.
               </p>
             </div>
           </div>
@@ -62,7 +62,7 @@ export default function RootLayout({
           }}
         >
           <div className="mx-auto max-w-3xl px-4 py-3 text-center text-xs font-bold text-white/90 drop-shadow-sm">
-            PRIMA+ · OPSI 2026 · Ilmu Sosial Humaniora — Bahasa dan Sastra
+            OPSI 2026 · Ilmu Sosial Humaniora
           </div>
         </footer>
       </body>

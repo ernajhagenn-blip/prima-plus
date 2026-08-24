@@ -12,7 +12,7 @@ const ZONES = [
     id: "story",
     icon: "🏰",
     name: "Story District",
-    desc: "Jelajahi cerita dan ambil keputusan yang membentuk karaktermu.",
+    desc: "Pilih jalan ceritamu. Keputusanmu nentuin karakter.",
     href: "/journey/1",
     gradient: "linear-gradient(135deg, #66BB6A 0%, #43A047 100%)",
     shadow: "#2E7D32",
@@ -23,7 +23,7 @@ const ZONES = [
     id: "kart",
     icon: "🏎️",
     name: "PRIMA Kart Arena",
-    desc: "Balapan kart melalui checkpoint situasi bahasa Indonesia.",
+    desc: "Balapan lewat situasi bahasa. Cepat dan jeli!",
     href: "/select",
     gradient: "linear-gradient(135deg, #EF5350 0%, #FFA726 100%)",
     shadow: "#C62828",
@@ -34,7 +34,7 @@ const ZONES = [
     id: "tower",
     icon: "🏗️",
     name: "Challenge Tower",
-    desc: "Taklukkan 6 lantai tantangan bahasa untuk membuktikan kemampuanmu.",
+    desc: "6 lantai tantangan. Naik terus atau stuck?",
     href: "/games/challenge-tower",
     gradient: "linear-gradient(135deg, #AB47BC 0%, #7E57C2 100%)",
     shadow: "#6A1B9A",
@@ -45,7 +45,7 @@ const ZONES = [
     id: "arcade",
     icon: "🎮",
     name: "Mini Game Arcade",
-    desc: "6 mini games seru untuk melatih kesadaran berbahasa.",
+    desc: "6 mini game seru. Latihan bahasa sambil main.",
     href: "/games",
     gradient: "linear-gradient(135deg, #42A5F5 0%, #26C6DA 100%)",
     shadow: "#1565C0",
@@ -56,7 +56,7 @@ const ZONES = [
     id: "garage",
     icon: "🔧",
     name: "Garage & Upgrade",
-    desc: "Kustomisasi kart dan tingkatkan performa balapanmu.",
+    desc: "Upgrade kartmu. Makin kenceng, makin asik.",
     href: "/kart",
     gradient: "linear-gradient(135deg, #FFCA28 0%, #FFA726 100%)",
     shadow: "#F57F17",
@@ -67,7 +67,7 @@ const ZONES = [
     id: "knowledge",
     icon: "📚",
     name: "Knowledge Center",
-    desc: "Pelajari materi kesadaran berbahasa sebelum masuk arena.",
+    desc: "Baca dulu biar makin ngerti. Nggak wajib, tapi ngebantu.",
     href: "/edukasi",
     gradient: "linear-gradient(135deg, #26C6DA 0%, #42A5F5 100%)",
     shadow: "#00838F",
@@ -301,7 +301,7 @@ export default function WorldHub({
             <div className="relative">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-black uppercase tracking-widest text-white drop-shadow-md">
-                  🗺️ Progress Perjalanan
+                  🗺️ Progress
                 </h3>
                 <span className="text-2xl font-black text-white drop-shadow-md">{pct}%</span>
               </div>
@@ -319,7 +319,7 @@ export default function WorldHub({
                   Kartu: <span className="font-black text-white">{cards}</span>
                 </p>
                 <p className="text-xs font-semibold text-white/80">
-                  Skor Total: <span className="font-black text-white">{stars}</span>
+                  Skor: <span className="font-black text-white">{stars}</span>
                 </p>
               </div>
             </div>

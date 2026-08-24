@@ -30,106 +30,96 @@ export interface QuestionnaireItem {
   statement: string;
 }
 
-// 15 items Likert — 3 per dimensi, dirancang research-valid
 export const LOYALTY_ITEMS: QuestionnaireItem[] = [
-  // ── Sikap Positif (3) ──
   {
     id: 1,
     dimension: "Sikap Positif",
     statement:
-      "Aku lebih nyaman menyampaikan pendapat formal dalam Bahasa Indonesia daripada bahasa lain.",
+      "Kalau harus menyampaikan sesuatu yang serius, aku lebih nyaman pakai Bahasa Indonesia.",
   },
   {
     id: 2,
     dimension: "Sikap Positif",
     statement:
-      "Menurutku, Bahasa Indonesia punya kekuatan ekspresi yang sama dengan bahasa asing kalau dipakai dengan tepat.",
+      "Bahasa Indonesia itu luwes banget — bisa puisi, bisa becanda, bisa ilmiah. Tergantung kita pakainya.",
   },
   {
     id: 3,
     dimension: "Sikap Positif",
     statement:
-      "Aku merasa bahasa Indonesia yang baik bukan cuma soal aturan, tapi juga soal rasa memiliki.",
+      "Bahasa Indonesia yang baik itu bukan cuma soal EYD, tapi juga soal perasaan punya.",
   },
-
-  // ── Kesetiaan Penggunaan (3) ──
   {
     id: 4,
     dimension: "Kesetiaan Penggunaan",
     statement:
-      "Aku tetap memilih Bahasa Indonesia saat menulis caption Instagram meskipun teman-temanku lebih banyak pakai bahasa Inggris.",
+      "Aku tetap pakai Bahasa Indonesia buat caption Instagram, meskipun teman-temanku lebih sering pakai bahasa Inggris.",
   },
   {
     id: 5,
     dimension: "Kesetiaan Penggunaan",
     statement:
-      "Dalam obrolan grup, aku berusaha tetap menggunakan Bahasa Indonesia yang runtut meski yang lain pakai campur kode.",
+      "Di grup chat, aku berusaha tetap nulis dengan runtut meskipun yang lain bebas campur-campur.",
   },
   {
     id: 6,
     dimension: "Kesetiaan Penggunaan",
     statement:
-      "Aku menghindari singkatan tidak baku (yg, dg, pdhl) saat menulis pesan ke guru atau pengumuman.",
+      "Aku nggak pakai singkatan kayak 'yg', 'dg', 'pdhl' kalau lagi nulis ke guru atau bikin pengumuman.",
   },
-
-  // ── Kesadaran Norma (3) ──
   {
     id: 7,
     dimension: "Kesadaran Norma",
     statement:
-      "Aku sadar ketika memilih kata yang tepat untuk audiens yang berbeda — guru, teman, orang tua.",
+      "Aku bisa ngerasain bedanya kapan harus pakai bahasa yang lebih rapi dan kapan boleh santai.",
   },
   {
     id: 8,
     dimension: "Kesadaran Norma",
     statement:
-      "Aku bisa membedakan kapan bahasa gaul wajar dipakai dan kapan sebaiknya tidak.",
+      "Aku tahu kapan bahasa gaul itu wajar dipakai dan kapan malah nggak cocok.",
   },
   {
     id: 9,
     dimension: "Kesadaran Norma",
     statement:
-      "Menurutku, penggunaan bahasa gaul di media sosial tetap punya batasan yang perlu disadari.",
+      "Pakai bahasa gaul di sosmed itu sah-sah aja, tapi tetap ada batas yang perlu disadari.",
   },
-
-  // ── Kebanggaan (3) ──
   {
     id: 10,
     dimension: "Kebanggaan",
     statement:
-      "Aku bangga kalau bisa menulis atau berbicara dengan Bahasa Indonesia yang baik dan jelas.",
+      "Aku bangga kalau bisa nulis atau ngomong pakai Bahasa Indonesia yang jelas dan enak dibaca.",
   },
   {
     id: 11,
     dimension: "Kebanggaan",
     statement:
-      "Aku merasa percaya diri memakai Bahasa Indonesia di depan orang asing atau di kompetisi internasional.",
+      "Nggak masalah pakai Bahasa Indonesia di depan orang asing atau di kompetisi internasional. Justru itu tantangannya.",
   },
   {
     id: 12,
     dimension: "Kebanggaan",
     statement:
-      "Menurutku, bangga berbahasa Indonesia itu bukan kuno, tapi justru menunjukkan kedewasaan.",
+      "Bangga pakai Bahasa Indonesia itu bukan kuno. Justru itu tanda kita kenal diri sendiri.",
   },
-
-  // ── Refleksi Kritis (3) ──
   {
     id: 13,
     dimension: "Refleksi Kritis",
     statement:
-      "Penggunaan bahasa gaul di media sosial tidak mempengaruhi kemampuan menulis formal aku.",
+      "Kebiasaan nge-chat pakai bahasa gaul nggak otomatis bikin tulisan formal aku berantakan.",
   },
   {
     id: 14,
     dimension: "Refleksi Kritis",
     statement:
-      "Aku pernah sadar bahwa kebiasaan pakai kata asing ternyata lebih karena tren, bukan kebutuhan.",
+      "Pernah sadar, ternyata aku sering pakai kata asing bukan karena butuh, tapi karena ikut-ikutan.",
   },
   {
     id: 15,
     dimension: "Refleksi Kritis",
     statement:
-      "Aku sering mengevaluasi pilihan bahasaku sendiri — apakah sudah sesuai konteks atau cuma ikut kebiasaan.",
+      "Aku sering ngecek ulang: bahasaku sekarang udah sesuai konteks, atau cuma kebiasaan?",
   },
 ];
 
@@ -149,19 +139,18 @@ export interface Scenario {
   feedback: string;
 }
 
-// 8 SCENARIOS — kasus nyata, 4 opsi, 1 benar (paling sadar bahasa)
 export const SCENARIOS: Scenario[] = [
   {
     id: 1,
     construct: "Konteks & Audiens",
     caseType: "Game 1 — Grup Chat",
-    task: "Kamu diminta mengumumkan pertemuan kelompok di grup kelas yang isinya teman dan guru. Pilih pengumuman yang paling tepat.",
+    task: "Kamu diminta mengumumkan pertemuan kelompok di grup kelas. Isinya teman dan guru. Pilih yang paling pas.",
     situation:
-      "Grup kelas: ada 30 siswa + Bu Hartati (guru Bahasa Indonesia).",
+      "Grup kelas: 30 siswa + Bu Hartati (guru Bahasa Indonesia).",
     options: [
       {
         key: "a",
-        text: '"Yuk kumpul besok jam 4 di perpustakaan ya guys! Jangan lupa bawa laptop 😄"',
+        text: '"Halo semuanya, besok kita kumpul jam 4 di perpustakaan ya. Jangan lupa bawa laptop!"',
         correct: true,
       },
       {
@@ -171,29 +160,29 @@ export const SCENARIOS: Scenario[] = [
       },
       {
         key: "c",
-        text: '"ATTENTION: All group members are required to attend the meeting tomorrow at 16:00. Bring your laptop."',
+        text: '"Attention: All members must attend meeting tomorrow at 16:00. Bring laptop."',
         correct: false,
       },
       {
         key: "d",
-        text: '"Kepada Yth. rekan-rekan kelompok, dengan ini diinformasikan bahwa pertemuan akan dilaksanakan besok pukul 16.00 di perpustakaan. Terima kasih."',
+        text: '"Kepada Yth. rekan-rekan kelompok, dengan ini diinformasikan pertemuan besok pukul 16.00. Terima kasih."',
         correct: false,
       },
     ],
     feedback:
-      "Grup kelas itu semi-formal: ada teman, ada guru. Opsi (a) pas — tetap hangat dan jelas, tapi nggak terlalu kasar. Opsi (b) terlalu santai untuk campuran audiens. Opsi (c) bahasa Inggris di grup Indonesia? Opsi (d) kaku banget, kayak surat dinas. Yang penting: sesuaikan ragam dengan SIAPA yang baca, bukan cuma isinya.",
+      "Grup kelas itu campuran: ada teman, ada guru. Opsi (a) pas — tetap hangat, tapi jelas dan sopan. Opsi (b) terlalu santai untuk campuran audiens. Opsi (c) bahasa Inggris di grup Indonesia? Opsi (d) terlalu kaku, kayak surat dinas. Yang penting: sesuaikan ragam dengan SIAPA yang baca.",
   },
   {
     id: 2,
     construct: "Kesadaran Ragam",
     caseType: "Game 2 — DM ke Guru",
-    task: "Kirim pesan ke Bu Guru tentang deadline tugas yang mendesak. Pilih yang paling tepat.",
+    task: "Kamu perlu minta izin kumpulkan tugas terlambat ke Bu Hartati via WhatsApp. Pilih pesan yang tepat.",
     situation:
-      "Kamu tahu Bu Hartati aktif di WhatsApp dan biasanya fast response.",
+      "Bu Hartati aktif di WhatsApp dan biasanya fast response.",
     options: [
       {
         key: "a",
-        text: '"Bu, selamat pagi. Mohon maaf mengganggu. Apakah boleh saya kumpulkan tugasnya besok siang? Hari ini saya ada kegiatan lain. Terima kasih, Bu."',
+        text: '"Bu, selamat pagi. Mohon maaf, boleh saya kumpulkan tugasnya besok siang? Hari ini ada kegiatan mendadak. Terima kasih, Bu."',
         correct: true,
       },
       {
@@ -208,20 +197,20 @@ export const SCENARIOS: Scenario[] = [
       },
       {
         key: "d",
-        text: '"Bu Hartati yang terhormat, dengan hormat saya bermaksud menanyakan mengenai kemungkinan perpanjangan waktu pengumpulan tugas. Atas perhatiannya saya ucapkan terima kasih."',
+        text: '"Bu Hartati yang terhormat, dengan hormat saya bermaksud menanyakan kemungkinan perpanjangan waktu pengumpulan tugas. Terima kasih."',
         correct: false,
       },
     ],
     feedback:
-      "DM ke guru itu situasi semi-formal: sopan tapi nggak perlu se-formal surat resmi. Opsi (a) pas — ada salam, alasan singkat, dan terima kasih. Opsi (b) terlalu casual. Opsi (c) bahasa Inggris ke guru Indonesia? Opsi (d) berlebihan, kayak nulis surat dinas. Yang diharapkan: jelas, sopan, dan manusiawi.",
+      "DM ke guru itu sopan tapi nggak harus seformal surat. Opsi (a) pas — ada salam, alasan singkat, terima kasih. Opsi (b) terlalu casual. Opsi (c) bahasa Inggris ke guru Indonesia? Opsi (d) berlebihan banget. Yang diharapkan: jelas, sopan, manusiawi.",
   },
   {
     id: 3,
     construct: "Kesadaran Audiens",
     caseType: "Game 3 — Caption Instagram",
-    task: "Kamu mau posting foto kegiatan sekolah di Instagram. Pilih caption yang paling sesuai untuk akun publikmu.",
+    task: "Kamu mau posting foto presentasi kelas XII di Instagram. Pilih caption yang cocok.",
     situation:
-      "Foto: kamu dan teman-teman sedang presentasi di kelas. Akun Instagram kamu diikuti teman, keluarga, dan beberapa guru.",
+      "Foto: kamu dan teman presentasi di kelas. Akun Instagram diikuti teman, keluarga, dan beberapa guru.",
     options: [
       {
         key: "a",
@@ -240,24 +229,24 @@ export const SCENARIOS: Scenario[] = [
       },
       {
         key: "d",
-        text: '"Diinformasikan bahwa pada hari ini telah dilaksanakan kegiatan presentasi kelas XII dengan lancar. Demikian informasi ini, terima kasih."',
+        text: '"Diinformasikan telah dilaksanakan kegiatan presentasi kelas XII dengan lancar. Terima kasih."',
         correct: false,
       },
     ],
     feedback:
-      "Caption Instagram itu publik: dibaca teman, keluarga, guru. Opsi (a) tetap personal dan hangat, tapi jelas dan pakai Bahasa Indonesia. Opsi (b) terlalu slang untuk akun publik campuran. Opsi (c) bahasa Inggris — fine kalau memang targetnya internasional, tapi di sini audiensnya lokal. Opsi (d) kayak pengumuman kantor. Caption yang baik = personal tapi tetap sopan.",
+      "Caption Instagram itu publik: dibaca teman, keluarga, guru. Opsi (a) personal tapi jelas dan pakai Bahasa Indonesia. Opsi (b) terlalu slang untuk akun campuran. Opsi (c) bahasa Inggris — fine kalau targetnya internasional, tapi audiensnya lokal. Opsi (d) kayak pengumuman kantor.",
   },
   {
     id: 4,
     construct: "Konteks & Prestasi",
     caseType: "Game 4 — Presentasi",
-    task: "Kamu presentasi di depan juri lomba penelitian. Pilih cara membuka presentasi yang paling tepat.",
+    task: "Kamu presentasi di depan juri lomba penelitian. Pilih cara membuka presentasi.",
     situation:
-      "Juri: 3 orang dewasa, profesor dari universitas. Tema: penelitian tentang bahasa.",
+      "Juri: 3 profesor dari universitas. Tema: penelitian tentang bahasa.",
     options: [
       {
         key: "a",
-        text: '"Selamat pagi, Bapak/Ibu Juri yang saya hormati. Perkenalkan, kami dari MAN Kotawaringin Timur akan memaparkan hasil penelitian kami tentang kesadaran berbahasa remaja."',
+        text: '"Selamat pagi, Bapak/Ibu Juri yang saya hormati. Perkenalkan, kami dari MAN Kotawaringin Timur akan memaparkan hasil penelitian tentang kesadaran berbahasa remaja."',
         correct: true,
       },
       {
@@ -277,13 +266,13 @@ export const SCENARIOS: Scenario[] = [
       },
     ],
     feedback:
-      "Presentasi di depan juri lomba itu situasi formal tinggi. Opsi (a) tepat: formal tapi nggak kaku, jelas, langsung ke poin. Opsi (b) dan (c) terlalu santai untuk juri. Opsi (d) terlalu panjang dan berbelit — juri wants you to get to the point. Kunci: tunjukkan kualitas tanpa berlebihan.",
+      "Presentasi depan juri itu formal. Opsi (a) tepat — formal tapi nggak kaku, langsung ke poin. Opsi (b) dan (c) terlalu santai. Opsi (d) panjang dan berbelit. Kunci: tunjukkan kualitas tanpa berlebihan.",
   },
   {
     id: 5,
     construct: "Kesadaran Relasi",
     caseType: "Game 5 — Chat Teman",
-    task: "Teman baru pindahan dari Jakarta chat kamu: 'Eh, kayaknya kita satu kelas deh. Boleh kenalan?' Pilih balasan yang paling tepat.",
+    task: "Teman baru pindahan dari Jakarta chat kamu: 'Eh, kayaknya kita satu kelas deh. Boleh kenalan?' Pilih balasan.",
     situation:
       "Kamu belum kenal orang ini. Chat pertama.",
     options: [
@@ -304,24 +293,24 @@ export const SCENARIOS: Scenario[] = [
       },
       {
         key: "d",
-        text: '"Halo, terima kasih sudah menghubungi. Perkenalkan, saya adalah siswa kelas XII IPA 1. Silakan apabila ada yang perlu ditanyakan."',
+        text: '"Halo, terima kasih sudah menghubungi. Perkenalkan, saya siswa kelas XII IPA 1. Silakan apabila ada yang perlu ditanyakan."',
         correct: false,
       },
     ],
     feedback:
-      "Chat pertama dengan orang baru itu hangat tapi sopan. Opsi (a) pas — ramah, jelas, dan menawarkan bantuan. Opsi (b) terlalu kasar. Opsi (c) bahasa Inggris ke sesama lokal — bisa, tapi nggak perlu. Opsi (d) kayak customer service. Yang penting: bikin orang baru merasa diterima.",
+      "Chat pertama dengan orang baru: hangat tapi sopan. Opsi (a) ramah, jelas, menawarkan bantuan. Opsi (b) terlalu kasar. Opsi (c) bahasa Inggris ke sesama lokal — bisa, tapi nggak perlu. Opsi (d) kayak customer service.",
   },
   {
     id: 6,
     construct: "Pemilihan Ragam",
     caseType: "Game 6 — Surat vs Chat",
-    task: "Kamu harus menyampaikan dua hal: (1) izin tidak masuk sekolah ke wali kelas, dan (2) info jadwal ulang ke grup kelas. Pilih pasangan yang paling tepat.",
+    task: "Kamu harus: (1) izin tidak masuk ke wali kelas, dan (2) info jadwal ulang ke grup kelas. Pilih pasangan yang tepat.",
     situation:
       "Izin ke wali kelas via WhatsApp pribadi. Info ke grup kelas.",
     options: [
       {
         key: "a",
-        text: 'Izin: "Pak, selamat pagi. Saya [namamu] izin tidak masuk hari ini karena sakit. Mohon doanya. Terima kasih." — Info grup: "Halo teman-teman, jadwal ulang besok jam 8 ya. Siapkan yang terbaik! 💪"',
+        text: 'Izin: "Pak, selamat pagi. Saya izin tidak masuk hari ini karena sakit. Terima kasih." — Info grup: "Halo teman-teman, jadwal ulang besok jam 8 ya. Siapkan yang terbaik! 💪"',
         correct: true,
       },
       {
@@ -331,23 +320,23 @@ export const SCENARIOS: Scenario[] = [
       },
       {
         key: "c",
-        text: 'Izin: "Good morning Sir, I would like to inform you that I cannot attend school today due to illness." — Info grup: "Dear classmates, please be informed that the remedial test will be conducted tomorrow at 8 AM."',
+        text: 'Izin: "Good morning Sir, I cannot attend school today due to illness." — Info grup: "Dear classmates, the remedial test will be conducted tomorrow at 8 AM."',
         correct: false,
       },
       {
         key: "d",
-        text: 'Izin: "Dengan hormat, bersama ini saya sampaikan ketidakhadiran saya pada hari ini dikarenakan kondisi kesehatan yang kurang memadai." — Info grub: "Yuk kumpul besok jam 8 buat ulangan, seru ga tuh wkwk"',
+        text: 'Izin: "Dengan hormat, bersama ini saya sampaikan ketidakhadiran saya dikarenakan kondisi kesehatan yang kurang memadai." — Info grup: "Yuk kumpul besok jam 8 buat ulangan, seru ga tuh wkwk"',
         correct: false,
       },
     ],
     feedback:
-      "Situasi berbeda = ragam berbeda. Izin ke guru: sopan, jelas, personal. Info ke teman: hangat, jelas, tapi santai. Opsi (a) pas untuk keduanya. Opsi (b) terlalu casual ke guru. Opsi (c) bahasa Inggris — nggak perlu. Opsi (d) berlebihan ke guru, tapi terlalu santai ke grup. Kunci: SATU ORANG bisa pakai DUA RAGAM dalam SATU HARI — dan itu BAIK.",
+      "Situasi beda = ragam beda. Izin ke guru: sopan, jelas, personal. Info ke teman: hangat, jelas, tapi santai. Opsi (a) pas untuk keduanya. Opsi (b) terlalu casual ke guru. Opsi (c) bahasa Inggris — nggak perlu. Opsi (d) berlebihan ke guru, tapi santai ke grup. Kunci: SATU ORANG bisa pakai DUA RAGAM dalam SATU HARI — dan itu BAIK.",
   },
   {
     id: 7,
     construct: "Refleksi Kritis",
     caseType: "Game 7 — Bahasa Kampungan",
-    task: "Temanmu bilang: 'Jangan pakai bahasa daerah di sini, kampungan banget!' Pilih respons yang paling menunjukkan kesadaran berbahasa.",
+    task: "Temanmu bilang: 'Jangan pakai bahasa daerah di sini, kampungan banget!' Pilih respons yang menunjukkan kesadaran berbahasa.",
     situation:
       "Kamu dan teman sedang di ruang kelas. Teman baru itu dari kota.",
     options: [
@@ -373,13 +362,13 @@ export const SCENARIOS: Scenario[] = [
       },
     ],
     feedback:
-      "Komentar 'bahasa daerah kampungan' itu cermin ketidaksadaran, bukan fakta. Opsi (a) — menjelaskan dengan tenang, tanpa menyerang, tapi tegas. Opsi (b) malah menyerah. Opsi (c) menyerang balik, justru memperkeruh. Opsi (d) apatis. Yang penting: bela keberagaman tanpa harus marah. Bahasa daerah itu KEKAYAAN, bukan aib.",
+      "Komentar 'bahasa daerah kampungan' itu cermin ketidaksadaran, bukan fakta. Opsi (a) menjelaskan dengan tenang, tanpa menyerang, tapi tegas. Opsi (b) malah menyerah. Opsi (c) menyerang balik. Opsi (d) apatis. Yang penting: bela keberagaman tanpa harus marah.",
   },
   {
     id: 8,
     construct: "Komitmen Identitas",
     caseType: "Game 8 — Kompetisi",
-    task: "Kamu ikut lomba penelitian tingkat nasional. Juri internasional akan membaca abstrakmu. Pilih cara menulis abstrak yang paling tepat.",
+    task: "Kamu ikut lomba penelitian tingkat nasional. Juri internasional akan membaca abstrakmu. Pilih cara menulis abstrak.",
     situation:
       "Abstrak: 250 kata, harus jelas, ilmiah, tapi bisa dibaca siapa saja.",
     options: [
@@ -405,18 +394,17 @@ export const SCENARIOS: Scenario[] = [
       },
     ],
     feedback:
-      "Di kompetisi internasional, Bahasa Indonesia tetap punya tempat. Opsi (a) — pakai Bahasa Indonesia yang baik, dengan terjemahan jika diperlukan. Ini menunjukkan kebanggaan sekaligus profesionalisme. Opsi (b) meninggalkan identitas. Opsi (c) campur kode di abstrak ilmiah? Opsi (d) 'seadanya' tidak profesional. Kunci: bangga berbahasa Indonesia TIDAK berarti menolak bahasa lain — tapi MEMILIH yang tepat.",
+      "Di kompetisi internasional, Bahasa Indonesia tetap punya tempat. Opsi (a) pakai Bahasa Indonesia yang baik, dengan terjemahan jika perlu. Ini menunjukkan kebanggaan sekaligus profesionalisme. Opsi (b) meninggalkan identitas. Opsi (c) campur kode di abstrak ilmiah? Opsi (d) 'seadanya' tidak profesional.",
   },
 ];
 
-// Refleksi terstruktur (D.6) — 6 pertanyaan deeper, bukan surface-level
 export const GAME_REFLECTION_QUESTIONS: string[] = [
-  "Pernahkah kamu merasa terpaksa menggunakan bahasa tertentu agar dianggap keren? Apa yang sebenarnya terjadi saat itu?",
-  "Kalau semua orang di sekitarmu tiba-tiba berhenti menggunakan Bahasa Indonesia, apa yang akan hilang dari hidupmu?",
-  "Coba ingat: kapan terakhir kali kamu memilih kata dengan sadar karena tahu siapa yang akan membaca atau mendengar? Apa yang membuatmu waktu itu?",
-  "Menurutmu, apakah anak muda Indonesia punya kekuatan untuk 'mengembalikan' bahasa Indonesia ke tempat yang lebih dihormati? Bagaimana caranya?",
-  "Pernahkah kamu mendengar seseorang berbicara dengan Bahasa Indonesia yang sangat baik dan tiba-tiba merasa bangga? Apa yang kamu rasakan?",
-  "Jika kamu harus menjelaskan kepada turis asing mengapa Bahasa Indonesia itu istimewa dalam satu kalimat, apa yang akan kamu katakan?",
+  "Pernahkah kamu pakai bahasa tertentu cuma biar dianggap keren? Apa yang sebenarnya terjadi waktu itu?",
+  "Kalau semua orang di sekitarmu tiba-tiba berhenti pakai Bahasa Indonesia, apa yang bakal hilang dari hidupmu?",
+  "Kapan terakhir kali kamu milih kata dengan sadar karena tahu siapa yang bakal baca atau dengar? Apa yang bikin kamu waktu itu?",
+  "Menurutmu, apakah anak muda Indonesia punya kekuatan untuk 'mengembalikan' bahasa Indonesia ke tempat yang lebih dihormati? Gimana caranya?",
+  "Pernahkah kamu dengar seseorang berbicara dengan Bahasa Indonesia yang sangat baik dan tiba-tiba merasa bangga? Apa yang kamu rasakan?",
+  "Kalau kamu harus jelaskan ke turis asing kenapa Bahasa Indonesia itu istimewa dalam satu kalimat, apa yang akan kamu katakan?",
 ];
 
 export interface ResponseItem {
@@ -425,16 +413,16 @@ export interface ResponseItem {
 }
 
 export const RESPONSE_ITEMS: ResponseItem[] = [
-  { id: 1, statement: "PRIMA+ membantu aku lebih sadar tentang pilihan bahasa dalam kehidupan sehari-hari." },
-  { id: 2, statement: "Setelah menggunakan PRIMA+, aku lebih memperhatikan ragam bahasa yang aku pakai untuk orang yang berbeda." },
-  { id: 3, statement: "Kuis dan skenario di PRIMA+ terasa relevan dengan situasi yang benar-benar aku alami." },
-  { id: 4, statement: "Aku jadi lebih mengerti bahwa campur kode itu tidak selalu salah, tapi perlu disadari alasannya." },
-  { id: 5, statement: "PRIMA+ membuat aku merasa lebih percaya diri berbahasa Indonesia, termasuk di media sosial." },
-  { id: 6, statement: "Materi edukasi di PRIMA+ mudah dipahami dan tidak menggurui." },
-  { id: 7, statement: "Aku akan merekomendasikan PRIMA+ ke teman-teman karena isinya bermanfaat." },
-  { id: 8, statement: "Setelah bermain PRIMA+, aku lebih sering mengevaluasi apakah bahasaku sudah sesuai konteks." },
-  { id: 9, statement: "PRIMA+ mengubah cara pandangku tentang Bahasa Indonesia — dari 'sekadar bahasa sekolah' menjadi 'bagian dari identitasku'." },
-  { id: 10, statement: "Aku merasa lebih bangga menggunakan Bahasa Indonesia setelah melalui pengalaman PRIMA+." },
+  { id: 1, statement: "PRIMA+ bikin aku lebih aware soal pilihan bahasa sehari-hari." },
+  { id: 2, statement: "Setelah pakai PRIMA+, aku lebih memperhatikan ragam bahasa yang aku pakai ke orang yang beda-beda." },
+  { id: 3, statement: "Kuis dan skenario di PRIMA+ kerasa relevan — kayak situasi yang beneran aku alami." },
+  { id: 4, statement: "Aku jadi ngerti bahwa campur kode itu nggak selalu salah, tapi perlu disadari alasannya." },
+  { id: 5, statement: "PRIMA+ bikin aku lebih percaya diri pakai Bahasa Indonesia, termasuk di media sosial." },
+  { id: 6, statement: "Materi di PRIMA+ mudah dipahami dan nggak menggurui." },
+  { id: 7, statement: "Aku bakal rekomendasiin PRIMA+ ke teman-teman karena isinya bermanfaat." },
+  { id: 8, statement: "Setelah main PRIMA+, aku lebih sering ngecek: bahasaku udah sesuai konteks belum ya?" },
+  { id: 9, statement: "PRIMA+ ngubah cara pandangku tentang Bahasa Indonesia — dari 'sekadar bahasa sekolah' jadi 'bagian dari identitasku'." },
+  { id: 10, statement: "Aku merasa lebih bangga pakai Bahasa Indonesia setelah lewat pengalaman PRIMA+." },
 ];
 
 export interface EduModule {
@@ -443,100 +431,95 @@ export interface EduModule {
   body: string;
 }
 
-// 6 EDU_SEED — modul edukasi dengan kasus nyata, bukan teori kosong
 export const EDU_SEED: EduModule[] = [
   {
     title: "Bahasa dan Identitas",
     dimension: "Sikap Positif",
-    body: `Bayangkan ini: kamu di rumah ngomong Javanese sama ibu, di sekolah pakai Bahasa Indonesia, dan di grup WhatsApp pakai campuran Indonesia-Inggris. Satu hari, tiga bahasa. Pertanyaannya: mana yang "kamu" yang asli?
+    body: `Eh, kamu sadar nggak? Di rumah mungkin kamu ngomong bahasa daerah sama ibu. Di sekolah pakai Bahasa Indonesia. Di grup WhatsApp, campur Indonesia-Inggris. Satu hari, tiga bahasa.
 
-Sebenarnya, semua itu kamu. Bahasa adalah cerminan konteks — bukan kepalsuan. Ketika kamu beralih dari Javanese ke Bahasa Indonesia ke English, itu bukan berarti kamu "berubah orang". Itu berarti kamu punya kemampuan luar biasa untuk menyesuaikan diri.
+Kira-kira, mana yang "kamu" yang asli?
 
-Tapi di sinilah masalahnya: ketika kita beralih tanpa sadar, kita bisa kehilangan kendali. Kita pakai bahasa karena kebiasaan, bukan karena pilihan. Dan ketika kebiasaan itu terbawa ke situasi yang tidak tepat — misalnya pakai bahasa gaul ke guru, atau pakai bahasa formal ke teman dekat — komunikasi jadi terasa kaku atau tidak sopan.
+Sebenarnya, semua itu kamu. Bukan kepalsuan. Bahasa itu cerminan konteks — kamu beralih bukan karena "berubah orang", tapi karena kamu bisa menyesuaikan diri. Itu kemampuan luar biasa, lho.
 
-**Refleksi:** Coba ingat satu momen hari ini di mana kamu berganti bahasa tanpa berpikir panjang. Apa yang terjadi? Apakah pesanmu sampai dengan baik?`,
+Masalahnya begini: kalau kita beralih tanpa sadar, kita kehilangan kendali. Kita pakai bahasa karena kebiasaan, bukan karena pilihan. Terus pas kebiasaan itu terbawa ke situasi yang nggak tepat — misalnya pakai bahasa gaul ke guru, atau bahasa formal ke teman dekat — komunikasi jadi terasa kaku atau nggak enak.
+
+Coba ingat: hari ini, kapan kamu berganti bahasa tanpa berpikir panjang? Apa pesanmu sampai dengan baik?`,
   },
   {
     title: "Konteks dan Audiens",
     dimension: "Kesadaran Norma",
-    body: `"Guys, meetingnya di kafe jam 4 ya, nanti aku bring materinya." — Kalimat ini wajar di grup teman. Tapi coba bayangkan kalimat ini dikirim ke kepala sekolah via email. Rasanya beda, kan?
+    body: `"Guys, meetingnya di kafe jam 4 ya, nanti aku bring materinya." — Kalimat ini wajar banget di grup teman. Tapi coba bayangkan kalau dikirim ke kepala sekolah via email. Rasanya beda, kan?
 
-Ini yang disebut kesadaran konteks: kemampuan membaca SIAPA yang akan menerima pesanmu, dan menyesuaikan ragam bahasa sesuai situasi. Bukan soal "formal selalu benar" atau "santai selalu salah" — tapi soal KESESUAIAN.
+Ini yang namanya kesadaran konteks: kemampuan baca SIAPA yang bakal terima pesanmu, terus sesuaikan ragam bahasanya. Bukan soal "formal selalu benar" atau "santai selalu salah" — tapi soal KESESUAIAN.
 
-Studi linguistik menunjukkan bahwa remaja yang punya kesadaran konteks lebih baik dalam membangun hubungan sosial. Mereka tahu kapan harus "naik ragam" (lebih formal) dan kapan boleh "turun ragam" (lebih santai). Kemampuan ini bukan bakat lahir — bisa dilatih.
+Penelitian bilang, remaja yang punya kesadaran konteks lebih jago membangun hubungan sosial. Mereka tahu kapan harus "naik ragam" dan kapan boleh "turun ragam". Dan ini bukan bakat lahir — bisa dilatih.
 
-Contoh nyata: DM ke guru tentang deadline. Kamu nggak perlu nulis kayak surat dinas, tapi juga nggak bisa bilang "Bu, gue telat ya 😅". Cukup: "Bu, selamat pagi. Mohon maaf, boleh saya kumpulkan besok? Hari ini ada kegiatan mendadak. Terima kasih." Sopan, jelas, manusiawi.
+Contoh: DM ke guru soal deadline. Nggak perlu nulis kayak surat dinas, tapi juga nggak bisa bilang "Bu, gue telat ya 😅". Cukup: "Bu, selamat pagi. Mohon maaf, boleh saya kumpulkan besok? Hari ini ada kegiatan mendadak." Sopan. Jelas. Manusiawi.
 
-**Refleksi:** Pernahkah kamu mengirim pesan yang salah ragam — terlalu formal ke teman, atau terlalu santai ke guru? Apa yang terjadi setelahnya?`,
+Pernah nggak kamu nge-chat yang salah ragam — terlalu formal ke teman, atau terlalu santai ke guru?`,
   },
   {
-    title: "Code-Mixing dan Code-Switching",
+    title: "Code-Mixing",
     dimension: "Kesadaran Norma",
-    body: `"Gue udah finish tugasnya, tapi deadline-nya masih lama kan?" — Kalimat ini mengandung apa yang linguists sebut CODE-MIXING: menyisipkan kata asing (finish, deadline) dalam kalimat Indonesia.
+    body: `"Gue udah finish tugasnya, tapi deadline-nya masih lama kan?" — Kalimat ini mengandung yang linguists sebut CODE-MIXING: menyisipkan kata asing dalam kalimat Indonesia.
 
-Ada juga CODE-SWITCHING: berpindah ke bahasa lain sepenuhnya. Misalnya, awalnya ngomong Bahasa Indonesia, tiba-tiba lanjut pakai Bahasa Inggris di pertengahan kalimat.
+Ada juga CODE-SWITCHING: berpindah ke bahasa lain sepenuhnya. Misalnya awalnya Bahasa Indonesia, tiba-tiba lanjut Bahasa Inggris di pertengahan kalimat.
 
-Keduanya WAJAR di kalangan remaja. Bukan berarti kamu "tidak bisa Bahasa Indonesia". Sering kali, code-mixing terjadi karena:
-1. **Kebiasaan** — kata itu sudah jadi bagian dari kosakata harianmu
-2. **Ketepatan** — tidak ada padanan Indonesia yang sama singkatnya
-3. **Tren** — semua orang pakai, jadi ikut pakai
-4. **Ekspresi** — terasa lebih "pass" dalam bahasa tertentu
+Keduanya WAJAR di kalangan remaja. Nggak berarti kamu "tidak bisa Bahasa Indonesia". Sering kali, campur kode terjadi karena kebiasaan, karena kata itu sudah jadi bagian kosakata harianmu. Atau karena nggak ada padanan Indonesia yang sama singkatnya. Atau ya, karena semua orang pakai jadi ikut pakai.
 
 Yang perlu disadari: ADAKAH padanan Indonesianya? Dan apakah lawan bicaramu paham kata asing yang kamu pakai?
 
-Contoh: kalau kamu bilang ke ibu "nanti aku share link meeting-nya", ibu mungkin bingung. Bukan karena ibu "kudet", tapi karena kata itu belum masuk dunianya. Di sinilah kesadaran berbahasa bekerja: kita yang menyesuaikan, bukan mereka yang harus "update".
+Kalau kamu bilang ke ibu "nanti aku share link meeting-nya", ibu mungkin bingung. Bukan karena ibu "kudet", tapi karena kata itu belum masuk dunianya. Kita yang harus jaga.
 
-**Refleksi:** Dalam percakapan terakhirmu, adakah kata asing yang kamu pakai tanpa berpikir? Apakah ada padanan Indonesianya yang sama efektifnya?`,
+Coba ingat percakapan terakhirmu: adakah kata asing yang kamu pakai tanpa berpikir? Apakah ada padanan Indonesianya yang sama efektifnya?`,
   },
   {
     title: "Dampak Bahasa Digital",
     dimension: "Refleksi Kritis",
     body: `Ketik: "gw lg dk rmh, lu kpn dtg? gpp gpp bgt" — Kamu masih bisa baca, kan? Tapi coba bayangkan kalimat ini ditulis di surat lamaran kerja atau ujian nasional.
 
-Bahasa digital — singkatan seperti gw, lu, bgt, gpp, FYI, btw — membentuk kebiasaan menulis kita. Penelitian dari Universitas Indonesia (2023) menunjukkan bahwa 78% pelajar SMA mengaku lebih sering menulis singkatan tidak baku di chat daripada kalimat lengkap. Dan yang menarik: 62% dari mereka mengaku kesulitan beralih ke bahasa formal saat menulis tugas sekolah.
+Bahasa digital — singkatan seperti gw, lu, bgt, gpp — membentuk kebiasaan menulis kita. Dari Universitas Indonesia (2023) bilang: 78% pelajar SMA ngaku lebih sering nulis singkatan tidak baku di chat daripada kalimat lengkap. Dan yang menarik: 62% dari mereka ngaku kesulitan beralih ke bahasa formal saat nulis tugas sekolah.
 
-Ini bukan soal singkatan itu "salah". Di chat dengan teman, "gw" dan "lu" efisien. Tapi masalah muncul ketika kebiasaan itu TIDAK BISA DIMATIKAN — ketika kamu menulis email ke guru dengan "gw mau izin ya", atau menulis caption sekolah dengan "yuk guys kita kumpul bgt nih".
+Ini bukan soal singkatan itu "salah". Di chat dengan teman, "gw" dan "lu" efisien. Tapi masalah muncul ketika kebiasaan itu TIDAK BISA DIMATIKAN — ketika kamu nulis email ke guru pakai "gw mau izin ya", atau bikin caption sekolah pakai "yuk guys kita kumpul bgt nih".
 
-Kemampuan untuk beralih antara ragam digital dan ragam formal adalah SKILL, bukan bakat. Dan seperti semua skill, ini bisa dilatih.
+Kemampuan beralih antara ragam digital dan ragam formal itu SKILL. Dan seperti semua skill, ini bisa dilatih.
 
-**Refleksi:** Apakah kamu pernah menulis sesuatu di chat, lalu sadar bahwa kamu menulis dengan cara yang sama saat menulis tugas sekolah? Apa dampaknya terhadap kualitas tulisanmu?`,
+Apakah kamu pernah nulis sesuatu di chat, lalu sadar bahwa kamu menulis dengan cara yang sama saat nulis tugas sekolah?`,
   },
   {
     title: "Loyalitas Bahasa Indonesia",
     dimension: "Kebanggaan",
-    body: `Loyalitas bukan berarti menolak semua bahasa lain. Loyalitas berarti MEMILIH Bahasa Indonesia ketika itu adalah pilihan yang tepat — dan bangga melakukannya.
+    body: `Loyalitas bukan berarti menolak semua bahasa lain. Loyalitas berarti MEMILIH Bahasa Indonesia ketika itu pilihan yang tepat — dan bangga melakukannya.
 
-Lihat para kreator Indonesia di YouTube, TikTok, atau Instagram. Banyak dari mereka menggunakan Bahasa Indonesia untuk konten yang ditonton oleh jutaan orang — termasuk penonton internasional. Mereka membuktikan bahwa Bahasa Indonesia bisa kreatif, modern, dan global tanpa harus "berganti" ke bahasa Inggris.
+Lihat kreator Indonesia di YouTube, TikTok, atau Instagram. Banyak dari mereka pakai Bahasa Indonesia untuk konten yang ditonton jutaan orang — termasuk penonton internasional. Mereka buktiin bahwa Bahasa Indonesia bisa kreatif, modern, dan global tanpa harus "berganti" ke bahasa Inggris.
 
-Contoh nyata: YouTuber seperti Deddy Corbuzier, Atta Halilintar, atau-content creator seperti Agnez Mo — mereka semua menggunakan Bahasa Indonesia dengan bangga dalam konteks global. Mereka tidak menolak bahasa Inggris, tapi mereka MEMILIH Indonesia sebagai bahasa utama ekspresi.
+Ketika kamu nulis caption Instagram dalam Bahasa Indonesia yang baik, kamu lagi nunjukin ke 270 juta orang Indonesia bahwa bahasa kita punya tempat di dunia digital. Ketika kamu berpidato dalam Bahasa Indonesia yang jelas di depan juri internasional, kamu lagi membuktikan bahwa "bahasa nasional" bukan berarti "bahasa kampungan".
 
-Loyalitas juga berarti: ketika kamu menulis caption Instagram dalam Bahasa Indonesia yang baik, kamu sedang menunjukkan kepada 270 juta orang Indonesia bahwa bahasa kita punya tempat di dunia digital. Ketika kamu berpidato dalam Bahasa Indonesia yang jelas di depan juri internasional, kamu sedang membuktikan bahwa "bahasa nasional" bukan berarti "bahasa kampungan".
+Yang terpenting: loyalitas bukan kewajiban. Itu PILIHAN yang lahir dari kesadaran.
 
-Yang terpenting: loyalitas bukan kewajiban — itu PILIHAN yang lahir dari kesadaran.
-
-**Refleksi:** Pernahkah kamu merasa bangga menggunakan Bahasa Indonesia di situasi yang biasanya didominasi bahasa Inggris? Apa yang kamu rasakan?`,
+Pernahkah kamu merasa bangga pakai Bahasa Indonesia di situasi yang biasanya didominasi bahasa Inggris?`,
   },
   {
     title: "Refleksi dan Aksi",
     dimension: "Refleksi Kritis",
-    body: `Sekarang kamu sudah memahami konsepnya. Tapi pemahaman tanpa aksi hanya akan menjadi pengetahuan yang terlupakan. Jadi, apa yang bisa kamu lakukan mulai hari ini?
+    body: `Oke, sekarang kamu udah paham konsepnya. Tapi pemahaman tanpa aksi cuma jadi pengetahuan yang terlupa. Jadi, apa yang bisa kamu lakuin mulai hari ini?
 
-**1. Language Journal (Jurnal Bahasa)**
-Setiap malam, tulis 3 kalimat tentang pengalaman bahasamu hari ini. Contoh: "Hari ini aku pakai bahasa Indonesia yang formal saat presentasi, tapi campur kode saat chat teman. Aku sadar akan perbedaannya."
+**1. Jurnal Bahasa**
+Setiap malam, tulis 3 kalimat soal pengalaman bahasamu hari ini. Contoh: "Hari ini aku pakai bahasa formal saat presentasi, tapi campur kode saat chat teman. Aku sadar bedanya."
 
-**2. Code-Switching Tracker (Pelacak Alih Kode)**
-Selama seminggu, catat setiap kali kamu beralih bahasa. Tanyakan: "Kenapa aku beralih? Karena kebiasaan, kebutuhan, atau tren?" Kamu akan kaget betapa sering kita beralih tanpa sadar.
+**2. Pelacak Alih Kode**
+Selama seminggu, catat setiap kali kamu beralih bahasa. Tanyakan: "Kenapa aku beralih? Karena kebiasaan, kebutuhan, atau tren?" Kamu bakal kaget betapa sering kita beralih tanpa sadar.
 
 **3. Caption Challenge**
-Posting satu konten di media sosial minggu ini sepenuhnya dalam Bahasa Indonesia yang baik dan kreatif. Lihat: apakah orang masih merespons dengan positif? (Spoiler: biasanya iya, dan malah lebih dihargai.)
+Posting satu konten di sosmed minggu ini sepenuhnya dalam Bahasa Indonesia yang baik dan kreatif. Lihat: apakah orang masih merespons positif? (Spoiler: biasanya iya, dan malah lebih dihargai.)
 
-**4. Bahasa Daerah Reclaim**
-Gunakan satu kata dari bahasa daerahmu dalam percakapan harian. Bangga dengan akarmu.
+**4. Reklamasi Bahasa Daerah**
+Pakai satu kata dari bahasa daerahmu dalam percakapan harian. Bangga dengan akarmu.
 
-**5. Language Awareness Conversation**
-Ajak temanmu bicara tentang kebiasaan bahasa kalian. diskusi ini sendiri sudah adalah latihan kesadaran berBahasa.
+**5. Ngobrol Soal Bahasa**
+Ajak temanmu bicara soal kebiasaan bahasa kalian. Diskusi ini sendiri sudah adalah latihan kesadaran berBahasa.
 
-**Refleksi:** Dari lima aksi di atas, mana yang paling menantang bagimu? Mengapa? Dan mana yang akan kamu coba mulai minggu ini?`,
+Dari lima aksi di atas, mana yang paling menantang bagimu? Dan mana yang bakal kamu coba mulai minggu ini?`,
   },
 ];
 
@@ -576,10 +559,11 @@ export interface PrimaCharacter {
 export const CHARACTERS: PrimaCharacter[] = [
   { key: "KARA", name: "KARA", role: "Protagonis / avatar", trait: "Remaja digital, ekspresif, awalnya mudah mengikuti tren.", educative: "Cermin pengguna.", color: "#ef4444" },
   { key: "NARA", name: "NARA", role: "Mentor", trait: "Tenang, kritis, tidak menggurui.", educative: "Menjelaskan konsep & mengajukan pertanyaan.", color: "#0ea5e9" },
-  { key: "RAKA", name: "RAKA", role: "Teman trend-driven", trait: "Cepat mengikuti tren, sering memakai campur kode.", educative: "Memunculkan konflik sosial.", color: "#f59e0b" },
-  { key: "SENA", name: "SENA", role: "Context expert", trait: "Praktis, peka terhadap situasi.", educative: "Menunjukkan pentingnya konteks.", color: "#10b981" },
-  { key: "MAYA", name: "MAYA", role: "Content creator", trait: "Memikirkan engagement & audiens.", educative: "Menghubungkan bahasa dengan media sosial.", color: "#a855f7" },
-  { key: "BIMA", name: "BIMA", role: "Culture explorer", trait: "Tertarik pada bahasa & budaya Indonesia.", educative: "Menghubungkan bahasa dengan identitas.", color: "#14b8a6" },
+  { key: "RAGA", name: "RAGA", role: "Teman trend-driven", trait: "Cepat mengikuti tren, sering memakai campur kode.", educative: "Memunculkan konflik sosial.", color: "#f59e0b" },
+  { key: "KIRA", name: "KIRA", role: "Content creator", trait: "Memikirkan engagement & audiens.", educative: "Menghubungkan bahasa dengan media sosial.", color: "#a855f7" },
+  { key: "BIMO", name: "BIMO", role: "Culture explorer", trait: "Tertarik pada bahasa & budaya Indonesia.", educative: "Menghubungkan bahasa dengan identitas.", color: "#14b8a6" },
+  { key: "ALYA", name: "ALYA", role: "Praktisi ragam", trait: "Tahu kapan harus naik atau turun ragam.", educative: "Menunjukkan pentingnya konteks.", color: "#10b981" },
+  { key: "SENA", name: "SENA", role: "Pembaca suasana", trait: "Peka terhadap dinamika sosial.", educative: "Menunjukkan pentingnya membaca ruangan.", color: "#8b5cf6" },
   { key: "AUTO", name: "AUTO-PILOT", role: "Boss simbolik", trait: "Selalu menjawab 'karena semua orang begitu'.", educative: "Representasi kebiasaan tanpa kesadaran.", color: "#64748b" },
 ];
 
@@ -627,7 +611,6 @@ export interface Episode {
   skillReward: string;
 }
 
-// 6 EPISODES — dialogue yang di-humanize, natural teen speech
 export const EPISODES: Episode[] = [
   {
     id: 1,
@@ -709,7 +692,7 @@ export const EPISODES: Episode[] = [
     subtitle: "Episode 2 — Code-Mixing",
     panels: [
       {
-        speaker: "RAKA",
+        speaker: "RAGA",
         text: "Tadi aku bilang ke ibu: 'nanti aku share link meeting-nya, Bu tinggal join jam 7'. Ibu malah bingung, 'meeting apa, join apa'. Padahal buat gue itu biasa banget.",
       },
       {
@@ -725,7 +708,7 @@ export const EPISODES: Episode[] = [
         text: "Bukan salah. Tapi sadari: ibu kamu nggak paham bukan karena 'kudet', tapi karena kata itu nggak ada di dunianya. Kita yang harus jaga.",
       },
       {
-        speaker: "SENA",
+        speaker: "ALYA",
         text: "Betul. Campur kode wajar, asal kita tau kapan lawan bicara kita nyambung dan kapan nggak.",
       },
     ],
@@ -782,7 +765,7 @@ export const EPISODES: Episode[] = [
     subtitle: "Episode 3 — Asing & Citra",
     panels: [
       {
-        speaker: "MAYA",
+        speaker: "KIRA",
         text: "Coba lihat caption lu: 'such a vibe, bestie!' Keren? Iya. Tapi jujur, lu pakai Inggris karena emang nyambung, atau takut keliatan kudet?",
       },
       {
@@ -794,7 +777,7 @@ export const EPISODES: Episode[] = [
         text: "Wajar. Kita sering diajarin diam-diam: bahasa asing = keren, sukses, gaul. Padahal itu cuma perasaan yang dibentuk iklan dan medsos.",
       },
       {
-        speaker: "MAYA",
+        speaker: "KIRA",
         text: "Coba deh: tulis caption yang sama, tapi pakai Indonesia. Masih keren nggak?",
       },
       {
@@ -803,7 +786,7 @@ export const EPISODES: Episode[] = [
       },
     ],
     decisionPrompt:
-      'MAYA: "Kalau kamu pakai istilah asing di caption, alasanmu yang bener-bener jujur apa?"',
+      'KIRA: "Kalau kamu pakai istilah asing di caption, alasanmu yang bener-bener jujur apa?"',
     options: [
       {
         key: "a",
@@ -859,7 +842,7 @@ export const EPISODES: Episode[] = [
         text: "Orang bilang 'loyal berbahasa' berarti bicara kayak penyiar berita. Gue nggak sanggup tiap hari 'selamat pagi bapak ibu'.",
       },
       {
-        speaker: "BIMA",
+        speaker: "BIMO",
         text: "Itu salah tangkap. Loyal bukan berarti jadi robot baku. Bahasa Indonesia itu luas: bisa becanda, santai, sampai jadi puisi.",
       },
       {
@@ -871,12 +854,12 @@ export const EPISODES: Episode[] = [
         text: "Jadi boleh santai tapi tetep 'aku'?",
       },
       {
-        speaker: "BIMA",
+        speaker: "BIMO",
         text: "Boleh banget. Yang nggak boleh cuma pasrah sama kebiasaan tanpa ngeh.",
       },
     ],
     decisionPrompt:
-      'BIMA: "Bisa nggak bahasa Indonesia tetap LU punya — santai, asli — tanpa ninggalin bahasamu sendiri?"',
+      'BIMO: "Bisa nggak bahasa Indonesia tetap LU punya — santai, asli — tanpa ninggalin bahasamu sendiri?"',
     options: [
       {
         key: "a",
@@ -928,7 +911,7 @@ export const EPISODES: Episode[] = [
     subtitle: "Episode 5 — Identitas & Daerah",
     panels: [
       {
-        speaker: "BIMA",
+        speaker: "BIMO",
         text: "Temen gue dari luar pulau pernah diketawain gara-gara logatnya pas presentasi. Padahal dia jago banget.",
       },
       {
@@ -940,7 +923,7 @@ export const EPISODES: Episode[] = [
         text: "Persis. Bahasa Indonesia lahir justru buat nyambungin orang dari bermacam daerah, bukan buat nyamain semua jadi satu.",
       },
       {
-        speaker: "BIMA",
+        speaker: "BIMO",
         text: "Daerah + Indonesia = kita. Bukan lawan.",
       },
       {
@@ -949,7 +932,7 @@ export const EPISODES: Episode[] = [
       },
     ],
     decisionPrompt:
-      'BIMA: "Pas temenmu diketawain karena logatnya, apa yang kamu lakuin?"',
+      'BIMO: "Pas temenmu diketawain karena logatnya, apa yang kamu lakuin?"',
     options: [
       {
         key: "a",
@@ -1001,7 +984,7 @@ export const EPISODES: Episode[] = [
     subtitle: "Episode 6 — Ruang Digital",
     panels: [
       {
-        speaker: "MAYA",
+        speaker: "KIRA",
         text: "Gue pernah balas 'oh' ke temen, dia ngira gue marah. Padahal gue emang cuma 'oh'. Di DM, satu kata bisa jadi drama.",
       },
       {
@@ -1013,16 +996,16 @@ export const EPISODES: Episode[] = [
         text: "Berarti gue harus mikir dua kali tiap ngetik?",
       },
       {
-        speaker: "MAYA",
+        speaker: "KIRA",
         text: "Nggak harus kaku. Cukup tau: apa yang kubikin bisa dibaca beda sama orang lain.",
       },
       {
-        speaker: "NARA",
+        speaker: "ALYA",
         text: "Pakai bahasa lain bila perlu. Pakai Indonesia bila itu pilihanmu. Yang penting: sadari alasannya.",
       },
     ],
     decisionPrompt:
-      'MAYA: "Kalau tren dan algoritma terus ngebentuk cara kamu nulis di digital, apa yang bisa kamu lakuin?"',
+      'KIRA: "Kalau tren dan algoritma terus ngebentuk cara kamu nulis di digital, apa yang bisa kamu lakuin?"',
     options: [
       {
         key: "a",
@@ -1046,7 +1029,7 @@ export const EPISODES: Episode[] = [
           context: "Virality nggak jamin kejelasan atau kesantunan.",
           languageEffect: "Tanpa kendali, pesan mudah salah tafsir atau nyudutin orang.",
           alternative: "Coba buat konten yang tetap relevan tanpa ikut arus kasar.",
-          reflection: "Pernah 'viraldrive' bikinmu nyesel?",
+          reflection: "Pernah 'viral drive' bikinmu nyesel?",
           transfer: "Gimana jaga sopan di ruang publik digital?",
         },
       },
@@ -1130,7 +1113,6 @@ export const BOSS_ROUNDS: BossRound[] = [
   ] },
 ];
 
-// Mini-game PRIMA CIRCUIT — konten khusus (selain SCENARIOS utama)
 export const GAME_CODE_MIX: Scenario[] = [
   {
     id: 1,
@@ -1220,7 +1202,7 @@ export const GAME_CONTEXT_SWITCH: Scenario[] = [
     task: "Untuk pengumuman di grup kelas, pilih bentuk yang paling tepat.",
     situation: "Info: besok ada pengumpulan tugas.",
     options: [
-      { key: "a", text: '"Yth teman-teman, diinformasikan pengumpulan tugas besok. Mohon disiapkan. Terima kasih."', correct: true },
+      { key: "a", text: '"Teman-teman, besok kita kumpul tugas ya. Siapkan yang terbaik!"', correct: true },
       { key: "b", text: '"wkwk besok kumpul tugas, gak ngumpul gue lapor Bu."', correct: false },
       { key: "c", text: '"submit tugas tmrw or else."', correct: false },
     ],
@@ -1304,7 +1286,7 @@ export const GAME_CAPTION_GARAGE: Scenario[] = [
     task: "Tulis ulang caption agar cocok untuk akun resmi sekolah.",
     situation: 'Draft: "yuk ikut lomba seru banget guys!! dm aja"',
     options: [
-      { key: "a", text: '"Diberitahukan: pendaftaran lomba dibuka. Silakan hubungi panitia. Terima kasih."', correct: true },
+      { key: "a", text: '"Pendaftaran lomba dibuka. Silakan hubungi panitia untuk informasi lebih lanjut."', correct: true },
       { key: "b", text: '"yuk ikut lomba seru banget guys!! dm aja"', correct: false },
       { key: "c", text: '"our competition is open, join now!"', correct: false },
     ],

@@ -18,34 +18,32 @@ export default async function SelesaiPage() {
           ✓
         </div>
         <h1 className="mt-4 text-2xl font-black text-gray-900">
-          Terima kasih, {p.name}!
+          Selesai juga, {p.name}!
         </h1>
         <p className="mt-1 text-gray-600">
-          Seluruh tahapan penelitian telah selesai. Jawabanmu sudah tersimpan
-          dengan kode responden{" "}
+          Semua skor udah tersimpan. Kode respondenmu:{" "}
           <span className="font-bold text-gray-900">{full?.code}</span>.
         </p>
 
         <div className="mx-auto mt-6 max-w-sm space-y-2 rounded-2xl bg-white/60 p-4 text-left text-sm backdrop-blur-sm border border-green-100">
           <div className="flex justify-between">
-            <span className="text-gray-600">Skor Pretest (maks. 80)</span>
+            <span className="text-gray-600">Pretest (maks. 80)</span>
             <span className="font-bold text-gray-900">{full?.pretest_total ?? "-"}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">Skor Kuis PRIMA+</span>
+            <span className="text-gray-600">Kuis PRIMA+</span>
             <span className="font-bold text-gray-900">
               {full?.game_score ?? "-"} / {full?.game_max ?? "-"}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">Skor Posttest (maks. 80)</span>
+            <span className="text-gray-600">Posttest (maks. 80)</span>
             <span className="font-bold text-gray-900">{full?.posttest_total ?? "-"}</span>
           </div>
         </div>
 
         <p className="mt-6 text-sm text-gray-500">
-          Kamu dapat menutup jendela ini. Terima kasih telah membantu penelitian
-          kesadaran berbahasa remaja di lingkungan sekolah.
+          Kamu bisa tutup ini. Makasih udah ikutan!
         </p>
       </div>
     </div>
