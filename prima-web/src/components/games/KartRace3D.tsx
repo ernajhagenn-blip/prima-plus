@@ -2,39 +2,60 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 
-const GOOD = ["makasih", "sampai jumpa", "seru", "hebat", "teman", "belajar", "santun", "ramah", "karya", "cita-cita", "semangat", "jujur", "rapi", "cantik", "gotong royong", "sopan"];
-const BAD = ["hallo guys", "btw", "omg", "literally", "vibes", "slay", "bestie", "okay dah", "see you", "so fun", "nope", "whatever"];
+/* ═══════════════════════════════════════════════════════════
+   LANGUAGE KART — Mario Kart × Bahasa Indonesia Edu-Racer
+   ═══════════════════════════════════════════════════════════ */
 
-interface Token { x: number; y: number; word: string; good: boolean; taken: boolean; respawn: number; z: number; bobPhase: number; }
-interface AIKart { angle: number; speed: number; color: string; glow: string; lap: number; crossed: boolean; bobPhase: number; }
-interface Particle { x: number; y: number; z: number; vx: number; vy: number; vz: number; life: number; maxLife: number; color: string; size: number; }
+const GOOD_WORDS = ["makasih", "sampai jumpa", "seru", "hebat", "teman", "belajar", "santun", "ramah", "karya", "cita-cita", "semangat", "jujur", "rapi", "cantik", "gotong royong", "sopan"];
+const BAD_WORDS = ["hallo guys", "btw", "omg", "literally", "vibes", "slay", "bestie", "okay dah", "see you"];
+
+const CHALLENGES = [
+  { q: "Manakah yang merupakan bahasa Indonesia baku?", opts: ["Gue mau pulang dulu ya", "Saya ingin pulang terlebih dahulu", "Gw mo cabut nih", "Aye mau out dulu"], ans: 1, tip: "Bahasa baku menggunakan 'saya' bukan 'gue/gw'." },
+  { q: "Kalimat mana yang menggunakan code-mixing?", opts: ["Aku pergi ke pasar", "Aku mau hangout sama temen-temen", "Dia sedang membaca buku", "Kami belajar di perpustakaan"], ans: 1, tip: "Code-mixing = mencampur bahasa Indonesia dengan bahasa asing dalam satu kalimat." },
+  { q: "Arti kata 'loyalitas' dalam konteks berbahasa adalah...", opts: ["Kemampuan berbicara dengan lancar", "Kesetiaan dan konsistensi menggunakan bahasa Indonesia", "Jumlah kosakata yang dikuasai", "Kecepatan dalam menulis"], ans: 1, tip: "Loyalitas berbahasa = kesetiaan menggunakan bahasa Indonesia dalam kehidupan sehari-hari." },
+  { q: "Penggunaan bahasa gaul di media sosial berdampak pada...", opts: ["Meningkatkan kreativitas", "Melemahkan kemampuan bahasa baku", "Tidak ada dampak", "Memperkuat budaya asing"], ans: 1, tip: "Penggunaan bahasa gaul terus-menerus dapat melemahkan penguasaan bahasa baku." },
+  { q: "Istilah 'bahasa Indonesia yang baik dan benar' merujuk pada...", opts: ["Bahasa yang sopan dan sesuai kaidah", "Bahasa yang paling keren", "Bahasa yang digunakan anak muda", "Bahasa yang paling banyak dipakai"], ans: 0, tip: "Bahasa yang baik = sopan, benar = sesuai kaidah tata bahasa." },
+  { q: "Apa yang dimaksud dengan 'kesadaran berbahasa'?", opts: ["Mengetahui banyak bahasa asing", "Menyadari pentingnya menggunakan bahasa Indonesia dengan tepat", "Bisa berbicara dengan logat yang benar", "Menulis tanpa kesalahan ejaan"], ans: 1, tip: "Kesadaran berbahasa = kesadaran akan pentingnya penggunaan bahasa Indonesia yang tepat." },
+  { q: "Frasa 'literally' dalam kalimat 'This is literally amazing' merupakan contoh...", opts: ["Bahasa Indonesia baku", "Pemakaian bahasa asing yang tidak perlu", "Bahasa daerah", "Singkatan resmi"], ans: 1, tip: "Kata 'literally' tidak perlu dipakai dalam konteks bahasa Indonesia." },
+  { q: "Cara yang tepat untuk menyapa dalam bahasa Indonesia formal adalah...", opts: ["Hey guys!", "Halo, apa kabar?", "Yo what's up!", "Hai bestie!"], ans: 1, tip: "Sapaan formal menggunakan kata yang sopan dan baku." },
+  { q: "Bahasa Indonesia memiliki peran penting sebagai...", opts: ["Bahasa internasional utama", "Alat pemersatu bangsa", "Bahasa bisnis dunia", "Bahasa teknologi"], ans: 1, tip: "Bahasa Indonesia adalah alat pemersatu NKRI sesuai UUD 1945." },
+  { q: "Penggunaan bahasa Indonesia yang baik di sekolah dapat...", opts: ["Mengurangi kreativitas siswa", "Meningkatkan komunikasi yang efektif", "Tidak berpengaruh", "Membuat siswa ketinggalan zaman"], ans: 1, tip: "Bahasa Indonesia yang baik meningkatkan kualitas komunikasi dan pemahaman." },
+  { q: "Kata 'aise' dan 'anjay' termasuk kategori...", opts: ["Bahasa baku Indonesia", "Bahasa gaul/slang", "Bahasa daerah", "Bahasa ilmiah"], ans: 1, tip: "Kata-kata tersebut merupakan bahasa gaul yang tidak sesuai kaidah baku." },
+  { q: "Tujuan utama penggunaan bahasa Indonesia di lingkungan sekolah adalah...", opts: ["Memenuhi aturan sekolah", "Membangun budaya literasi dan komunikasi", "Agar terlihat pintar", "Karena guru mengharuskan"], ans: 1, tip: "Penggunaan bahasa Indonesia yang baik membangun budaya literasi dan komunikasi." },
+  { q: "Kalimat yang benar adalah...", opts: ["Dia telah pergi kepusat", "Dia telah pergi ke pusat", "Dia udah cabut kepusat", "Dia udah cabut ke pusat"], ans: 1, tip: "Penulisan 'ke pusat' terpisah dan menggunakan kata baku 'telah'." },
+  { q: "Apa dampak negatif jika remaja lebih sering menggunakan bahasa asing?", opts: ["Tidak ada dampak", "Kemampuan berbahasa Indonesia menurun", "Menambah wawasan", "Meningkatkan kreativitas"], ans: 1, tip: "Terlalu sering menggunakan bahasa asing menurunkan kemampuan berbahasa Indonesia." },
+  { q: "Istilah 'bahasa prokem' adalah...", opts: ["Bahasa resmi Indonesia", "Bahasa gaul remaja Jakarta", "Bahasa daerah Jawa", "Bahasa internasional"], ans: 1, tip: "Bahasa prokem adalah ragam bahasa gaul yang berkembang di kalangan remaja Jakarta." },
+];
+
+interface Token { x: number; y: number; word: string; good: boolean; taken: boolean; respawn: number; z: number; bob: number; }
+interface Obstacle { x: number; y: number; angle: number; type: string; }
+interface AIKart { angle: number; speed: number; color: string; glow: string; lap: number; crossed: boolean; }
+interface Particle { x: number; y: number; z: number; vx: number; vy: number; vz: number; life: number; max: number; color: string; size: number; }
 interface Popup { x: number; y: number; z: number; text: string; color: string; life: number; }
 interface Star { x: number; y: number; r: number; b: number; layer: number; }
+interface QuizGate { angle: number; used: boolean; }
 
 function sfx(type: string) {
   try {
     const c = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const o = c.createOscillator();
-    const g = c.createGain();
-    o.connect(g); g.connect(c.destination); g.gain.value = 0.06;
+    const o = c.createOscillator(); const g = c.createGain();
+    o.connect(g); g.connect(c.destination); g.gain.value = 0.05;
     if (type === "pickup") { o.type = "sine"; o.frequency.setValueAtTime(880, c.currentTime); o.frequency.exponentialRampToValueAtTime(1760, c.currentTime + 0.08); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.15); o.start(); o.stop(c.currentTime + 0.15); }
     else if (type === "crash") { o.type = "sawtooth"; o.frequency.setValueAtTime(200, c.currentTime); o.frequency.exponentialRampToValueAtTime(60, c.currentTime + 0.2); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.25); o.start(); o.stop(c.currentTime + 0.25); }
-    else if (type === "tick") { o.type = "square"; o.frequency.value = 1200; g.gain.value = 0.03; g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.06); o.start(); o.stop(c.currentTime + 0.06); }
-    else if (type === "go") { o.type = "sine"; o.frequency.setValueAtTime(523, c.currentTime); o.frequency.setValueAtTime(659, c.currentTime + 0.12); o.frequency.setValueAtTime(784, c.currentTime + 0.24); g.gain.value = 0.08; g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.4); o.start(); o.stop(c.currentTime + 0.4); }
-    else if (type === "lap") { o.type = "sine"; o.frequency.setValueAtTime(660, c.currentTime); o.frequency.setValueAtTime(880, c.currentTime + 0.1); g.gain.value = 0.07; g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.25); o.start(); o.stop(c.currentTime + 0.25); }
+    else if (type === "correct") { o.type = "sine"; o.frequency.setValueAtTime(523, c.currentTime); o.frequency.setValueAtTime(659, c.currentTime + 0.1); o.frequency.setValueAtTime(784, c.currentTime + 0.2); g.gain.value = 0.07; g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.35); o.start(); o.stop(c.currentTime + 0.35); }
+    else if (type === "wrong") { o.type = "sawtooth"; o.frequency.setValueAtTime(300, c.currentTime); o.frequency.exponentialRampToValueAtTime(100, c.currentTime + 0.3); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.35); o.start(); o.stop(c.currentTime + 0.35); }
+    else if (type === "tick") { o.type = "square"; o.frequency.value = 1200; g.gain.value = 0.025; g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.05); o.start(); o.stop(c.currentTime + 0.05); }
+    else if (type === "go") { o.type = "sine"; o.frequency.setValueAtTime(523, c.currentTime); o.frequency.setValueAtTime(659, c.currentTime + 0.12); o.frequency.setValueAtTime(784, c.currentTime + 0.24); g.gain.value = 0.07; g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.4); o.start(); o.stop(c.currentTime + 0.4); }
   } catch {}
 }
 
-// 3D projection: isometric-ish view
-function project(x3: number, y3: number, z3: number, cx: number, cy: number, scale: number, camAngle: number, tiltX: number) {
-  const cosA = Math.cos(camAngle);
-  const sinA = Math.sin(camAngle);
-  const rx = x3 * cosA - y3 * sinA;
-  const ry = x3 * sinA + y3 * cosA;
-  const px = cx + rx * scale;
-  const py = cy + ry * scale * 0.45 - z3 * scale * 0.8 + tiltX * 30;
-  const depth = ry;
-  return { px, py, depth, scale: scale * (1 - depth * 0.0003) };
+function lerp(a: number, b: number, t: number) { return a + (b - a) * t; }
+
+function project(x: number, y: number, z: number, cx: number, cy: number, sc: number, cam: number) {
+  const ca = Math.cos(cam), sa = Math.sin(cam);
+  const rx = x * ca - y * sa;
+  const ry = x * sa + y * ca;
+  return { px: cx + rx * sc, py: cy + ry * sc * 0.42 - z * sc * 0.75, depth: ry, s: sc * (1 - ry * 0.0002) };
 }
 
 export default function KartRace3D({
@@ -42,15 +63,15 @@ export default function KartRace3D({
   kartBody = "#ef4444",
   kartAccent = "#a855f7",
 }: {
-  onComplete: (score: number) => void;
+  onComplete: (raceScore: number, eduScore: number, correct: number) => void;
   kartBody?: string;
   kartAccent?: string;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dims, setDims] = useState({ w: 900, h: 600 });
-  const [score, setScore] = useState(0);
-  const [time, setTime] = useState(60);
+  const [raceScore, setRaceScore] = useState(0);
+  const [time, setTime] = useState(90);
   const [position, setPosition] = useState(1);
   const [lap, setLap] = useState(0);
   const [speed, setSpeed] = useState(0);
@@ -58,98 +79,174 @@ export default function KartRace3D({
   const [over, setOver] = useState(false);
   const [cd, setCd] = useState(3);
 
+  // Quiz state
+  const [quizActive, setQuizActive] = useState(false);
+  const [quizQ, setQuizQ] = useState(0);
+  const [quizTimer, setQuizTimer] = useState(10);
+  const [quizAnswered, setQuizAnswered] = useState(false);
+  const [quizCorrect, setQuizCorrect] = useState(false);
+  const [selectedOpt, setSelectedOpt] = useState(-1);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [eduScore, setEduScore] = useState(0);
+  const [combo, setCombo] = useState(0);
+
   const S = useRef({
     px: 0, py: 0, pa: 0, pv: 0, pz: 0,
-    tokens: [] as Token[], ai: [] as AIKart[],
-    particles: [] as Particle[], popups: [] as Popup[],
+    tokens: [] as Token[],
+    obstacles: [] as Obstacle[],
+    ai: [] as AIKart[],
+    particles: [] as Particle[],
+    popups: [] as Popup[],
     keys: {} as Record<string, boolean>,
-    score: 0, time: 60, lap: 0, over: false,
+    score: 0, time: 90, lap: 0, over: false,
     lastAngle: 0, crossedStart: false,
-    cx: 0, cy: 0, trackR: 0, trackW: 0, scale: 1,
+    cx: 0, cy: 0, trackR: 0, trackW: 0, sc: 1,
     cdVal: 3, cdTime: 0, started: false,
     stars: [] as Star[],
-    camAngle: 0, camTilt: 0,
+    camAngle: 0,
+    gates: [] as QuizGate[],
+    quizPaused: false,
+    quizIdx: 0,
+    combo: 0,
+    usedQuestions: new Set<number>(),
     boostTimer: 0,
+    shieldActive: false,
   });
 
-  const touch = useRef({ steerX: 0, gas: false, brake: false, active: false, sx: 0, sy: 0 });
+  const touch = useRef({ steerX: 0, gas: false, brake: false, active: false, sx: 0 });
 
   useEffect(() => {
-    const obs = new ResizeObserver(e => { for (const en of e) setDims({ w: en.contentRect.width, h: en.contentRect.height }); });
+    const obs = new ResizeObserver(e => { for (const en of e) { const w = en.contentRect.width; const h = en.contentRect.height; if (w > 0 && h > 0) setDims({ w, h }); } });
     if (containerRef.current) obs.observe(containerRef.current);
     return () => obs.disconnect();
   }, []);
 
+  // Init
   useEffect(() => {
     const s = S.current;
     const w = dims.w, h = dims.h;
-    s.cx = w / 2;
-    s.cy = h * 0.55;
-    s.trackR = Math.min(w, h) * 0.32;
+    s.cx = w / 2; s.cy = h * 0.52;
+    s.trackR = Math.min(w, h) * 0.30;
     s.trackW = Math.min(w, h) * 0.12;
-    s.scale = Math.min(w / 900, h / 600) * 1.1;
-    s.px = 0;
-    s.py = s.trackR;
-    s.pa = Math.PI;
-    s.camAngle = 0;
+    s.sc = Math.min(w / 900, h / 600) * 1.05;
+    s.px = 0; s.py = s.trackR; s.pa = Math.PI;
 
-    s.stars = [];
-    for (let i = 0; i < 120; i++) {
-      s.stars.push({
-        x: Math.random() * w,
-        y: Math.random() * h * 0.5,
-        r: Math.random() * 2 + 0.2,
-        b: Math.random() * Math.PI * 2,
-        layer: Math.floor(Math.random() * 3),
-      });
-    }
+    s.stars = Array.from({ length: 100 }, () => ({ x: Math.random() * w, y: Math.random() * h * 0.55, r: Math.random() * 1.8 + 0.3, b: Math.random() * Math.PI * 2, layer: Math.floor(Math.random() * 3) }));
 
+    // Tokens around track
     s.tokens = [];
-    const cnt = 16;
-    for (let i = 0; i < cnt; i++) {
-      const a = (i / cnt) * Math.PI * 2;
+    const tc = 14;
+    for (let i = 0; i < tc; i++) {
+      const a = (i / tc) * Math.PI * 2;
       const r = s.trackR + (Math.random() - 0.5) * s.trackW * 0.5;
-      const good = i < 12;
-      s.tokens.push({
-        x: Math.cos(a) * r,
-        y: Math.sin(a) * r,
-        word: good ? GOOD[i % GOOD.length] : BAD[(i - 12) % BAD.length],
-        good, taken: false, respawn: 0, z: 0, bobPhase: Math.random() * Math.PI * 2,
-      });
+      const good = i < 10;
+      s.tokens.push({ x: Math.cos(a) * r, y: Math.sin(a) * r, word: good ? GOOD_WORDS[i % GOOD_WORDS.length] : BAD_WORDS[(i - 10) % BAD_WORDS.length], good, taken: false, respawn: 0, z: 0, bob: Math.random() * Math.PI * 2 });
     }
+
+    // Obstacles (bahasa gaul traps)
+    s.obstacles = [];
+    for (let i = 0; i < 5; i++) {
+      const a = (i / 5) * Math.PI * 2 + 0.3;
+      const r = s.trackR + (Math.random() - 0.5) * s.trackW * 0.3;
+      s.obstacles.push({ x: Math.cos(a) * r, y: Math.sin(a) * r, angle: a, type: ["trap", "barrier", "oil"][i % 3] });
+    }
+
+    // Quiz gates at specific angles
+    s.gates = [0, Math.PI / 2.5, Math.PI * 2 / 2.5, Math.PI * 3 / 2.5, Math.PI * 4 / 2.5].map(a => ({ angle: a, used: false }));
 
     s.ai = [
-      { angle: 0, speed: 0.013, color: "#a855f7", glow: "#c084fc", lap: 0, crossed: false, bobPhase: 0 },
-      { angle: Math.PI * 2 / 3, speed: 0.011, color: "#22c55e", glow: "#4ade80", lap: 0, crossed: false, bobPhase: 1 },
-      { angle: Math.PI * 4 / 3, speed: 0.015, color: "#f97316", glow: "#fb923c", lap: 0, crossed: false, bobPhase: 2 },
+      { angle: 0, speed: 0.011, color: "#a855f7", glow: "#c084fc", lap: 0, crossed: false },
+      { angle: Math.PI * 2 / 3, speed: 0.009, color: "#22c55e", glow: "#4ade80", lap: 0, crossed: false },
+      { angle: Math.PI * 4 / 3, speed: 0.013, color: "#f97316", glow: "#fb923c", lap: 0, crossed: false },
     ];
   }, [dims]);
 
+  // Quiz logic
+  const startQuiz = useCallback(() => {
+    const s = S.current;
+    if (s.quizPaused || s.over) return;
+    // Pick unused question
+    const available = CHALLENGES.map((_, i) => i).filter(i => !s.usedQuestions.has(i));
+    if (available.length === 0) { s.usedQuestions.clear(); }
+    const pool = CHALLENGES.map((_, i) => i).filter(i => !s.usedQuestions.has(i));
+    const idx = pool[Math.floor(Math.random() * pool.length)];
+    s.usedQuestions.add(idx);
+    s.quizIdx = idx;
+    s.quizPaused = true;
+    setQuizQ(idx);
+    setQuizActive(true);
+    setQuizTimer(12);
+    setQuizAnswered(false);
+    setSelectedOpt(-1);
+  }, []);
+
+  const answerQuiz = useCallback((optIdx: number) => {
+    const s = S.current;
+    if (s.quizPaused || quizAnswered) return;
+    setQuizAnswered(true);
+    setSelectedOpt(optIdx);
+    const ch = CHALLENGES[s.quizIdx];
+    const correct = optIdx === ch.ans;
+    if (correct) {
+      sfx("correct");
+      s.score += 20;
+      s.combo++;
+      s.boostTimer = 30;
+      setRaceScore(s.score);
+      setCorrectCount(c => c + 1);
+      setEduScore(e => e + 10);
+      setCombo(s.combo);
+      s.popups.push({ x: s.px, y: s.py, z: 25, text: "+20 BENAR!", color: "#22c55e", life: 60 });
+    } else {
+      sfx("wrong");
+      s.score = Math.max(0, s.score - 5);
+      s.pv *= 0.4;
+      s.combo = 0;
+      setRaceScore(s.score);
+      setCombo(0);
+      s.popups.push({ x: s.px, y: s.py, z: 25, text: "-5 SALAH", color: "#f43f5e", life: 60 });
+    }
+    setTimeout(() => {
+      s.quizPaused = false;
+      setQuizActive(false);
+    }, correct ? 1500 : 2500);
+  }, [quizAnswered]);
+
+  // Quiz timer
+  useEffect(() => {
+    if (!quizActive || quizAnswered) return;
+    const t = setInterval(() => {
+      setQuizTimer(prev => {
+        if (prev <= 1) {
+          answerQuiz(-1);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, [quizActive, quizAnswered, answerQuiz]);
+
+  // Game loop
   useEffect(() => {
     const s = S.current;
-    const ek = (e: KeyboardEvent) => {
-      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) e.preventDefault();
-      s.keys[e.key.toLowerCase()] = true;
-    };
+    const ek = (e: KeyboardEvent) => { if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) e.preventDefault(); s.keys[e.key.toLowerCase()] = true; };
     const eu = (e: KeyboardEvent) => { s.keys[e.key.toLowerCase()] = false; };
     window.addEventListener("keydown", ek);
     window.addEventListener("keyup", eu);
 
-    s.cdVal = 3; s.cdTime = Date.now(); s.over = false; s.score = 0; s.time = 60; s.lap = 0;
+    s.cdVal = 3; s.cdTime = Date.now(); s.over = false; s.score = 0; s.time = 90; s.lap = 0; s.usedQuestions.clear(); s.combo = 0;
+    setRaceScore(0); setCorrectCount(0); setEduScore(0); setCombo(0);
 
     const timer = setInterval(() => {
       if (s.over) return;
       const el = Date.now() - s.cdTime;
       const v = 3 - Math.floor(el / 1000);
-      if (v !== s.cdVal && v >= 0) {
-        s.cdVal = v; setCd(v);
-        if (v > 0) sfx("tick");
-        if (v === 0) { sfx("go"); s.started = true; setTimeout(() => { s.cdVal = -1; setCd(-1); }, 800); }
-      }
-      if (s.started && el > 4000) {
+      if (v !== s.cdVal && v >= 0) { s.cdVal = v; setCd(v); if (v > 0) sfx("tick"); if (v === 0) { sfx("go"); s.started = true; setTimeout(() => { s.cdVal = -1; setCd(-1); }, 800); } }
+      if (s.started && !s.quizPaused && el > 4200) {
         s.time--; setTime(s.time);
         if (s.time <= 10 && s.time > 0) sfx("tick");
-        if (s.time <= 0) { s.over = true; setOver(true); onComplete(s.score); }
+        if (s.time <= 0) { s.over = true; setOver(true); onComplete(s.score, s.combo > 0 ? Math.floor(s.score * 0.3) : 0, 0); }
       }
     }, 1000);
 
@@ -157,8 +254,10 @@ export default function KartRace3D({
     const loop = (now: number) => {
       if (s.over) { draw(s, now); return; }
       const dt = Math.min(now - lt, 32); lt = now;
-
       if (!s.started) { draw(s, now); requestAnimationFrame(loop); return; }
+
+      // PAUSED for quiz
+      if (s.quizPaused) { draw(s, now); requestAnimationFrame(loop); return; }
 
       const k = s.keys;
       const tc = touch.current;
@@ -168,105 +267,106 @@ export default function KartRace3D({
       const brake = k["arrowdown"] || k["s"] || (hasT && tc.brake);
       const steer = ((k["arrowleft"] || k["a"] ? 1 : 0) - (k["arrowright"] || k["d"] ? 1 : 0)) + (hasT ? tc.steerX : 0);
 
-      if (gas) s.pv += 0.17;
-      if (brake) s.pv -= 0.23;
-      s.pa += steer * 0.05;
+      if (gas) s.pv += 0.15;
+      if (brake) s.pv -= 0.2;
+      s.pa += steer * 0.045;
 
       const isDrift = !!k[" "];
       setDrifting(isDrift);
-      s.pv *= isDrift ? 0.925 : 0.968;
-      if (s.pv > 0.9) s.pv = 0.9;
-      if (s.pv < -0.32) s.pv = -0.32;
-      if (Math.abs(s.pv) < 0.004) s.pv = 0;
+      s.pv *= isDrift ? 0.93 : 0.97;
+      if (s.boostTimer > 0) { s.boostTimer--; s.pv += 0.02; }
+      if (s.pv > 0.85) s.pv = 0.85;
+      if (s.pv < -0.3) s.pv = -0.3;
+      if (Math.abs(s.pv) < 0.003) s.pv = 0;
 
-      s.px += Math.sin(s.pa) * s.pv * dt * 0.35;
-      s.py += -Math.cos(s.pa) * s.pv * dt * 0.35;
-
-      // Boost effect
-      if (s.boostTimer > 0) { s.boostTimer--; s.pv *= 1.01; }
+      s.px += Math.sin(s.pa) * s.pv * dt * 0.33;
+      s.py += -Math.cos(s.pa) * s.pv * dt * 0.33;
+      s.pz = Math.max(0, s.pz - 0.3);
 
       // Track bounds
-      const dx = s.px, dy = s.py - s.trackR;
-      const dist = Math.sqrt(s.px * s.px + (s.py) * (s.py));
+      const dist = Math.hypot(s.px, s.py);
       const dTrack = Math.abs(dist - s.trackR);
-      if (dTrack > s.trackW / 2 + 8) {
+      if (dTrack > s.trackW / 2 + 6) {
         const a = Math.atan2(s.py, s.px);
-        const target = s.trackR + (dist > s.trackR ? s.trackW / 2 + 6 : -(s.trackW / 2 + 6));
-        s.px = Math.cos(a) * target;
-        s.py = Math.sin(a) * target;
-        s.pv *= 0.2;
-        sfx("crash");
-        for (let i = 0; i < 12; i++) {
-          s.particles.push({ x: s.px, y: s.py, z: 5, vx: (Math.random() - 0.5) * 6, vy: (Math.random() - 0.5) * 6, vz: Math.random() * 4, life: 25, maxLife: 25, color: "#f97316", size: Math.random() * 3 + 1.5 });
-        }
+        const target = s.trackR + (dist > s.trackR ? s.trackW / 2 + 4 : -(s.trackW / 2 + 4));
+        s.px = Math.cos(a) * target; s.py = Math.sin(a) * target;
+        s.pv *= 0.2; sfx("crash");
+        for (let i = 0; i < 8; i++) s.particles.push({ x: s.px, y: s.py, z: 3, vx: (Math.random() - 0.5) * 5, vy: (Math.random() - 0.5) * 5, vz: Math.random() * 3, life: 20, max: 20, color: "#f97316", size: Math.random() * 3 + 1 });
       }
 
-      // Player Z bounce
-      s.pz = Math.max(0, s.pz - 0.3);
-      if (dTrack > s.trackW / 2 - 5 && dTrack < s.trackW / 2 + 5) s.pz = Math.sin(now * 0.01) * 2;
-
-      // Camera follow player angle
-      s.camAngle = lerp(s.camAngle, s.pa * 0.15, 0.03);
-      s.camTilt = lerp(s.camTilt, steer * 0.5, 0.08);
+      // Camera
+      s.camAngle = lerp(s.camAngle, s.pa * 0.12, 0.03);
 
       // Lap
       const curA = Math.atan2(s.py, s.px);
       const norm = curA < 0 ? curA + Math.PI * 2 : curA;
       if (norm < 0.3 && s.lastAngle > Math.PI * 2 - 0.3 && !s.crossedStart) {
         s.crossedStart = true;
-        if (s.pv > 0.05) {
-          s.lap++; setLap(s.lap); sfx("lap");
-          if (s.lap >= 3) { s.over = true; setOver(true); onComplete(s.score); }
-        }
+        if (s.pv > 0.05) { s.lap++; setLap(s.lap); if (s.lap >= 3) { s.over = true; setOver(true); onComplete(s.score, Math.floor(s.score * 0.3), 0); } }
       } else if (norm > Math.PI) s.crossedStart = false;
       s.lastAngle = norm;
+
+      // Quiz gates — check proximity
+      for (const gate of s.gates) {
+        if (gate.used) continue;
+        const gx = Math.cos(gate.angle) * s.trackR;
+        const gy = Math.sin(gate.angle) * s.trackR;
+        const gd = Math.hypot(gx - s.px, gy - s.py);
+        if (gd < 35) {
+          gate.used = true;
+          startQuiz();
+          break;
+        }
+      }
 
       // Tokens
       for (let i = 0; i < s.tokens.length; i++) {
         const t = s.tokens[i];
-        if (t.taken) { if (t.respawn > 0) { t.respawn--; continue; } const a = Math.random() * Math.PI * 2; const r = s.trackR + (Math.random() - 0.5) * s.trackW * 0.5; t.x = Math.cos(a) * r; t.y = Math.sin(a) * r; t.word = t.good ? GOOD[Math.floor(Math.random() * GOOD.length)] : BAD[Math.floor(Math.random() * BAD.length)]; t.taken = false; t.z = 0; continue; }
-        t.z = Math.sin(now * 0.003 + t.bobPhase) * 3 + 5;
+        if (t.taken) { if (t.respawn > 0) { t.respawn--; continue; } const a = Math.random() * Math.PI * 2; const r = s.trackR + (Math.random() - 0.5) * s.trackW * 0.5; t.x = Math.cos(a) * r; t.y = Math.sin(a) * r; t.word = t.good ? GOOD_WORDS[Math.floor(Math.random() * GOOD_WORDS.length)] : BAD_WORDS[Math.floor(Math.random() * BAD_WORDS.length)]; t.taken = false; t.z = 0; continue; }
+        t.z = Math.sin(now * 0.003 + t.bob) * 3 + 5;
         const td = Math.hypot(t.x - s.px, t.y - s.py);
-        if (td < 28) {
-          t.taken = true; t.respawn = 160;
+        if (td < 26) {
+          t.taken = true; t.respawn = 180;
           if (t.good) {
-            s.score += 10; s.boostTimer = 20; sfx("pickup");
-            s.popups.push({ x: t.x, y: t.y, z: 20, text: "+10 " + t.word, color: "#22d3ee", life: 55 });
-            for (let j = 0; j < 10; j++) s.particles.push({ x: t.x, y: t.y, z: t.z, vx: (Math.random() - 0.5) * 5, vy: (Math.random() - 0.5) * 5, vz: Math.random() * 3 + 1, life: 30, maxLife: 30, color: "#22d3ee", size: Math.random() * 3 + 1 });
+            s.score += 10; sfx("pickup");
+            s.popups.push({ x: t.x, y: t.y, z: 18, text: "+10 " + t.word, color: "#22d3ee", life: 50 });
+            for (let j = 0; j < 6; j++) s.particles.push({ x: t.x, y: t.y, z: t.z, vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4, vz: Math.random() * 2 + 1, life: 22, max: 22, color: "#22d3ee", size: Math.random() * 2.5 + 1 });
           } else {
-            s.score = Math.max(0, s.score - 6); s.pv *= 0.3; sfx("crash");
-            s.popups.push({ x: t.x, y: t.y, z: 20, text: "-6 " + t.word, color: "#f43f5e", life: 55 });
-            for (let j = 0; j < 10; j++) s.particles.push({ x: t.x, y: t.y, z: t.z, vx: (Math.random() - 0.5) * 5, vy: (Math.random() - 0.5) * 5, vz: Math.random() * 3 + 1, life: 30, maxLife: 30, color: "#f43f5e", size: Math.random() * 3 + 1 });
+            s.score = Math.max(0, s.score - 6); s.pv *= 0.35; sfx("crash");
+            s.popups.push({ x: t.x, y: t.y, z: 18, text: "-6 " + t.word, color: "#f43f5e", life: 50 });
           }
-          setScore(s.score);
+          setRaceScore(s.score);
+        }
+      }
+
+      // Obstacles
+      for (const ob of s.obstacles) {
+        const od = Math.hypot(ob.x - s.px, ob.y - s.py);
+        if (od < 20) {
+          s.pv *= 0.25; sfx("crash");
+          s.popups.push({ x: ob.x, y: ob.y, z: 12, text: "BAHASA GAUL!", color: "#f97316", life: 40 });
+          for (let j = 0; j < 6; j++) s.particles.push({ x: ob.x, y: ob.y, z: 3, vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4, vz: Math.random() * 2, life: 18, max: 18, color: "#f97316", size: Math.random() * 2 + 1 });
+          // Respawn obstacle elsewhere
+          const na = Math.random() * Math.PI * 2;
+          const nr = s.trackR + (Math.random() - 0.5) * s.trackW * 0.3;
+          ob.x = Math.cos(na) * nr; ob.y = Math.sin(na) * nr;
         }
       }
 
       // AI
       for (const ai of s.ai) {
-        ai.angle += ai.speed * (1 + Math.sin(now * 0.0003 + ai.bobPhase * 5) * 0.15);
+        ai.angle += ai.speed * (1 + Math.sin(now * 0.0003 + ai.angle * 2) * 0.12);
         if (ai.angle > Math.PI * 2) ai.angle -= Math.PI * 2;
         if (ai.angle < 0.3 && !ai.crossed) { ai.crossed = true; ai.lap++; }
         else if (ai.angle > Math.PI) ai.crossed = false;
       }
 
       // Particles
-      if (isDrift && Math.abs(s.pv) > 0.3) {
-        for (let i = 0; i < 2; i++) {
-          s.particles.push({
-            x: s.px - Math.sin(s.pa) * 10 + (Math.random() - 0.5) * 6,
-            y: s.py + Math.cos(s.pa) * 10 + (Math.random() - 0.5) * 6,
-            z: 2, vx: -Math.sin(s.pa) * s.pv * 0.4, vy: Math.cos(s.pa) * s.pv * 0.4, vz: 0.5,
-            life: 18, maxLife: 18, color: "rgba(168,85,247,0.7)", size: Math.random() * 2.5 + 1,
-          });
-        }
+      if (isDrift && Math.abs(s.pv) > 0.25) {
+        for (let i = 0; i < 2; i++) s.particles.push({ x: s.px - Math.sin(s.pa) * 8 + (Math.random() - 0.5) * 5, y: s.py + Math.cos(s.pa) * 8 + (Math.random() - 0.5) * 5, z: 1, vx: -Math.sin(s.pa) * s.pv * 0.3, vy: Math.cos(s.pa) * s.pv * 0.3, vz: 0.3, life: 15, max: 15, color: "rgba(168,85,247,0.6)", size: Math.random() * 2 + 1 });
       }
-      if (Math.abs(s.pv) > 0.5) {
-        s.particles.push({ x: s.px - Math.sin(s.pa) * 12, y: s.py + Math.cos(s.pa) * 12, z: 1, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3, vz: 0, life: 12, maxLife: 12, color: "rgba(255,255,255,0.25)", size: 1 });
-      }
-
-      s.particles = s.particles.filter(p => { p.x += p.vx; p.y += p.vy; p.z += p.vz; p.vz -= 0.12; if (p.z < 0) { p.z = 0; p.vz *= -0.3; } p.life--; return p.life > 0; });
-      s.popups = s.popups.filter(p => { p.z += 0.3; p.life--; return p.life > 0; });
+      s.particles = s.particles.filter(p => { p.x += p.vx; p.y += p.vy; p.z += p.vz; p.vz -= 0.1; if (p.z < 0) { p.z = 0; p.vz *= -0.3; } p.life--; return p.life > 0; });
+      s.popups = s.popups.filter(p => { p.z += 0.25; p.life--; return p.life > 0; });
 
       // Position
       const pProg = s.lap * 1000 + norm * 100;
@@ -281,8 +381,9 @@ export default function KartRace3D({
 
     const id = requestAnimationFrame(loop);
     return () => { window.removeEventListener("keydown", ek); window.removeEventListener("keyup", eu); clearInterval(timer); cancelAnimationFrame(id); };
-  }, [dims, onComplete]);
+  }, [dims, onComplete, startQuiz]);
 
+  // ── RENDER ──
   const draw = (s: typeof S.current, now: number) => {
     const c = canvasRef.current;
     if (!c) return;
@@ -290,448 +391,401 @@ export default function KartRace3D({
     if (!ctx) return;
     const w = dims.w, h = dims.h;
 
-    // === SKY ===
+    // Sky
     const sky = ctx.createLinearGradient(0, 0, 0, h);
-    sky.addColorStop(0, "#050510");
-    sky.addColorStop(0.3, "#0a0a2e");
-    sky.addColorStop(0.6, "#0f0a30");
-    sky.addColorStop(1, "#1a0825");
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, w, h);
+    sky.addColorStop(0, "#050510"); sky.addColorStop(0.3, "#0a0a2e"); sky.addColorStop(0.6, "#0f0a30"); sky.addColorStop(1, "#1a0825");
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, w, h);
 
-    // Nebula layers
+    // Nebula
     for (let i = 0; i < 3; i++) {
-      const nx = w * (0.2 + i * 0.3);
-      const ny = h * (0.15 + i * 0.15);
+      const nx = w * (0.2 + i * 0.3), ny = h * (0.15 + i * 0.15);
       const neb = ctx.createRadialGradient(nx, ny, 0, nx, ny, w * 0.3);
-      const colors = ["rgba(124,58,237,0.06)", "rgba(168,85,247,0.05)", "rgba(192,132,252,0.04)"];
-      neb.addColorStop(0, colors[i]);
+      neb.addColorStop(0, ["rgba(124,58,237,0.06)", "rgba(168,85,247,0.05)", "rgba(192,132,252,0.04)"][i]);
       neb.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = neb;
-      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = neb; ctx.fillRect(0, 0, w, h);
     }
 
-    // Stars parallax layers
+    // Stars parallax
     for (let layer = 0; layer < 3; layer++) {
-      const parallax = (layer + 1) * 0.3;
-      const scrollX = s.camAngle * 50 * parallax;
+      const px = s.camAngle * 40 * (layer + 1) * 0.3;
       for (const star of s.stars) {
         if (star.layer !== layer) continue;
-        const twinkle = 0.3 + 0.7 * Math.sin(now * 0.001 + star.b * 8);
-        const sx = ((star.x - scrollX) % w + w) % w;
-        ctx.beginPath();
-        ctx.arc(sx, star.y, star.r * (0.6 + layer * 0.2), 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${twinkle * (0.3 + layer * 0.15)})`;
-        ctx.fill();
-        if (layer === 2 && star.r > 1.5) {
-          ctx.beginPath();
-          ctx.arc(sx, star.y, star.r * 3, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(168,85,247,${twinkle * 0.08})`;
-          ctx.fill();
-        }
+        const tw = 0.3 + 0.7 * Math.sin(now * 0.001 + star.b * 8);
+        const sx = ((star.x - px) % w + w) % w;
+        ctx.beginPath(); ctx.arc(sx, star.y, star.r * (0.6 + layer * 0.2), 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${tw * (0.25 + layer * 0.12)})`; ctx.fill();
       }
     }
 
-    // === GROUND PLANE ===
-    const groundY = h * 0.42;
-    const groundGrad = ctx.createLinearGradient(0, groundY, 0, h);
-    groundGrad.addColorStop(0, "rgba(15,15,45,0.6)");
-    groundGrad.addColorStop(0.3, "rgba(10,10,35,0.8)");
-    groundGrad.addColorStop(1, "rgba(5,5,20,1)");
-    ctx.fillStyle = groundGrad;
-    ctx.fillRect(0, groundY, w, h - groundY);
+    // Ground
+    const gy = h * 0.4;
+    const grd = ctx.createLinearGradient(0, gy, 0, h);
+    grd.addColorStop(0, "rgba(12,12,40,0.5)"); grd.addColorStop(0.4, "rgba(8,8,30,0.8)"); grd.addColorStop(1, "rgba(5,5,20,1)");
+    ctx.fillStyle = grd; ctx.fillRect(0, gy, w, h - gy);
 
-    // Grid lines for ground depth
-    ctx.strokeStyle = "rgba(124,58,237,0.06)";
-    ctx.lineWidth = 1;
-    for (let i = 0; i < 20; i++) {
-      const gy = groundY + i * (h - groundY) / 20;
-      ctx.beginPath();
-      ctx.moveTo(0, gy);
-      ctx.lineTo(w, gy);
-      ctx.stroke();
+    // Grid depth
+    ctx.strokeStyle = "rgba(124,58,237,0.04)"; ctx.lineWidth = 1;
+    for (let i = 0; i < 15; i++) { const yy = gy + i * (h - gy) / 15; ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(w, yy); ctx.stroke(); }
+
+    // ── DEPTH SORT ──
+    interface Obj { type: string; depth: number; data: any; }
+    const objs: Obj[] = [];
+
+    // Track surface fill
+    for (let i = 0; i < 60; i++) {
+      const a1 = (i / 60) * Math.PI * 2, a2 = ((i + 1) / 60) * Math.PI * 2;
+      const io1 = project(Math.cos(a1) * (s.trackR + s.trackW / 2), Math.sin(a1) * (s.trackR + s.trackW / 2), 0, s.cx, s.cy, s.sc, s.camAngle);
+      const io2 = project(Math.cos(a2) * (s.trackR + s.trackW / 2), Math.sin(a2) * (s.trackR + s.trackW / 2), 0, s.cx, s.cy, s.sc, s.camAngle);
+      const ii1 = project(Math.cos(a1) * (s.trackR - s.trackW / 2), Math.sin(a1) * (s.trackR - s.trackW / 2), 0, s.cx, s.cy, s.sc, s.camAngle);
+      const ii2 = project(Math.cos(a2) * (s.trackR - s.trackW / 2), Math.sin(a2) * (s.trackR - s.trackW / 2), 0, s.cx, s.cy, s.sc, s.camAngle);
+      const md = (io1.depth + io2.depth + ii1.depth + ii2.depth) / 4;
+      objs.push({ type: "tracksurf", depth: md, data: { io1, io2, ii1, ii2 } });
     }
 
-    // === COLLECT ALL 3D OBJECTS FOR DEPTH SORTING ===
-    interface RenderObj { type: string; x: number; y: number; z: number; depth: number; data: any; }
-    const objects: RenderObj[] = [];
-
-    // Track ring - multiple rings for 3D look
-    for (let ring = 0; ring < 3; ring++) {
-      const rOff = (ring - 1) * s.trackW * 0.35;
-      const r = s.trackR + rOff;
-      const segments = 60;
-      for (let i = 0; i < segments; i++) {
-        const a1 = (i / segments) * Math.PI * 2;
-        const a2 = ((i + 1) / segments) * Math.PI * 2;
-        const x1 = Math.cos(a1) * r, y1 = Math.sin(a1) * r;
-        const x2 = Math.cos(a2) * r, y2 = Math.sin(a2) * r;
-        const p1 = project(x1, y1, 0, s.cx, s.cy, s.scale, s.camAngle, s.camTilt);
-        const p2 = project(x2, y2, 0, s.cx, s.cy, s.scale, s.camAngle, s.camTilt);
-        const midDepth = (p1.depth + p2.depth) / 2;
-        objects.push({ type: "track", x: 0, y: 0, z: 0, depth: midDepth, data: { p1, p2, ring, seg: i } });
+    // Track borders
+    for (let ring = 0; ring < 2; ring++) {
+      const r = ring === 0 ? s.trackR + s.trackW / 2 : s.trackR - s.trackW / 2;
+      for (let i = 0; i < 60; i++) {
+        const a1 = (i / 60) * Math.PI * 2, a2 = ((i + 1) / 60) * Math.PI * 2;
+        const p1 = project(Math.cos(a1) * r, Math.sin(a1) * r, 0, s.cx, s.cy, s.sc, s.camAngle);
+        const p2 = project(Math.cos(a2) * r, Math.sin(a2) * r, 0, s.cx, s.cy, s.sc, s.camAngle);
+        objs.push({ type: "trackborder", depth: (p1.depth + p2.depth) / 2, data: { p1, p2, ring } });
       }
     }
 
     // Start/finish
-    const sf1 = project(s.trackR, -3, 0, s.cx, s.cy, s.scale, s.camAngle, s.camTilt);
-    const sf2 = project(s.trackR, 3, 0, s.cx, s.cy, s.scale, s.camAngle, s.camTilt);
-    objects.push({ type: "startfinish", x: s.trackR, y: 0, z: 0, depth: sf1.depth, data: { p1: sf1, p2: sf2 } });
+    const sf1 = project(s.trackR, -3, 0, s.cx, s.cy, s.sc, s.camAngle);
+    const sf2 = project(s.trackR, 3, 0, s.cx, s.cy, s.sc, s.camAngle);
+    objs.push({ type: "startfinish", depth: sf1.depth, data: { p1: sf1, p2: sf2 } });
+
+    // Quiz gates
+    for (const gate of s.gates) {
+      if (gate.used) continue;
+      const gx = Math.cos(gate.angle) * s.trackR;
+      const gy = Math.sin(gate.angle) * s.trackR;
+      const pg = project(gx, gy, 0, s.cx, s.cy, s.sc, s.camAngle);
+      objs.push({ type: "quizgate", depth: pg.depth, data: { proj: pg, angle: gate.angle } });
+    }
 
     // Tokens
     for (const t of s.tokens) {
       if (t.taken) continue;
-      const p = project(t.x, t.y, t.z, s.cx, s.cy, s.scale, s.camAngle, s.camTilt);
-      objects.push({ type: "token", x: t.x, y: t.y, z: t.z, depth: p.depth, data: { ...t, proj: p } });
+      const p = project(t.x, t.y, t.z, s.cx, s.cy, s.sc, s.camAngle);
+      objs.push({ type: "token", depth: p.depth, data: { ...t, proj: p } });
+    }
+
+    // Obstacles
+    for (const ob of s.obstacles) {
+      const p = project(ob.x, ob.y, 4, s.cx, s.cy, s.sc, s.camAngle);
+      objs.push({ type: "obstacle", depth: p.depth, data: { ...ob, proj: p } });
     }
 
     // AI
     for (const ai of s.ai) {
-      const ax = Math.cos(ai.angle) * s.trackR;
-      const ay = Math.sin(ai.angle) * s.trackR;
-      const p = project(ax, ay, 3, s.cx, s.cy, s.scale, s.camAngle, s.camTilt);
-      objects.push({ type: "kart", x: ax, y: ay, z: 3, depth: p.depth, data: { ...ai, proj: p, isPlayer: false } });
+      const ax = Math.cos(ai.angle) * s.trackR, ay = Math.sin(ai.angle) * s.trackR;
+      const p = project(ax, ay, 3, s.cx, s.cy, s.sc, s.camAngle);
+      objs.push({ type: "kart", depth: p.depth, data: { ...ai, proj: p, isPlayer: false } });
     }
 
     // Player
-    const pp = project(s.px, s.py, 3 + s.pz, s.cx, s.cy, s.scale, s.camAngle, s.camTilt);
-    objects.push({ type: "kart", x: s.px, y: s.py, z: 3 + s.pz, depth: pp.depth, data: { color: kartBody, glow: kartAccent, angle: s.pa, proj: pp, isPlayer: true, speed: s.pv, drifting } });
+    const pp = project(s.px, s.py, 3 + s.pz, s.cx, s.cy, s.sc, s.camAngle);
+    objs.push({ type: "kart", depth: pp.depth, data: { color: s.boostTimer > 0 ? "#22d3ee" : kartBody, glow: s.boostTimer > 0 ? "#22d3ee" : kartAccent, angle: s.pa, proj: pp, isPlayer: true, speed: s.pv, drifting } });
 
     // Particles
     for (const p of s.particles) {
-      const proj = project(p.x, p.y, p.z, s.cx, s.cy, s.scale, s.camAngle, s.camTilt);
-      objects.push({ type: "particle", x: p.x, y: p.y, z: p.z, depth: proj.depth, data: { ...p, proj } });
+      const proj = project(p.x, p.y, p.z, s.cx, s.cy, s.sc, s.camAngle);
+      objs.push({ type: "particle", depth: proj.depth, data: { ...p, proj } });
     }
 
     // Popups
     for (const p of s.popups) {
-      const proj = project(p.x, p.y, p.z, s.cx, s.cy, s.scale, s.camAngle, s.camTilt);
-      objects.push({ type: "popup", x: p.x, y: p.y, z: p.z, depth: proj.depth, data: { ...p, proj } });
+      const proj = project(p.x, p.y, p.z, s.cx, s.cy, s.sc, s.camAngle);
+      objs.push({ type: "popup", depth: proj.depth, data: { ...p, proj } });
     }
 
-    // Sort by depth (back to front)
-    objects.sort((a, b) => a.depth - b.depth);
+    objs.sort((a, b) => a.depth - b.depth);
 
-    // === RENDER OBJECTS ===
-    for (const obj of objects) {
-      if (obj.type === "track") {
-        const { p1, p2, ring, seg } = obj.data;
-        ctx.beginPath();
-        ctx.moveTo(p1.px, p1.py);
-        ctx.lineTo(p2.px, p2.py);
-        const isOuter = ring === 0;
-        const isInner = ring === 2;
-        const alpha = isOuter ? 0.5 : isInner ? 0.4 : 0.15;
-        const color = ring === 1 ? `rgba(124,58,237,${alpha})` : ring === 0 ? `rgba(168,85,247,${alpha})` : `rgba(99,102,241,${alpha})`;
-        ctx.strokeStyle = color;
-        ctx.lineWidth = ring === 1 ? 3 : 1.5;
-        ctx.setLineDash(ring === 1 ? [] : [6, 4]);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Track surface between inner and outer
-        if (ring === 1) {
-          const io1 = project(Math.cos((seg / 60) * Math.PI * 2) * (s.trackR + s.trackW / 2), Math.sin((seg / 60) * Math.PI * 2) * (s.trackR + s.trackW / 2), 0, s.cx, s.cy, s.scale, s.camAngle, s.camTilt);
-          const io2 = project(Math.cos(((seg + 1) / 60) * Math.PI * 2) * (s.trackR + s.trackW / 2), Math.sin(((seg + 1) / 60) * Math.PI * 2) * (s.trackR + s.trackW / 2), 0, s.cx, s.cy, s.scale, s.camAngle, s.camTilt);
-          const ii1 = project(Math.cos((seg / 60) * Math.PI * 2) * (s.trackR - s.trackW / 2), Math.sin((seg / 60) * Math.PI * 2) * (s.trackR - s.trackW / 2), 0, s.cx, s.cy, s.scale, s.camAngle, s.camTilt);
-          const ii2 = project(Math.cos(((seg + 1) / 60) * Math.PI * 2) * (s.trackR - s.trackW / 2), Math.sin(((seg + 1) / 60) * Math.PI * 2) * (s.trackR - s.trackW / 2), 0, s.cx, s.cy, s.scale, s.camAngle, s.camTilt);
-          ctx.beginPath();
-          ctx.moveTo(io1.px, io1.py);
-          ctx.lineTo(io2.px, io2.py);
-          ctx.lineTo(ii2.px, ii2.py);
-          ctx.lineTo(ii1.px, ii1.py);
-          ctx.closePath();
-          ctx.fillStyle = "rgba(20,15,50,0.7)";
-          ctx.fill();
-        }
+    for (const obj of objs) {
+      if (obj.type === "tracksurf") {
+        const { io1, io2, ii1, ii2 } = obj.data;
+        ctx.beginPath(); ctx.moveTo(io1.px, io1.py); ctx.lineTo(io2.px, io2.py); ctx.lineTo(ii2.px, ii2.py); ctx.lineTo(ii1.px, ii1.py); ctx.closePath();
+        ctx.fillStyle = "rgba(18,12,45,0.75)"; ctx.fill();
       }
-
+      if (obj.type === "trackborder") {
+        const { p1, p2, ring } = obj.data;
+        ctx.beginPath(); ctx.moveTo(p1.px, p1.py); ctx.lineTo(p2.px, p2.py);
+        ctx.strokeStyle = ring === 0 ? "rgba(168,85,247,0.45)" : "rgba(99,102,241,0.35)";
+        ctx.lineWidth = ring === 0 ? 2 : 1.5;
+        ctx.setLineDash(ring === 0 ? [] : [5, 4]); ctx.stroke(); ctx.setLineDash([]);
+      }
       if (obj.type === "startfinish") {
         const { p1, p2 } = obj.data;
-        ctx.beginPath();
-        ctx.moveTo(p1.px, p1.py);
-        ctx.lineTo(p2.px, p2.py);
-        ctx.strokeStyle = "white";
-        ctx.lineWidth = 4;
-        ctx.stroke();
-        ctx.strokeStyle = "#1e293b";
-        ctx.lineWidth = 2;
-        ctx.setLineDash([4, 4]);
-        ctx.stroke();
-        ctx.setLineDash([]);
+        ctx.beginPath(); ctx.moveTo(p1.px, p1.py); ctx.lineTo(p2.px, p2.py);
+        ctx.strokeStyle = "rgba(255,255,255,0.7)"; ctx.lineWidth = 4; ctx.stroke();
+        ctx.setLineDash([4, 4]); ctx.strokeStyle = "#1e293b"; ctx.lineWidth = 2; ctx.stroke(); ctx.setLineDash([]);
       }
-
+      if (obj.type === "quizgate") {
+        const { proj: p, angle } = obj.data;
+        const pulse = 0.7 + Math.sin(now * 0.005) * 0.3;
+        const sz = Math.max(12, s.trackR * 0.08) * p.s;
+        ctx.save(); ctx.translate(p.px, p.py);
+        // Gate ring
+        ctx.beginPath(); ctx.arc(0, 0, sz, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(250,204,21,${pulse})`;
+        ctx.lineWidth = 3;
+        ctx.shadowColor = "#facc15"; ctx.shadowBlur = 20 * pulse;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        // Question mark
+        ctx.font = `900 ${sz * 0.9}px "Arial Black", sans-serif`;
+        ctx.fillStyle = `rgba(250,204,21,${pulse})`;
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText("?", 0, 0);
+        // Label
+        ctx.font = `800 ${Math.max(7, sz * 0.3)}px "Arial", sans-serif`;
+        ctx.fillStyle = "rgba(255,255,255,0.5)";
+        ctx.fillText("TANTANGAN", 0, sz + 10);
+        ctx.restore();
+      }
       if (obj.type === "token") {
         const t = obj.data;
         const p = t.proj;
-        const pulse = 1 + Math.sin(now * 0.004 + t.bobPhase) * 0.1;
-        const sz = Math.max(8, s.trackR * 0.04) * p.scale;
-        const pillW = sz * (t.word.length * 0.7 + 2);
-        const pillH = sz * 1.6;
-
-        ctx.save();
-        ctx.translate(p.px, p.py);
-        ctx.scale(pulse, pulse);
-
-        // Token shadow on ground
-        ctx.beginPath();
-        ctx.ellipse(0, pillH * 0.4, pillW * 0.4, pillH * 0.15, 0, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(0,0,0,0.3)";
-        ctx.fill();
-
+        const pulse = 1 + Math.sin(now * 0.004 + t.bob) * 0.08;
+        const sz = Math.max(7, s.trackR * 0.038) * p.s;
+        const textW = ctx.measureText(`${t.good ? "+" : "−"} ${t.word}`).width;
+        const pw = textW + 16, ph = sz * 1.5;
+        ctx.save(); ctx.translate(p.px, p.py); ctx.scale(pulse, pulse);
+        // Shadow
+        ctx.beginPath(); ctx.ellipse(0, ph * 0.4, pw * 0.35, ph * 0.12, 0, 0, Math.PI * 2); ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fill();
         // Glow
-        ctx.shadowColor = t.good ? "#22d3ee" : "#f43f5e";
-        ctx.shadowBlur = 15 * pulse;
-
+        ctx.shadowColor = t.good ? "#22d3ee" : "#f43f5e"; ctx.shadowBlur = 12 * pulse;
         // Pill
-        ctx.beginPath();
-        ctx.roundRect(-pillW / 2, -pillH / 2, pillW, pillH, pillH / 2);
-        const g = ctx.createLinearGradient(-pillW / 2, 0, pillW / 2, 0);
-        g.addColorStop(0, t.good ? "rgba(34,211,238,0.95)" : "rgba(251,113,133,0.95)");
-        g.addColorStop(1, t.good ? "rgba(14,165,233,0.95)" : "rgba(225,29,72,0.95)");
-        ctx.fillStyle = g;
-        ctx.fill();
-
-        // Highlight on pill
-        ctx.beginPath();
-        ctx.roundRect(-pillW / 2 + 2, -pillH / 2 + 1, pillW - 4, pillH * 0.35, pillH * 0.15);
-        ctx.fillStyle = "rgba(255,255,255,0.2)";
-        ctx.fill();
-
+        ctx.beginPath(); ctx.roundRect(-pw / 2, -ph / 2, pw, ph, ph / 2);
+        const g = ctx.createLinearGradient(-pw / 2, 0, pw / 2, 0);
+        g.addColorStop(0, t.good ? "rgba(34,211,238,0.9)" : "rgba(251,113,133,0.9)");
+        g.addColorStop(1, t.good ? "rgba(14,165,233,0.9)" : "rgba(225,29,72,0.9)");
+        ctx.fillStyle = g; ctx.fill();
         ctx.shadowBlur = 0;
-        ctx.font = `800 ${sz * 0.85}px "Arial Black", sans-serif`;
-        ctx.fillStyle = "white";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
+        // Highlight
+        ctx.beginPath(); ctx.roundRect(-pw / 2 + 2, -ph / 2 + 1, pw - 4, ph * 0.3, ph * 0.12); ctx.fillStyle = "rgba(255,255,255,0.18)"; ctx.fill();
+        // Text
+        ctx.font = `800 ${sz * 0.8}px "Arial Black", sans-serif`; ctx.fillStyle = "white"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
         ctx.fillText(`${t.good ? "+" : "−"} ${t.word}`, 0, 1);
-
         ctx.restore();
       }
-
+      if (obj.type === "obstacle") {
+        const ob = obj.data;
+        const p = ob.proj;
+        const sz = Math.max(10, s.trackR * 0.05) * p.s;
+        ctx.save(); ctx.translate(p.px, p.py);
+        // Warning triangle
+        ctx.beginPath(); ctx.moveTo(0, -sz); ctx.lineTo(-sz * 0.8, sz * 0.5); ctx.lineTo(sz * 0.8, sz * 0.5); ctx.closePath();
+        ctx.fillStyle = "rgba(249,115,22,0.85)";
+        ctx.shadowColor = "#f97316"; ctx.shadowBlur = 12;
+        ctx.fill(); ctx.shadowBlur = 0;
+        ctx.strokeStyle = "rgba(255,255,255,0.5)"; ctx.lineWidth = 1.5; ctx.stroke();
+        // Exclamation
+        ctx.font = `900 ${sz * 0.7}px "Arial Black", sans-serif`;
+        ctx.fillStyle = "white"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText("!", 0, sz * 0.15);
+        ctx.restore();
+      }
       if (obj.type === "kart") {
         const d = obj.data;
         const p = d.proj;
-        const sz = Math.max(10, s.trackR * 0.06) * p.scale;
-
-        ctx.save();
-        ctx.translate(p.px, p.py);
-
+        const sz = Math.max(9, s.trackR * 0.055) * p.s;
+        ctx.save(); ctx.translate(p.px, p.py);
         // Shadow
-        ctx.beginPath();
-        ctx.ellipse(2, sz * 0.5, sz * 0.5, sz * 0.15, 0, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(0,0,0,0.4)";
-        ctx.fill();
-
-        // Kart body rotation
+        ctx.beginPath(); ctx.ellipse(2, sz * 0.45, sz * 0.45, sz * 0.12, 0, 0, Math.PI * 2); ctx.fillStyle = "rgba(0,0,0,0.35)"; ctx.fill();
         ctx.rotate((d.angle || 0) + Math.PI / 2);
-
         // Glow
-        ctx.shadowColor = d.glow;
-        ctx.shadowBlur = d.isPlayer ? 20 : 12;
-
+        ctx.shadowColor = d.glow; ctx.shadowBlur = d.isPlayer ? 18 : 10;
         // Body
-        ctx.beginPath();
-        ctx.roundRect(-sz * 0.35, -sz * 0.65, sz * 0.7, sz * 1.3, sz * 0.18);
-        const bg = ctx.createLinearGradient(0, -sz * 0.65, 0, sz * 0.65);
-        bg.addColorStop(0, d.glow);
-        bg.addColorStop(1, d.color);
-        ctx.fillStyle = bg;
-        ctx.fill();
-
-        // Body highlight
-        ctx.beginPath();
-        ctx.roundRect(-sz * 0.25, -sz * 0.55, sz * 0.5, sz * 0.5, sz * 0.12);
-        ctx.fillStyle = "rgba(255,255,255,0.15)";
-        ctx.fill();
-
+        ctx.beginPath(); ctx.roundRect(-sz * 0.32, -sz * 0.6, sz * 0.64, sz * 1.2, sz * 0.16);
+        const bg = ctx.createLinearGradient(0, -sz * 0.6, 0, sz * 0.6); bg.addColorStop(0, d.glow); bg.addColorStop(1, d.color);
+        ctx.fillStyle = bg; ctx.fill();
+        // Highlight
+        ctx.beginPath(); ctx.roundRect(-sz * 0.22, -sz * 0.5, sz * 0.44, sz * 0.4, sz * 0.1); ctx.fillStyle = "rgba(255,255,255,0.12)"; ctx.fill();
         ctx.shadowBlur = 0;
-
         // Head
-        ctx.beginPath();
-        ctx.arc(0, -sz * 0.15, sz * 0.22, 0, Math.PI * 2);
-        ctx.fillStyle = "#f1c9a5";
-        ctx.fill();
-        ctx.strokeStyle = "rgba(255,255,255,0.5)";
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
+        ctx.beginPath(); ctx.arc(0, -sz * 0.12, sz * 0.2, 0, Math.PI * 2); ctx.fillStyle = "#f1c9a5"; ctx.fill(); ctx.strokeStyle = "rgba(255,255,255,0.4)"; ctx.lineWidth = 1.2; ctx.stroke();
         // Eyes
-        ctx.fillStyle = "#1e293b";
-        ctx.beginPath();
-        ctx.arc(-sz * 0.07, -sz * 0.18, sz * 0.045, 0, Math.PI * 2);
-        ctx.arc(sz * 0.07, -sz * 0.18, sz * 0.045, 0, Math.PI * 2);
-        ctx.fill();
-        // Eye highlight
-        ctx.fillStyle = "white";
-        ctx.beginPath();
-        ctx.arc(-sz * 0.06, -sz * 0.19, sz * 0.015, 0, Math.PI * 2);
-        ctx.arc(sz * 0.08, -sz * 0.19, sz * 0.015, 0, Math.PI * 2);
-        ctx.fill();
-
+        ctx.fillStyle = "#1e293b"; ctx.beginPath(); ctx.arc(-sz * 0.06, -sz * 0.14, sz * 0.04, 0, Math.PI * 2); ctx.arc(sz * 0.06, -sz * 0.14, sz * 0.04, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(-sz * 0.05, -sz * 0.15, sz * 0.013, 0, Math.PI * 2); ctx.arc(sz * 0.07, -sz * 0.15, sz * 0.013, 0, Math.PI * 2); ctx.fill();
         // Wheels
         ctx.fillStyle = "#0f172a";
-        const ww = sz * 0.16, wh = sz * 0.1;
-        ctx.fillRect(-sz * 0.45, -sz * 0.42, ww, wh);
-        ctx.fillRect(sz * 0.29, -sz * 0.42, ww, wh);
-        ctx.fillRect(-sz * 0.45, sz * 0.32, ww, wh);
-        ctx.fillRect(sz * 0.29, sz * 0.32, ww, wh);
-
-        // Wheel glow
-        ctx.fillStyle = `${d.glow}44`;
-        ctx.fillRect(-sz * 0.45, -sz * 0.42, ww, wh);
-        ctx.fillRect(sz * 0.29, -sz * 0.42, ww, wh);
-
+        ctx.fillRect(-sz * 0.42, -sz * 0.38, sz * 0.14, sz * 0.1); ctx.fillRect(sz * 0.28, -sz * 0.38, sz * 0.14, sz * 0.1);
+        ctx.fillRect(-sz * 0.42, sz * 0.28, sz * 0.14, sz * 0.1); ctx.fillRect(sz * 0.28, sz * 0.28, sz * 0.14, sz * 0.1);
+        ctx.fillStyle = `${d.glow}33`; ctx.fillRect(-sz * 0.42, -sz * 0.38, sz * 0.14, sz * 0.1); ctx.fillRect(sz * 0.28, -sz * 0.38, sz * 0.14, sz * 0.1);
         ctx.restore();
-
-        // Player indicator arrow
+        // Player arrow
         if (d.isPlayer) {
-          ctx.save();
-          ctx.translate(p.px, p.py - sz * 0.9);
-          const arrowBounce = Math.sin(now * 0.005) * 3;
-          ctx.translate(0, arrowBounce);
-          ctx.beginPath();
-          ctx.moveTo(0, 0);
-          ctx.lineTo(-5, -8);
-          ctx.lineTo(5, -8);
-          ctx.closePath();
-          ctx.fillStyle = d.glow;
-          ctx.shadowColor = d.glow;
-          ctx.shadowBlur = 10;
-          ctx.fill();
-          ctx.shadowBlur = 0;
+          ctx.save(); ctx.translate(p.px, p.py - sz * 0.85); ctx.translate(0, Math.sin(now * 0.005) * 3);
+          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-4, -7); ctx.lineTo(4, -7); ctx.closePath();
+          ctx.fillStyle = d.glow; ctx.shadowColor = d.glow; ctx.shadowBlur = 8; ctx.fill(); ctx.shadowBlur = 0;
           ctx.restore();
         }
       }
-
       if (obj.type === "particle") {
         const p = obj.data;
-        const proj = p.proj;
-        const alpha = p.life / p.maxLife;
-        ctx.globalAlpha = alpha;
-        ctx.beginPath();
-        ctx.arc(proj.px, proj.py, p.size * alpha * proj.scale, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.fill();
+        ctx.globalAlpha = p.life / p.max;
+        ctx.beginPath(); ctx.arc(p.proj.px, p.proj.py, p.size * (p.life / p.max) * p.proj.s, 0, Math.PI * 2);
+        ctx.fillStyle = p.color; ctx.fill();
       }
-
       if (obj.type === "popup") {
         const p = obj.data;
-        const proj = p.proj;
-        const alpha = p.life / 55;
-        ctx.globalAlpha = alpha;
-        ctx.font = `900 ${Math.max(11, s.trackR * 0.055) * proj.scale}px "Arial Black", sans-serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "bottom";
-        ctx.shadowColor = p.color;
-        ctx.shadowBlur = 10;
-        ctx.fillStyle = p.color;
-        ctx.fillText(p.text, proj.px, proj.py);
+        ctx.globalAlpha = p.life / 60;
+        ctx.font = `900 ${Math.max(10, s.trackR * 0.05) * p.proj.s}px "Arial Black", sans-serif`;
+        ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+        ctx.shadowColor = p.color; ctx.shadowBlur = 8;
+        ctx.fillStyle = p.color; ctx.fillText(p.text, p.proj.px, p.proj.py);
         ctx.shadowBlur = 0;
       }
     }
     ctx.globalAlpha = 1;
 
-    // Center PRIMA+ label
-    const cp = project(0, 0, 0, s.cx, s.cy, s.scale, s.camAngle, s.camTilt);
-    ctx.font = `900 ${Math.max(14, s.trackR * 0.1)}px "Arial Black", sans-serif`;
-    ctx.fillStyle = "rgba(168,85,247,0.15)";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
+    // Center label
+    const cp = project(0, 0, 0, s.cx, s.cy, s.sc, s.camAngle);
+    ctx.font = `900 ${Math.max(12, s.trackR * 0.09)}px "Arial Black", sans-serif`;
+    ctx.fillStyle = "rgba(168,85,247,0.12)"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
     ctx.fillText("PRIMA+", cp.px, cp.py);
 
-    // === COUNTDOWN ===
+    // Countdown
     if (s.cdVal > 0) {
-      ctx.font = `900 ${Math.min(w, h) * 0.3}px "Arial Black", sans-serif`;
+      ctx.font = `900 ${Math.min(w, h) * 0.28}px "Arial Black", sans-serif`;
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.shadowColor = "#a855f7"; ctx.shadowBlur = 40;
-      ctx.fillStyle = "white";
-      ctx.fillText(String(s.cdVal), w / 2, h * 0.35);
-      ctx.shadowBlur = 0;
+      ctx.shadowColor = "#a855f7"; ctx.shadowBlur = 40; ctx.fillStyle = "white";
+      ctx.fillText(String(s.cdVal), w / 2, h * 0.33); ctx.shadowBlur = 0;
     } else if (s.cdVal === 0) {
-      ctx.font = `900 ${Math.min(w, h) * 0.22}px "Arial Black", sans-serif`;
+      ctx.font = `900 ${Math.min(w, h) * 0.2}px "Arial Black", sans-serif`;
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.shadowColor = "#22c55e"; ctx.shadowBlur = 40;
-      ctx.fillStyle = "#22c55e";
-      ctx.fillText("GO!", w / 2, h * 0.35);
-      ctx.shadowBlur = 0;
+      ctx.shadowColor = "#22c55e"; ctx.shadowBlur = 40; ctx.fillStyle = "#22c55e";
+      ctx.fillText("GO!", w / 2, h * 0.33); ctx.shadowBlur = 0;
     }
 
     // Vignette
-    const vig = ctx.createRadialGradient(w / 2, h / 2, w * 0.25, w / 2, h / 2, w * 0.65);
-    vig.addColorStop(0, "rgba(0,0,0,0)");
-    vig.addColorStop(1, "rgba(0,0,0,0.4)");
-    ctx.fillStyle = vig;
-    ctx.fillRect(0, 0, w, h);
+    const vig = ctx.createRadialGradient(w / 2, h / 2, w * 0.25, w / 2, h / 2, w * 0.6);
+    vig.addColorStop(0, "rgba(0,0,0,0)"); vig.addColorStop(1, "rgba(0,0,0,0.35)");
+    ctx.fillStyle = vig; ctx.fillRect(0, 0, w, h);
+
+    // Combo display
+    if (s.combo > 1) {
+      ctx.font = `900 ${Math.max(14, w * 0.02)}px "Arial Black", sans-serif`;
+      ctx.textAlign = "right"; ctx.textBaseline = "top";
+      ctx.fillStyle = "#facc15"; ctx.shadowColor = "#facc15"; ctx.shadowBlur = 10;
+      ctx.fillText(`COMBO x${s.combo}`, w - 16, h * 0.48);
+      ctx.shadowBlur = 0;
+    }
   };
 
+  // Touch handlers
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     e.preventDefault();
-    const t = e.touches[0];
-    const r = containerRef.current?.getBoundingClientRect();
+    const t = e.touches[0]; const r = containerRef.current?.getBoundingClientRect();
     if (!r) return;
-    touch.current = { active: true, sx: t.clientX - r.left, sy: t.clientY - r.top, steerX: 0, gas: (t.clientY - r.top) < r.height * 0.55, brake: (t.clientY - r.top) >= r.height * 0.55 };
+    touch.current = { active: true, sx: t.clientX - r.left, steerX: 0, gas: (t.clientY - r.top) < r.height * 0.55, brake: (t.clientY - r.top) >= r.height * 0.55 };
   }, []);
-
   const onTouchMove = useCallback((e: React.TouchEvent) => {
-    e.preventDefault();
-    if (!touch.current.active) return;
-    const t = e.touches[0];
-    const r = containerRef.current?.getBoundingClientRect();
-    if (!r) return;
+    e.preventDefault(); if (!touch.current.active) return;
+    const t = e.touches[0]; const r = containerRef.current?.getBoundingClientRect(); if (!r) return;
     const x = t.clientX - r.left, y = t.clientY - r.top;
-    touch.current.steerX = Math.max(-1, Math.min(1, (x - touch.current.sx) / (r.width * 0.12)));
-    touch.current.gas = y < r.height * 0.55;
-    touch.current.brake = y >= r.height * 0.55;
+    touch.current.steerX = Math.max(-1, Math.min(1, (x - touch.current.sx) / (r.width * 0.1)));
+    touch.current.gas = y < r.height * 0.55; touch.current.brake = y >= r.height * 0.55;
   }, []);
+  const onTouchEnd = useCallback(() => { touch.current = { active: false, steerX: 0, gas: false, brake: false, sx: 0 }; }, []);
 
-  const onTouchEnd = useCallback(() => { touch.current = { active: false, steerX: 0, gas: false, brake: false, sx: 0, sy: 0 }; }, []);
+  const ch = CHALLENGES[quizQ];
 
   return (
-    <div ref={containerRef} style={{ width: "100%", height: "100%", minHeight: "70vh", position: "relative", overflow: "hidden", borderRadius: 16, touchAction: "none", border: "1px solid rgba(124,58,237,0.3)" }}
+    <div ref={containerRef} style={{ width: "100vw", height: "100vh", position: "relative", overflow: "hidden", touchAction: "none" }}
       onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
       <canvas ref={canvasRef} width={dims.w} height={dims.h} style={{ width: "100%", height: "100%", display: "block" }} />
 
       {/* HUD */}
       <div style={{ position: "absolute", top: 10, left: 10, right: 10, display: "flex", justifyContent: "space-between", gap: 6, zIndex: 30, pointerEvents: "none", flexWrap: "wrap" }}>
-        {[{ l: "SKOR", v: score, c: "#22d3ee", i: "★" }, { l: "WAKTU", v: `${time}s`, c: time <= 10 ? "#ef4444" : "#f43f5e", i: "⏱" }, { l: "POS", v: `${position}/4`, c: "#a855f7", i: "🏁" }, { l: "LAP", v: `${Math.min(lap + 1, 3)}/3`, c: "#22c55e", i: "🔄" }].map(it => (
-          <div key={it.l} style={{ padding: "5px 12px", borderRadius: 10, background: "rgba(10,10,30,0.88)", border: `1px solid ${it.c}40`, backdropFilter: "blur(12px)", display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ fontSize: 13 }}>{it.i}</span>
-            <div><div style={{ fontFamily: "Arial", fontSize: 8, color: "rgba(255,255,255,0.45)", fontWeight: 700, letterSpacing: "0.1em" }}>{it.l}</div>
-              <div style={{ fontFamily: "'Arial Black'", fontSize: 13, color: it.c, fontWeight: 900, lineHeight: 1 }}>{it.v}</div></div>
+        {[{ l: "SKOR", v: raceScore, c: "#22d3ee", i: "★" }, { l: "WAKTU", v: `${time}s`, c: time <= 10 ? "#ef4444" : "#f43f5e", i: "⏱" }, { l: "POS", v: `${position}/4`, c: "#a855f7", i: "🏁" }, { l: "LAP", v: `${Math.min(lap + 1, 3)}/3`, c: "#22c55e", i: "🔄" }, { l: "BENAR", v: correctCount, c: "#facc15", i: "📝" }].map(it => (
+          <div key={it.l} style={{ padding: "4px 10px", borderRadius: 10, background: "rgba(10,10,30,0.88)", border: `1px solid ${it.c}40`, backdropFilter: "blur(12px)", display: "flex", alignItems: "center", gap: 5 }}>
+            <span style={{ fontSize: 12 }}>{it.i}</span>
+            <div><div style={{ fontFamily: "Arial", fontSize: 7, color: "rgba(255,255,255,0.4)", fontWeight: 700, letterSpacing: "0.1em" }}>{it.l}</div>
+              <div style={{ fontFamily: "'Arial Black'", fontSize: 12, color: it.c, fontWeight: 900, lineHeight: 1 }}>{it.v}</div></div>
           </div>
         ))}
       </div>
 
       {/* Speed */}
-      <div style={{ position: "absolute", bottom: 36, left: 10, zIndex: 30, display: "flex", alignItems: "center", gap: 6, padding: "5px 10px", borderRadius: 10, background: "rgba(10,10,30,0.88)", border: "1px solid rgba(124,58,237,0.3)", backdropFilter: "blur(12px)" }}>
-        <span style={{ fontFamily: "'Arial Black'", fontSize: 8, color: "rgba(255,255,255,0.45)", fontWeight: 900, letterSpacing: "0.1em" }}>SPD</span>
-        <div style={{ width: 90, height: 6, borderRadius: 3, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
-          <div style={{ width: `${Math.min(speed * 115, 100)}%`, height: "100%", borderRadius: 3, background: drifting ? "linear-gradient(90deg,#f97316,#ef4444)" : "linear-gradient(90deg,#22c55e,#06b6d4)", transition: "width 0.08s", boxShadow: drifting ? "0 0 10px #f97316" : "0 0 10px #22c55e" }} />
+      <div style={{ position: "absolute", bottom: 32, left: 10, zIndex: 30, display: "flex", alignItems: "center", gap: 5, padding: "4px 8px", borderRadius: 8, background: "rgba(10,10,30,0.85)", border: "1px solid rgba(124,58,237,0.3)" }}>
+        <span style={{ fontFamily: "'Arial Black'", fontSize: 7, color: "rgba(255,255,255,0.4)", letterSpacing: "0.1em" }}>SPD</span>
+        <div style={{ width: 70, height: 5, borderRadius: 3, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
+          <div style={{ width: `${Math.min(speed * 118, 100)}%`, height: "100%", borderRadius: 3, background: drifting ? "linear-gradient(90deg,#f97316,#ef4444)" : "linear-gradient(90deg,#22c55e,#06b6d4)", transition: "width 0.08s", boxShadow: drifting ? "0 0 8px #f97316" : "0 0 8px #22c55e" }} />
         </div>
-        {drifting && <span style={{ fontFamily: "'Arial Black'", fontSize: 9, color: "#f97316", fontWeight: 900, textShadow: "0 0 10px #f97316" }}>DRIFT!</span>}
+        {drifting && <span style={{ fontFamily: "'Arial Black'", fontSize: 8, color: "#f97316", textShadow: "0 0 8px #f97316" }}>DRIFT!</span>}
+        {S.current.boostTimer > 0 && <span style={{ fontFamily: "'Arial Black'", fontSize: 8, color: "#22d3ee", textShadow: "0 0 8px #22d3ee" }}>BOOST!</span>}
       </div>
 
-      {!over && (
-        <div style={{ position: "absolute", bottom: 8, left: "50%", transform: "translateX(-50%)", zIndex: 30, padding: "3px 10px", borderRadius: 8, background: "rgba(10,10,30,0.7)", backdropFilter: "blur(8px)", whiteSpace: "nowrap" }}>
-          <span style={{ fontFamily: "Arial", fontSize: 9, color: "rgba(255,255,255,0.35)" }}>WASD/Arrows nyetir · Spasi drift · Kumpul kata Indonesia (+10) · Hindari bahasa asing (-6) · 3 lap!</span>
+      {!over && !quizActive && (
+        <div style={{ position: "absolute", bottom: 6, left: "50%", transform: "translateX(-50%)", zIndex: 30, padding: "2px 8px", borderRadius: 6, background: "rgba(10,10,30,0.6)", whiteSpace: "nowrap" }}>
+          <span style={{ fontFamily: "Arial", fontSize: 8, color: "rgba(255,255,255,0.3)" }}>WASD/Arrows · Spasi drift · Kumpul kata (+10) · Hindari bahasa asing (-6) · Lewati ? untuk quiz (+20)</span>
+        </div>
+      )}
+
+      {/* QUIZ OVERLAY */}
+      {quizActive && (
+        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(5,5,20,0.85)", backdropFilter: "blur(12px)", zIndex: 100 }}>
+          <div style={{ padding: "24px 28px", borderRadius: 20, background: "rgba(15,15,50,0.95)", border: "1px solid rgba(250,204,21,0.4)", maxWidth: 480, width: "90%", animation: "popIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both" }}>
+            {/* Timer bar */}
+            <div style={{ width: "100%", height: 4, borderRadius: 2, background: "rgba(255,255,255,0.1)", marginBottom: 16 }}>
+              <div style={{ width: `${(quizTimer / 12) * 100}%`, height: "100%", borderRadius: 2, background: quizTimer <= 3 ? "#ef4444" : "#facc15", transition: "width 1s linear" }} />
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <span style={{ fontFamily: "'Arial Black'", fontSize: 10, color: "#facc15", letterSpacing: "0.1em" }}>TANTANGAN BAHASA</span>
+              <span style={{ fontFamily: "'Arial Black'", fontSize: 14, color: quizTimer <= 3 ? "#ef4444" : "#facc15" }}>{quizTimer}s</span>
+            </div>
+
+            <p style={{ fontFamily: "'Arial Black'", fontSize: 15, color: "white", margin: "0 0 16px", lineHeight: 1.4 }}>{ch.q}</p>
+
+            <div style={{ display: "grid", gap: 8 }}>
+              {ch.opts.map((opt, i) => {
+                let bg = "rgba(255,255,255,0.06)";
+                let border = "rgba(255,255,255,0.1)";
+                let txtColor = "rgba(255,255,255,0.8)";
+                if (quizAnswered) {
+                  if (i === ch.ans) { bg = "rgba(34,197,94,0.2)"; border = "#22c55e"; txtColor = "#22c55e"; }
+                  else if (i === selectedOpt && i !== ch.ans) { bg = "rgba(239,68,68,0.2)"; border = "#ef4444"; txtColor = "#ef4444"; }
+                } else if (i === selectedOpt) { bg = "rgba(250,204,21,0.15)"; border = "#facc15"; }
+                return (
+                  <button key={i} onClick={() => !quizAnswered && answerQuiz(i)} disabled={quizAnswered}
+                    style={{ padding: "10px 14px", borderRadius: 12, background: bg, border: `1px solid ${border}`, color: txtColor, fontFamily: "Arial", fontSize: 12, fontWeight: 600, textAlign: "left", cursor: quizAnswered ? "default" : "pointer", transition: "all 0.15s" }}>
+                    <span style={{ fontFamily: "'Arial Black'", fontSize: 10, color: "rgba(255,255,255,0.3)", marginRight: 8 }}>{String.fromCharCode(65 + i)}.</span>
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
+
+            {quizAnswered && (
+              <div style={{ marginTop: 12, padding: "8px 12px", borderRadius: 10, background: quizCorrect ? "rgba(34,197,94,0.1)" : "rgba(239,68,68,0.1)", border: `1px solid ${quizCorrect ? "#22c55e33" : "#ef444433"}` }}>
+                <p style={{ fontFamily: "Arial", fontSize: 11, color: quizCorrect ? "#22c55e" : "#ef4444", margin: 0, fontWeight: 700 }}>{quizCorrect ? "✓ Benar! +20 poin" : "✗ Salah! -5 poin"}</p>
+                <p style={{ fontFamily: "Arial", fontSize: 10, color: "rgba(255,255,255,0.5)", margin: "4px 0 0" }}>{ch.tip}</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
       {over && (
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "rgba(5,5,20,0.88)", backdropFilter: "blur(16px)", zIndex: 50 }}>
-          <div style={{ padding: "30px 50px", borderRadius: 20, background: "rgba(15,15,45,0.95)", border: "1px solid rgba(124,58,237,0.5)", textAlign: "center", animation: "popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both" }}>
-            <p style={{ fontFamily: "'Arial Black'", fontSize: "2.5rem", fontWeight: 900, color: "white", margin: 0 }}>SELESAI!</p>
-            <p style={{ fontFamily: "'Arial Black'", fontSize: "1.8rem", fontWeight: 900, color: "#22d3ee", margin: "10px 0 5px" }}>Skor: {score}</p>
-            <p style={{ fontFamily: "Arial", fontSize: "0.85rem", color: "rgba(255,255,255,0.55)", margin: 0 }}>
-              {score >= 80 ? "Mantul! Loyalitas bahasamu kece." : score >= 40 ? "Lumayan, masih bisa lebih sadar." : "Coba lagi, kumpulin lebih banyak kata Indonesia!"}
-            </p>
+          <div style={{ padding: "28px 40px", borderRadius: 20, background: "rgba(15,15,45,0.95)", border: "1px solid rgba(124,58,237,0.5)", textAlign: "center", animation: "popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both" }}>
+            <p style={{ fontFamily: "'Arial Black'", fontSize: "2.2rem", fontWeight: 900, color: "white", margin: 0 }}>SELESAI!</p>
+            <div style={{ display: "flex", gap: 24, justifyContent: "center", margin: "14px 0" }}>
+              <div><p style={{ fontFamily: "Arial", fontSize: 9, color: "rgba(255,255,255,0.4)", margin: 0 }}>SKOR</p><p style={{ fontFamily: "'Arial Black'", fontSize: "1.4rem", color: "#22d3ee", fontWeight: 900, margin: 0 }}>{raceScore}</p></div>
+              <div><p style={{ fontFamily: "Arial", fontSize: 9, color: "rgba(255,255,255,0.4)", margin: 0 }}>BENAR</p><p style={{ fontFamily: "'Arial Black'", fontSize: "1.4rem", color: "#22c55e", fontWeight: 900, margin: 0 }}>{correctCount}</p></div>
+            </div>
           </div>
         </div>
       )}
 
-      <style>{`@keyframes popIn{0%{opacity:0;transform:scale(0.5)}100%{opacity:1;transform:scale(1)}}`}</style>
+      <style>{`@keyframes popIn{0%{opacity:0;transform:scale(0.85)}100%{opacity:1;transform:scale(1)}}`}</style>
     </div>
   );
 }
-
-function lerp(a: number, b: number, t: number) { return a + (b - a) * t; }
