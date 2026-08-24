@@ -1,868 +1,1298 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 
-/* ═══════════════════════════════════════════════════════════
-   LANGUAGE KART — Mario Kart × Bahasa Indonesia Edu-Racer
-   ═══════════════════════════════════════════════════════════ */
+const R = 180;
+const W = 64;
+const RI = R - W / 2;
+const RO = R + W / 2;
+const CAMH = 20;
+const CAMD = 34;
+const MAXBASE = 150;
+const RACE_TIME = 240;
 
-const GOOD_WORDS = ["makasih", "sampai jumpa", "seru", "hebat", "teman", "belajar", "santun", "ramah", "karya", "cita-cita", "semangat", "jujur", "rapi", "cantik", "gotong royong", "sopan"];
-const BAD_WORDS = ["hallo guys", "btw", "omg", "literally", "vibes", "slay", "bestie", "okay dah", "see you"];
+type ItemKind = "mushroom" | "banana" | "green" | "red" | "star";
+
+const ITEMS: Record<ItemKind, { icon: string; name: string }> = {
+  mushroom: { icon: "🍄", name: "Jamur Kilat" },
+  banana: { icon: "🍌", name: "Pisang" },
+  green: { icon: "🟢", name: "Cangkang Hijau" },
+  red: { icon: "🔴", name: "Cangkang Merah" },
+  star: { icon: "⭐", name: "Bintang" },
+};
 
 const CHALLENGES = [
-  { q: "Seorang siswa menulis di chat: 'Gw lagi males banget nih, males gerak, males ngapa-ngapain.' Menurutmu, apa dampak jangka panjang kebiasaan ini terhadap kemampuan bahasanya?", opts: ["Tidak ada dampak, toh cuma di chat pribadi", "Kemampuan menulis dan berbicara bahasa baku akan melemah karena jarang berlatih", "Justru menambah variasi kosakata", "Lebih efisien karena singkat"], ans: 1, tip: "Kebiasaan menulis informal secara konsisten akan membentuk pola pikir linguistik yang sulit beralih ke bahasa baku saat dibutuhkan (di sekolah, ujian, kerja)." },
-  { q: "Di sebuah seminar, pembicara berkata: 'Jadi basically, intinya kita harus aware terhadap issue ini, karena literally everyone affected.' Apa yang salah dari komunikasi ini?", opts: ["Tidak ada yang salah, semua orang paham", "Pencampuran bahasa asing yang tidak perlu mengurangi kejelasan bagi pendengar yang tidak menguasai bahasa tersebut", "Gaya bicara ini sudah diterima secara universal", "Hanya masalah selera, bukan kualitas"], ans: 1, tip: "Dalam konteks formal/semnar, penggunaan campuran bahasa asing bisa mengalienasi pendengar yang tidak familiar dan menurunkan kredibilitas pembicara." },
-  { q: "Sebuah penelitian menunjukkan bahwa remaja yang aktif di media sosial cenderung lebih sering menggunakan bahasa gaul dibanding bahasa baku. Mengapa fenomena ini perlu diwaspadai?", opts: ["Karena media sosial itu buruk bagi remaja", "Karena batas antara bahasa gaul dan baku bisa kabur, sehingga remaja kesulitan beralih ke bahasa formal saat diperlukan", "Karena bahasa gaul lebih kreatif", "Sebenarnya tidak perlu dikhawatirkan"], ans: 1, tip: "Media sosial membentuk kebiasaan linguistik. Tanpa kesadaran, remaja bisa kehilangan kemampuan beralih ragam (code-switching) yang tepat untuk konteks berbeda." },
-  { q: "Perhatikan kalimat ini: 'Aku mau presentasi tentang impact of social media terhadap generasi muda.' Apa masalah utama dari kalimat tersebut?", opts: ["Tidak ada masalah, semua orang mengerti", "Terlalu banyak kata serapan bahasa asing yang bisa diganti dengan padanan Indonesia yang lebih tepat", "Kalimatnya terlalu pendek", "Struktur kalimatnya sudah benar"], ans: 1, tip: "'Impact' → dampak, 'social media' → media sosial, 'terhadap' sudah benar. Menggunakan padanan Indonesia menunjukkan penguasaan kosakata yang lebih kuat." },
-  { q: "Guru bahasa Indonesia meminta siswa membuat esai formal. Seorang siswa menulis dengan campuran bahasa: 'Essay ini basically membahas tentang fenomena yang literally terjadi di sekitar kita.' Penilaian yang tepat adalah...", opts: ["Sudah bagus karena kreatif", "Perlu diperbaiki karena esai formal harus menggunakan bahasa Indonesia yang konsisten tanpa campuran bahasa asing yang tidak perlu", "Tidak masalah karena pembaca masih mengerti", "Nilai penuh karena isi/esainya yang penting"], ans: 1, tip: "Esai formal mengharapkan konsistensi penggunaan bahasa. Campuran bahasa asing yang tidak perlu menunjukkan belum matangnya kesadaran berbahasa." },
-  { q: "Ibu Kota Nusantara (IKN) menggunakan bahasa Indonesia sebagai bahasa resmi. Mengapa penegasan ini penting bagi identitas bangsa?", opts: ["Hanya formalitas administratif", "Bahasa Indonesia adalah alat pemersatu yang menjamin semua warga negara bisa berkomunikasi tanpa diskriminasi", "Bahasa Inggris seharusnya dijadikan bahasa utama", "Tidak terlalu penting selama komunikasi berjalan"], ans: 1, tip: "Penggunaan bahasa Indonesia di institusi negara memperkuat fungsi bahasa sebagai alat pemersatu dan identitas nasional Indonesia." },
-  { q: "Seorang konten kreator bilang: 'Content ini gw buat buat kalian semua yang literally need this!' Dari perspektif loyalitas berbahasa, apa yang terjadi?", opts: ["Normal saja, semua orang juga bicara begitu", "Terjadi erosi kesadaran berbahasa karena penggunaan bahasa asing secara membabi buta tanpa mempertimbangkan konteks", "Ini menunjukkan kreativitas tinggi", "Bahasa berkembang, itu wajar saja"], ans: 1, tip: "Loyalitas berbahasa bukan berarti tidak boleh meminjam kata, tapi tentang kesadaran memilih ragam yang tepat sesuai konteks dan audiens." },
-  { q: "Seorang siswa berkata: 'Aku lebih nyaman pakai bahasa gaul karena bahasa baku itu kaku dan membosankan.' Bagaimana cara merespons dengan bijak?", opts: ["Setuju saja, toh bahasa baku memang kaku", "Menjelaskan bahwa bahasa baku dan bahasa gaul punya fungsi masing-masing, dan keterampilan beralih antar keduanya adalah kekuatan, bukan kelemahan", "Melarang penggunaan bahasa gaul sepenuhnya", "Tidak usah dipedulikan"], ans: 1, tip: "Pendekatan ekstrem (larang total atau biarkan saja) kurang efektif. Yang dibutuhkan adalah kesadaran untuk menggunakan ragam yang tepat di waktu yang tepat." },
-  { q: "Dalam ujian tulis, seorang siswa menulis: 'Gimana caranya biar Indonesia tetep jaya?' Padahal soal meminta jawaban formal. Apa konsekuensinya?", opts: ["Tidak ada masalah karena isi jawabannya benar", "Guru berhak mengurangi poin karena penggunaan ragam informal tidak sesuai tuntutan soal yang meminta bahasa baku", "Siswa berhak menulis dengan gaya apapun", "Soal yang harus diperbaiki, bukan jawaban siswa"], ans: 1, tip: "Kesadaran berbahasa termasuk kemampuan menyesuaikan ragam dengan konteks. Ujian formal menuntut bahasa baku, dan ini adalah keterampilan yang harus dikuasai." },
-  { q: "Sebuah iklan produk menggunakan bahasa: 'Produk kami, basically, super bagus dan literally bikin hidup kamu lebih amazing!' Apa analisis kritismu?", opts: ["Iklan yang efektif karena menggunakan bahasa anak muda", "Penggunaan bahasa asing yang berlebihan dalam iklan bisa memperkuat tren bahasa gaul dan melemahkan kesadaran berbahasa baku di masyarakat", "Iklan seperti ini sudah standar industri", "Tidak ada masalah seluai produknya laku"], ans: 1, tip: "Media massa (termasuk iklan) memiliki pengaruh besar dalam membentuk kebiasaan berbahasa. Iklan yang tidak memperhatikan kualitas bahasa ikut andil dalam degradasi kesadaran berbahasa." },
-  { q: "Kata 'literally' sering dipakai remaja Indonesia dalam percakapan sehari-hari. Apa fungsi sebenarnya kata ini dan mengapa penggunaannya di Indonesia perlu dikritisi?", opts: ["Kata ini universal dan tidak perlu dikritisi", "Literally berarti 'secara harfiah' dalam bahasa Inggris, dan penggunaannya dalam bahasa Indonesia tanpa konteks yang tepat menunjukkan minimnya kesadaran linguistik", "Kata ini sudah menjadi bagian dari bahasa Indonesia", "Hanya masalah tren yang akan hilang sendiri"], ans: 1, tip: "Literally = secara harfiah. Dipakai remaja Indonesia biasanya tanpa makna harfiah, menunjukkan pengaruh media sosial yang membentuk kebiasaan tanpa pemahaman makna." },
-  { q: "Sebuah sekolah menerapkan 'Gerakan Ngomong Bahasa Indonesia' di lingkungan sekolah. Langkah ini sejalan dengan...", opts: ["Membatasi kreativitas siswa", "Upaya membangun kesadaran berbahasa dan loyalitas terhadap bahasa Indonesia sebagai identitas bangsa", "Aturan yang tidak relevan dengan zaman digital", "Memaksa siswa berbicara formal sepanjang hari"], ans: 1, tip: "Program seperti ini membantu remaja membiasakan diri menggunakan bahasa Indonesia secara konsisten, membangun kesadaran dan loyalitas berbahasa." },
-  { q: "Amatan: Di media sosial, banyak remaja menulis caption seperti 'Day 47: Still healing, still growing, still learning.' Padahal mereka berbicara tentang kehidupan di Indonesia. Apa yang bisa disimpulkan?", opts: ["Mereka lebih berbakat menulis dalam bahasa Inggris", "Terdapat desakulturalisasi bahasa Indonesia di kalangan remaja akibat pengaruh konten luar negeri yang dominan", "Tidak ada masalah karena caption Instagram memang pakai bahasa Inggris", "Mereka sedang belajar bahasa Inggris"], ans: 1, tip: "Ketika remaja secara default memilih bahasa asing untuk mengekspresikan diri (bukan karena konteks internasional), ini menunjukkan pelemahan ikatan emosional dengan bahasa Indonesia." },
-  { q: "Perhatikan dua kalimat: (A) 'Film ini bagus banget, wajib nonton!' (B) 'Film ini sangat menarik dan layak ditonton.' Kapan masing-masing kalimat tepat digunakan?", opts: ["Kalimat A untuk semua situasi", "Kalimat B untuk situasi formal/tulisan, Kalimat A untuk percakapan santai — keduanya valid di konteksnya masing-masing", "Kalimat B lebih baik dari Kalimat A", "Kalimat A tidak boleh digunakan"], ans: 1, tip: "Kesadaran berbahasa bukan tentang melarang bahasa gaul, tapi tentang kemampuan memilih ragam yang tepat. Formal = B, informal = A. Masalah muncul ketika satu ragam mendominasi semua konteks." },
-  { q: "Menurut UUD 1945 Pasal 36, bahasa Indonesia adalah bahasa negara. Faktanya, banyak remaja lebih bangga menggunakan bahasa asing. Apa langkah konkret yang bisa dilakukan untuk memperkuat loyalitas berbahasa?", opts: ["Melarang semua penggunaan bahasa asing", "Membangun kesadaran melalui edukasi, penguatan di lingkungan sekolah, dan menunjukkan bahwa bahasa Indonesia itu kaya, indah, dan mampu mengekspresikan ide kompleks", "Biarkan saja karena tren akan berubah", "Ganti semua bahasa asing dengan bahasa Indonesia di teknologi"], ans: 1, tip: "Pendekatan represif (melarang) kurang efektif. Yang dibutuhkan adalah pendekatan positif: edukasi, paparan, dan pembuktian bahwa bahasa Indonesia memadai untuk semua kebutuhan komunikasi." },
+  {
+    q: "Kelasmu akan memasang caption pameran di media sosial sekolah. Sebagian besar anggota mengusulkan bahasa Inggris agar terlihat modern. Sebagai koordinator, keputusan apa yang paling tepat?",
+    opts: ["Mengikuti usulan mayoritas agar tidak dianggap kuno", "Menyusun caption berbahasa Indonesia yang menarik melalui permainan kata dan tipografi, lalu menjelaskan alasannya kepada anggota", "Mencampur dua bahasa sekaligus supaya aman dari dua sisi", "Menyerahkan sepenuhnya kepada pengelola akun"],
+    ans: 1,
+    tip: "Daya tarik sebuah bahasa bukan pada asal-usulnya, melainkan pada kreativitas penggunanya. Membuktikan bahwa bahasa Indonesia mampu tampil menarik adalah wujud kebanggaan berbahasa.",
+  },
+  {
+    q: "Seorang teman kerap mengejek teman lain yang berbicara bahasa Indonesia dengan ragam baku dan menyebutnya kaku. Sikap yang paling bertanggung jawab adalah...",
+    opts: ["Ikut tertawa agar tetap diterima dalam kelompok", "Berbicara kepada pengejek secara pribadi bahwa kemampuan berbahasa yang baik patut dihargai, bukan diejek", "Mengabaikannya karena itu bukan urusanmu", "Mengajak yang diejek pindah kelompok saja"],
+    ans: 1,
+    tip: "Ejekan terhadap ragam baku menurunkan kepercayaan diri berbahasa. Menegur dengan sopan secara pribadi menumbuhkan sikap positif tanpa memperbesar konflik.",
+  },
+  {
+    q: "OSIS akan menerbitkan pengumuman resmi lomba. Pilihan kalimat yang paling sesuai untuk konteks resmi adalah...",
+    opts: ["Guys, besok ada gathering lomba, jangan lupa datang!", "Diberitahukan kepada seluruh peserta, pelaksanaan lomba digelar besok pukul delapan pagi.", "Besok meeting penting, wajib hadir, tanpa alasan!", "Yang bersangkutan dimohon hadir, terima kasih banyak bestie!"],
+    ans: 1,
+    tip: "Dokumen resmi menuntut ragam formal: kata baku, struktur kalimat lengkap, dan nada sopan. Kesesuaian ragam dengan konteks adalah inti kesadaran berbahasa.",
+  },
+  {
+    q: "Dalam diskusi kelas, muncul perdebatan mengenai posisi bahasa daerah, bahasa Indonesia, dan bahasa asing. Analisis yang paling kritis adalah...",
+    opts: ["Bahasa asing paling penting karena bersifat global", "Ketiganya memiliki fungsi: bahasa daerah menunjukkan identitas, bahasa Indonesia mempersatukan, bahasa asing menjembatani dunia; persoalan muncul ketika proporsinya terbalik", "Semua bahasa bernilai sama sehingga tidak perlu diperdebatkan", "Bahasa daerah sebaiknya ditinggalkan agar lebih efisien"],
+    ans: 1,
+    tip: "Berpikir kritis berarti memahami fungsi setiap bahasa dan menjaga keseimbangannya, bukan memilih yang paling populer.",
+  },
+  {
+    q: "Video tugasmu banyak ditonton, namun ada komentar bahwa campuran bahasamu menyulitkan pemahaman. Respons yang paling dewasa adalah...",
+    opts: ["Membalas komentar dengan ejekan serupa", "Mengevaluasi kembali cara berbahasamu dan berlatih berbicara lebih konsisten agar mudah dipahami", "Menghapus semua komentar kritis", "Beralasan bahwa itu gaya khas anak muda"],
+    ans: 1,
+    tip: "Kritik penonton merupakan cermin bagi kesadaran berbahasa. Menyikapinya dengan evaluasi menunjukkan kedewasaan dalam berkomunikasi.",
+  },
+  {
+    q: "Seorang siswa baru dari daerah belum lancar berbahasa Indonesia, dan beberapa teman mulai menggosipinya. Tindakan yang paling membantu adalah...",
+    opts: ["Ikut menggosip agar tidak dicap berbeda", "Mengajaknya berbicara secara sabar dan membantunya berlatih bahasa Indonesia", "Mengabaikannya sampai beradaptasi sendiri", "Langsung melaporkan penggosip kepada guru"],
+    ans: 1,
+    tip: "Bahasa Indonesia berfungsi sebagai alat pemersatu. Membantu teman berlatih adalah pengamalan nyata dari sikap positif terhadap bahasa.",
+  },
+  {
+    q: "Sekolah mengadakan lomba video yang dinilai dari kejelasan penggunaan bahasa Indonesia. Strategi paling tepat untuk menang adalah...",
+    opts: ["Menggunakan sebanyak mungkin istilah asing agar terlihat hebat", "Menyusun naskah yang runtut dengan kata baku, artikulasi jelas, dan isi yang bermanfaat", "Mengutamakan efek visual yang meriah", "Mengundang narasumber terkenal"],
+    ans: 1,
+    tip: "Kejelasan pesan adalah inti komunikasi. Bahasa yang tertata membuat ide mudah dipahami dan dihargai penilai.",
+  },
+  {
+    q: "Akun resmi sekolah menulis keterangan acara dengan bahasa campuran yang sulit dipahami. Sebagai warga sekolah, sikap yang paling konstruktif adalah...",
+    opts: ["Membiarkannya karena yang penting informasi menyebar", "Menyampaikan usulan sopan kepada pengelola agar berbahasa Indonesia secara konsisten demi citra sekolah", "Menulis komentar yang mencela pengelola", "Meniru gaya penulisan tersebut di akun pribadi"],
+    ans: 1,
+    tip: "Media sekolah menjadi teladan berbahasa bagi seluruh warga. Menyampaikan masukan secara sopan adalah refleksi kritis yang membangun.",
+  },
+  {
+    q: "Seorang teman berpendapat bahwa ketepatan berbahasa tidak penting selama pesannya sampai. Argumen penyeimbang yang paling kuat adalah...",
+    opts: ["Pendapat itu benar sehingga tidak perlu dibantah", "Ketidaktepatan bahasa dapat mengubah makna dan menurunkan kepercayaan pembaca; ketepatan adalah bentuk penghormatan kepada lawan bicara", "Teman itu yang terlalu menganggap remeh", "Mengalihkan pembicaraan ke topik lain"],
+    ans: 1,
+    tip: "Bahasa yang tepat menjaga makna tetap utuh dan menunjukkan tanggung jawab dalam berkomunikasi.",
+  },
+  {
+    q: "Kelas merencanakan kampanye Bangga Berbahasa Indonesia. Program dengan dampak paling berkelanjutan adalah...",
+    opts: ["Pidato panjang setiap Senin pagi", "Konten kreatif mingguan karya siswa seperti cerita pendek, puisi video, dan teka-teki kata yang menghibur", "Denda bagi siapa pun yang memakai bahasa asing", "Melarang penggunaan gawai di sekolah"],
+    ans: 1,
+    tip: "Kampanye berhasil apabila menyenangkan dan melibatkan banyak orang. Konten kreatif membuat bahasa Indonesia terasa dekat dengan keseharian remaja.",
+  },
+  {
+    q: "Di grup kelas mulai muncul kata-kata kasar dan ejekan. Sebagai admin grup, langkah yang paling tepat adalah...",
+    opts: ["Membiarkan karena itu ruang bebas", "Mengundang anggota menyepakati etika berbahasa di grup lalu mengingatkan secara pribadi bila dilanggar", "Langsung mengeluarkan anggota yang melanggar", "Membalas dengan kata yang sama agar paham rasanya"],
+    ans: 1,
+    tip: "Kesepakatan yang disusun bersama menumbuhkan kesadaran norma dari dalam diri, sehingga pembiasaan berjalan lebih lestari daripada paksaan.",
+  },
+  {
+    q: "Banyak temanmu meyakini bahwa bahasa Indonesia itu kaku dan tidak menarik. Cara membantah yang paling efektif adalah...",
+    opts: ["Memarahi mereka karena dianggap tidak cinta bahasa", "Menunjukkan contoh nyata berupa lirik, novel, film, dan konten kreatif berbahasa Indonesia yang menyentuh dan berkualitas", "Mencatat nama mereka untuk dilaporkan", "Ikut berhenti menggunakan bahasa Indonesia"],
+    ans: 1,
+    tip: "Bukti nyata jauh lebih meyakinkan daripada nasihat. Pengalaman estetislah yang membuat seseorang jatuh cinta kembali pada bahasanya.",
+  },
+  {
+    q: "Sebuah kalimat pada artikel mading berbunyi: Dikarenakan adanya faktor tersebut maka nilai menjadi turun. Perbaikan yang paling tepat adalah...",
+    opts: ["Karena faktor tersebut, nilai menjadi turun.", "Disebabkan faktor tadi menurunlah nilainya.", "Nilai turunlah karena hal itu tadi.", "Dikarenakan faktor, menurun nilai."],
+    ans: 0,
+    tip: "Konjungsi yang tepat dan kalimat yang efisien membuat tulisan mudah dipahami. Kesadaran norma dimulai dari detail sekecil apa pun.",
+  },
+  {
+    q: "Teman sebangku sering menanyakan arti kata baku yang kamu gunakan. Sikap yang paling menguatkan loyalitas berbahasa adalah...",
+    opts: ["Menjelaskan dengan senang hati dan mengajaknya memperkaya kosakata bersama", "Menertawakan karena dianggap tidak tahu", "Menyuruhnya mencari sendiri di kamus", "Mengganti ujaranmu dengan bahasa gaul supaya ia paham"],
+    ans: 0,
+    tip: "Berbagi pengetahuan bahasa memperkuat lingkungan yang bangga berbahasa Indonesia. Loyalitas tumbuh dalam kebersamaan, bukan kesendirian.",
+  },
+  {
+    q: "Saat diskusi panel, seorang moderator memotong pembicaraanmu dan mengevaluasi bahasamu dengan kasar di depan umum. Sikap yang paling bermartabat adalah...",
+    opts: ["Memotong kembali pembicaraannya dengan suara lebih keras", "Menyampaikan pendapat kembali dengan tenang dan santun, lalu mengusulkan suasana diskusi yang saling menghormati", "Menyerah dan memilih diam sampai acara selesai", "Meninggalkan ruangan untuk menghindari konflik"],
+    ans: 1,
+    tip: "Keteguhan menggunakan bahasa yang santun justru pada situasi sulit merupakan bentuk loyalitas berbahasa yang paling tinggi.",
+  },
 ];
 
-interface Token { x: number; y: number; word: string; good: boolean; taken: boolean; respawn: number; z: number; bob: number; }
-interface Obstacle { x: number; y: number; angle: number; type: string; }
-interface AIKart { angle: number; speed: number; color: string; glow: string; lap: number; crossed: boolean; }
+interface AIKart {
+  a: number; lat: number; baseLat: number; phase: number; v: number; baseV: number;
+  color: string; accent: string; spin: number; prog: number; itemT: number;
+}
+interface Coin { a: number; lat: number; taken: number; }
+interface Box { a: number; taken: number; }
+interface Pad { a: number; }
+interface Banana { x: number; y: number; life: number; }
+interface Shell { x: number; y: number; vx: number; vy: number; kind: "green" | "red"; life: number; target: number; owner: number; bounces: number; }
+interface Gate { a: number; cd: number; }
 interface Particle { x: number; y: number; z: number; vx: number; vy: number; vz: number; life: number; max: number; color: string; size: number; }
-interface Popup { x: number; y: number; z: number; text: string; color: string; life: number; }
-interface Star { x: number; y: number; r: number; b: number; layer: number; }
-interface QuizGate { angle: number; used: boolean; }
+interface Popup { sx: number; sy: number; text: string; color: string; life: number; }
 
-function sfx(type: string) {
-  try {
-    const c = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const o = c.createOscillator(); const g = c.createGain();
-    o.connect(g); g.connect(c.destination); g.gain.value = 0.05;
-    if (type === "pickup") { o.type = "sine"; o.frequency.setValueAtTime(880, c.currentTime); o.frequency.exponentialRampToValueAtTime(1760, c.currentTime + 0.08); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.15); o.start(); o.stop(c.currentTime + 0.15); }
-    else if (type === "crash") { o.type = "sawtooth"; o.frequency.setValueAtTime(200, c.currentTime); o.frequency.exponentialRampToValueAtTime(60, c.currentTime + 0.2); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.25); o.start(); o.stop(c.currentTime + 0.25); }
-    else if (type === "correct") { o.type = "sine"; o.frequency.setValueAtTime(523, c.currentTime); o.frequency.setValueAtTime(659, c.currentTime + 0.1); o.frequency.setValueAtTime(784, c.currentTime + 0.2); g.gain.value = 0.07; g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.35); o.start(); o.stop(c.currentTime + 0.35); }
-    else if (type === "wrong") { o.type = "sawtooth"; o.frequency.setValueAtTime(300, c.currentTime); o.frequency.exponentialRampToValueAtTime(100, c.currentTime + 0.3); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.35); o.start(); o.stop(c.currentTime + 0.35); }
-    else if (type === "tick") { o.type = "square"; o.frequency.value = 1200; g.gain.value = 0.025; g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.05); o.start(); o.stop(c.currentTime + 0.05); }
-    else if (type === "go") { o.type = "sine"; o.frequency.setValueAtTime(523, c.currentTime); o.frequency.setValueAtTime(659, c.currentTime + 0.12); o.frequency.setValueAtTime(784, c.currentTime + 0.24); g.gain.value = 0.07; g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.4); o.start(); o.stop(c.currentTime + 0.4); }
-  } catch {}
+class AudioEngine {
+  ctx: AudioContext | null = null;
+  master: GainNode | null = null;
+  eOsc: OscillatorNode | null = null;
+  eOsc2: OscillatorNode | null = null;
+  eGain: GainNode | null = null;
+  init() {
+    if (this.ctx) return;
+    try {
+      const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      this.ctx = new AC();
+      this.master = this.ctx.createGain();
+      this.master.gain.value = 0.5;
+      this.master.connect(this.ctx.destination);
+      this.eGain = this.ctx.createGain();
+      this.eGain.gain.value = 0;
+      this.eOsc = this.ctx.createOscillator();
+      this.eOsc.type = "sawtooth";
+      this.eOsc.frequency.value = 70;
+      this.eOsc2 = this.ctx.createOscillator();
+      this.eOsc2.type = "square";
+      this.eOsc2.frequency.value = 71;
+      this.eOsc.connect(this.eGain);
+      this.eOsc2.connect(this.eGain);
+      this.eGain.connect(this.master);
+      this.eOsc.start();
+      this.eOsc2.start();
+    } catch { }
+  }
+  engine(freq: number, vol: number) {
+    if (!this.ctx || !this.eOsc || !this.eOsc2 || !this.eGain) return;
+    const t = this.ctx.currentTime;
+    this.eOsc.frequency.setTargetAtTime(freq, t, 0.05);
+    this.eOsc2.frequency.setTargetAtTime(freq * 1.007 + 2, t, 0.05);
+    this.eGain.gain.setTargetAtTime(vol, t, 0.08);
+  }
+  beep(f0: number, f1: number, dur: number, type: OscillatorType, vol: number) {
+    if (!this.ctx || !this.master) return;
+    try {
+      const o = this.ctx.createOscillator();
+      const g = this.ctx.createGain();
+      o.type = type;
+      o.connect(g); g.connect(this.master);
+      const t = this.ctx.currentTime;
+      o.frequency.setValueAtTime(f0, t);
+      if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(Math.max(1, f1), t + dur);
+      g.gain.setValueAtTime(vol, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.start(t); o.stop(t + dur + 0.02);
+    } catch { }
+  }
+  setMuted(m: boolean) {
+    if (this.master && this.ctx) this.master.gain.setTargetAtTime(m ? 0 : 0.5, this.ctx.currentTime, 0.02);
+  }
 }
 
-function lerp(a: number, b: number, t: number) { return a + (b - a) * t; }
+const AI_COLORS = [
+  ["#a855f7", "#e9d5ff"], ["#22c55e", "#bbf7d0"], ["#f97316", "#fed7aa"],
+  ["#3b82f6", "#bfdbfe"], ["#e11d48", "#fecdd3"], ["#eab308", "#fef08a"], ["#14b8a6", "#99f6e4"],
+];
+const AI_BASE = [141, 137, 134, 131, 128, 125, 122];
 
-function project(x: number, y: number, z: number, cx: number, cy: number, sc: number, cam: number) {
-  const ca = Math.cos(cam), sa = Math.sin(cam);
-  const rx = x * ca - y * sa;
-  const ry = x * sa + y * ca;
-  return { px: cx + rx * sc, py: cy + ry * sc * 0.42 - z * sc * 0.75, depth: ry, s: sc * (1 - ry * 0.0002) };
+function angDiff(a: number, b: number) {
+  let d = Math.abs(a - b) % (Math.PI * 2);
+  if (d > Math.PI) d = Math.PI * 2 - d;
+  return d;
 }
+function posSuffix(n: number) {
+  if (n === 1) return "st";
+  if (n === 2) return "nd";
+  if (n === 3) return "rd";
+  return "th";
+}
+const POS_COLORS = ["#FFD34D", "#C9D6E3", "#E3A05C", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF"];
 
 export default function KartRace3D({
   onComplete,
   kartBody = "#ef4444",
-  kartAccent = "#a855f7",
+  kartAccent = "#ffb4a2",
 }: {
-  onComplete: (raceScore: number, eduScore: number, correct: number) => void;
+  onComplete: (score: number, correct: number, position: number) => void;
   kartBody?: string;
   kartAccent?: string;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [dims, setDims] = useState({ w: 900, h: 600 });
-  const [raceScore, setRaceScore] = useState(0);
-  const [time, setTime] = useState(90);
-  const [position, setPosition] = useState(1);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [dims, setDims] = useState({ w: 960, h: 600 });
+  const [phase, setPhase] = useState<"intro" | "count" | "race" | "results">("intro");
+  const [cdStep, setCdStep] = useState(3);
   const [lap, setLap] = useState(0);
-  const [speed, setSpeed] = useState(0);
-  const [drifting, setDrifting] = useState(false);
-  const [over, setOver] = useState(false);
-  const [cd, setCd] = useState(3);
-
-  // Quiz state
-  const [quizActive, setQuizActive] = useState(false);
-  const [quizQ, setQuizQ] = useState(0);
-  const [quizTimer, setQuizTimer] = useState(10);
+  const [position, setPosition] = useState(8);
+  const [timeLeft, setTimeLeft] = useState(RACE_TIME);
+  const [coinCount, setCoinCount] = useState(0);
+  const [item, setItem] = useState<ItemKind | null>(null);
+  const [muted, setMuted] = useState(false);
+  const [quizOpen, setQuizOpen] = useState(false);
+  const [quizIdx, setQuizIdx] = useState(0);
+  const [quizTimer, setQuizTimer] = useState(25);
   const [quizAnswered, setQuizAnswered] = useState(false);
-  const [quizCorrect, setQuizCorrect] = useState(false);
-  const [selectedOpt, setSelectedOpt] = useState(-1);
+  const [quizSelected, setQuizSelected] = useState(-1);
   const [correctCount, setCorrectCount] = useState(0);
-  const [eduScore, setEduScore] = useState(0);
-  const [combo, setCombo] = useState(0);
-  const [showInstructions, setShowInstructions] = useState(true);
-  const showInstructionsRef = useRef(true);
+  const [quizScore, setQuizScore] = useState(0);
+  const [result, setResult] = useState({ score: 0, correct: 0, position: 8, coins: 0 });
+
+  const isTouch = useMemo(() => typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0), []);
 
   const S = useRef({
-    px: 0, py: 0, pa: 0, pv: 0, pz: 0,
-    tokens: [] as Token[],
-    obstacles: [] as Obstacle[],
+    x: 0, y: R, h: Math.PI, v: 0,
+    drifting: false, driftDir: 0, charge: 0, hop: 0,
+    boost: 0, star: 0, spin: 0, shake: 0,
+    coins: 0, quizScore: 0, correct: 0,
+    lap: 0, prevT: Math.PI / 2, prog: 0,
+    item: null as ItemKind | null,
     ai: [] as AIKart[],
+    coinsArr: [] as Coin[],
+    boxes: [] as Box[],
+    pads: [] as Pad[],
+    bananas: [] as Banana[],
+    shells: [] as Shell[],
+    gates: [] as Gate[],
     particles: [] as Particle[],
     popups: [] as Popup[],
     keys: {} as Record<string, boolean>,
-    score: 0, time: 90, lap: 0, over: false,
-    lastAngle: 0, crossedStart: false,
-    cx: 0, cy: 0, trackR: 0, trackW: 0, sc: 1,
-    cdVal: 3, cdTime: 0, started: false,
-    stars: [] as Star[],
-    camAngle: 0,
-    gates: [] as QuizGate[],
-    quizPaused: false,
-    quizIdx: 0,
-    combo: 0,
-    usedQuestions: new Set<number>(),
-    boostTimer: 0,
-    shieldActive: false,
+    touch: { left: false, right: false, gas: false, brake: false, drift: false },
+    started: false, finished: false, paused: false,
+    raceTime: 0, usedQ: new Set<number>(),
+    audio: new AudioEngine(),
+    steerVis: 0,
   });
 
-  const touch = useRef({ steerX: 0, gas: false, brake: false, active: false, sx: 0 });
-
   useEffect(() => {
-    const obs = new ResizeObserver(e => { for (const en of e) { const w = en.contentRect.width; const h = en.contentRect.height; if (w > 0 && h > 0) setDims({ w, h }); } });
-    if (containerRef.current) obs.observe(containerRef.current);
+    const obs = new ResizeObserver((es) => {
+      for (const e of es) {
+        const w = e.contentRect.width, h = e.contentRect.height;
+        if (w > 0 && h > 0) setDims({ w, h });
+      }
+    });
+    if (wrapRef.current) obs.observe(wrapRef.current);
     return () => obs.disconnect();
   }, []);
 
-  // Init
-  useEffect(() => {
+  const initWorld = useCallback(() => {
     const s = S.current;
-    const w = dims.w, h = dims.h;
-    s.cx = w / 2; s.cy = h * 0.52;
-    s.trackR = Math.min(w, h) * 0.30;
-    s.trackW = Math.min(w, h) * 0.12;
-    s.sc = Math.min(w / 900, h / 600) * 1.05;
-    s.px = 0; s.py = s.trackR; s.pa = Math.PI;
+    s.x = 0; s.y = R; s.h = Math.PI; s.v = 0;
+    s.drifting = false; s.charge = 0; s.boost = 0; s.star = 0; s.spin = 0;
+    s.coins = 0; s.quizScore = 0; s.correct = 0; s.lap = 0; s.prevT = Math.PI / 2; s.prog = 0;
+    s.item = null; s.raceTime = 0; s.finished = false; s.paused = false; s.usedQ.clear();
+    s.bananas = []; s.shells = []; s.particles = []; s.popups = [];
+    s.ai = AI_COLORS.map((c, i) => ({
+      a: Math.PI / 2 - (i + 1) * 0.085, lat: (i % 2 === 0 ? 1 : -1) * 13,
+      baseLat: (i % 2 === 0 ? 1 : -1) * 13, phase: i * 1.7, v: 0, baseV: AI_BASE[i],
+      color: c[0], accent: c[1], spin: 0, prog: Math.PI / 2 - (i + 1) * 0.085, itemT: 8 + Math.random() * 10,
+    }));
+    s.coinsArr = [];
+    for (let i = 0; i < 16; i++) s.coinsArr.push({ a: 0.28 + i * 0.392, lat: (i % 2 === 0 ? 1 : -1) * W * 0.22, taken: 0 });
+    s.boxes = [];
+    for (let i = 0; i < 8; i++) s.boxes.push({ a: 0.35 + i * 0.785, taken: 0 });
+    s.pads = [{ a: 1.2 }, { a: 3.4 }, { a: 5.1 }];
+    s.gates = [{ a: 2.25, cd: 0 }, { a: 5.35, cd: 0 }];
+    setCoinCount(0); setQuizScore(0); setCorrectCount(0); setLap(0); setItem(null); setTimeLeft(RACE_TIME);
+  }, []);
 
-    s.stars = Array.from({ length: 100 }, () => ({ x: Math.random() * w, y: Math.random() * h * 0.55, r: Math.random() * 1.8 + 0.3, b: Math.random() * Math.PI * 2, layer: Math.floor(Math.random() * 3) }));
+  useEffect(() => { initWorld(); }, [initWorld]);
 
-    // Tokens around track
-    s.tokens = [];
-    const tc = 14;
-    for (let i = 0; i < tc; i++) {
-      const a = (i / tc) * Math.PI * 2;
-      const r = s.trackR + (Math.random() - 0.5) * s.trackW * 0.5;
-      const good = i < 10;
-      s.tokens.push({ x: Math.cos(a) * r, y: Math.sin(a) * r, word: good ? GOOD_WORDS[i % GOOD_WORDS.length] : BAD_WORDS[(i - 10) % BAD_WORDS.length], good, taken: false, respawn: 0, z: 0, bob: Math.random() * Math.PI * 2 });
-    }
-
-    // Obstacles (bahasa gaul traps)
-    s.obstacles = [];
-    for (let i = 0; i < 5; i++) {
-      const a = (i / 5) * Math.PI * 2 + 0.3;
-      const r = s.trackR + (Math.random() - 0.5) * s.trackW * 0.3;
-      s.obstacles.push({ x: Math.cos(a) * r, y: Math.sin(a) * r, angle: a, type: ["trap", "barrier", "oil"][i % 3] });
-    }
-
-    // Quiz gates at specific angles
-    s.gates = [0, Math.PI / 2.5, Math.PI * 2 / 2.5, Math.PI * 3 / 2.5, Math.PI * 4 / 2.5].map(a => ({ angle: a, used: false }));
-
-    s.ai = [
-      { angle: 0, speed: 0.011, color: "#a855f7", glow: "#c084fc", lap: 0, crossed: false },
-      { angle: Math.PI * 2 / 3, speed: 0.009, color: "#22c55e", glow: "#4ade80", lap: 0, crossed: false },
-      { angle: Math.PI * 4 / 3, speed: 0.013, color: "#f97316", glow: "#fb923c", lap: 0, crossed: false },
-    ];
+  const addPopup = useCallback((wx: number, wy: number, text: string, color: string) => {
+    const s = S.current;
+    const d = dims;
+    const f = d.h * 0.95;
+    const camx = s.x - Math.cos(s.h) * CAMD, camy = s.y - Math.sin(s.h) * CAMD;
+    const dx = wx - camx, dy = wy - camy;
+    const cz = dx * Math.cos(s.h) + dy * Math.sin(s.h);
+    if (cz < 0.2) return;
+    const cx = -dx * Math.sin(s.h) + dy * Math.cos(s.h);
+    const horizon = d.h * 0.42;
+    const sx = d.w / 2 + (cx * f) / cz;
+    const sy = horizon + (CAMH * f) / cz;
+    s.popups.push({ sx, sy, text, color, life: 70 });
   }, [dims]);
 
-  const answeringRef = useRef(false);
-
-  // Quiz logic
-  const startQuiz = useCallback(() => {
-    const s = S.current;
-    if (s.quizPaused || s.over) return;
-    answeringRef.current = false;
-    // Pick unused question
-    const available = CHALLENGES.map((_, i) => i).filter(i => !s.usedQuestions.has(i));
-    if (available.length === 0) { s.usedQuestions.clear(); }
-    const pool = CHALLENGES.map((_, i) => i).filter(i => !s.usedQuestions.has(i));
-    const idx = pool[Math.floor(Math.random() * pool.length)];
-    s.usedQuestions.add(idx);
-    s.quizIdx = idx;
-    s.quizPaused = true;
-    setQuizQ(idx);
-    setQuizActive(true);
-    setQuizTimer(20);
-    setQuizAnswered(false);
-    setSelectedOpt(-1);
-  }, []);
-
-  const answerQuiz = useCallback((optIdx: number) => {
-    const s = S.current;
-    if (answeringRef.current) return;
-    answeringRef.current = true;
-    setQuizAnswered(true);
-    setSelectedOpt(optIdx);
-    const ch = CHALLENGES[s.quizIdx];
-    const correct = optIdx >= 0 && optIdx === ch.ans;
-    setQuizCorrect(correct);
-    if (correct) {
-      sfx("correct");
-      s.score += 20;
-      s.combo++;
-      s.boostTimer = 30;
-      setRaceScore(s.score);
-      setCorrectCount(c => c + 1);
-      setCombo(s.combo);
-      s.popups.push({ x: s.px, y: s.py, z: 25, text: "+20 BENAR!", color: "#22c55e", life: 60 });
-    } else {
-      sfx("wrong");
-      s.score = Math.max(0, s.score - 5);
-      s.pv *= 0.4;
-      s.combo = 0;
-      setRaceScore(s.score);
-      setCombo(0);
-      s.popups.push({ x: s.px, y: s.py, z: 25, text: optIdx < 0 ? "WAKTU HABIS!" : "-5 SALAH", color: "#f43f5e", life: 60 });
+  const sfxEvent = useCallback((kind: string) => {
+    const a = S.current.audio;
+    switch (kind) {
+      case "coin": a.beep(1300, 1900, 0.09, "sine", 0.16); break;
+      case "box": a.beep(700, 1200, 0.12, "triangle", 0.18); break;
+      case "mushroom": a.beep(400, 900, 0.3, "sawtooth", 0.2); break;
+      case "shell": a.beep(900, 300, 0.2, "square", 0.16); break;
+      case "hit": a.beep(220, 60, 0.35, "sawtooth", 0.24); break;
+      case "bump": a.beep(160, 90, 0.12, "square", 0.14); break;
+      case "lap": a.beep(660, 660, 0.12, "sine", 0.2); setTimeout(() => a.beep(880, 880, 0.18, "sine", 0.2), 130); break;
+      case "count": a.beep(880, 880, 0.14, "square", 0.2); break;
+      case "go": a.beep(1320, 1320, 0.4, "square", 0.24); break;
+      case "boost": a.beep(300, 1000, 0.35, "sawtooth", 0.2); break;
+      case "correct": a.beep(523, 784, 0.15, "sine", 0.2); setTimeout(() => a.beep(784, 1046, 0.22, "sine", 0.2), 150); break;
+      case "wrong": a.beep(300, 120, 0.3, "sawtooth", 0.2); break;
+      case "star": [523, 659, 784, 1046].forEach((fq, i) => setTimeout(() => a.beep(fq, fq, 0.12, "square", 0.18), i * 90)); break;
+      case "finish": [523, 659, 784, 1046, 784, 1046].forEach((fq, i) => setTimeout(() => a.beep(fq, fq, 0.16, "square", 0.22), i * 140)); break;
     }
   }, []);
+
+  const startRace = useCallback(() => {
+    S.current.audio.init();
+    initWorld();
+    setPhase("count");
+    setCdStep(3);
+    sfxEvent("count");
+  }, [initWorld, sfxEvent]);
+
+  useEffect(() => {
+    if (phase !== "count") return;
+    const s = S.current;
+    let step = 3;
+    const iv = setInterval(() => {
+      step -= 1;
+      setCdStep(step);
+      if (step > 0) sfxEvent("count");
+      if (step === 0) {
+        sfxEvent("go");
+        const gas = s.keys["arrowup"] || s.keys["w"] || s.touch.gas;
+        if (gas) { s.boost = 55; sfxEvent("boost"); }
+        s.started = true;
+        setPhase("race");
+        clearInterval(iv);
+      }
+    }, 750);
+    return () => clearInterval(iv);
+  }, [phase, sfxEvent]);
+
+  const giveItem = useCallback(() => {
+    const s = S.current;
+    if (s.item) return;
+    let pool: ItemKind[];
+    if (position === 1) pool = ["banana", "banana", "green", "green", "mushroom"];
+    else if (position <= 4) pool = ["mushroom", "green", "red", "banana", "mushroom", "red"];
+    else pool = ["mushroom", "red", "star", "red", "mushroom", "star"];
+    const it = pool[Math.floor(Math.random() * pool.length)];
+    s.item = it;
+    setItem(it);
+    sfxEvent("box");
+  }, [position, sfxEvent]);
+
+  const useItem = useCallback(() => {
+    const s = S.current;
+    if (!s.item || s.spin > 0 || s.finished) return;
+    const it = s.item;
+    s.item = null;
+    setItem(null);
+    if (it === "mushroom") { s.boost = Math.max(s.boost, 60); sfxEvent("mushroom"); }
+    else if (it === "banana") {
+      s.bananas.push({ x: s.x - Math.cos(s.h) * 24, y: s.y - Math.sin(s.h) * 24, life: 2000 });
+      sfxEvent("shell");
+    } else if (it === "green" || it === "red") {
+      const sh: Shell = {
+        x: s.x + Math.cos(s.h) * 22, y: s.y + Math.sin(s.h) * 22,
+        vx: Math.cos(s.h) * 280, vy: Math.sin(s.h) * 280,
+        kind: it, life: 5, target: -1, owner: -1, bounces: 0,
+      };
+      s.shells.push(sh);
+      sfxEvent("shell");
+    } else if (it === "star") { s.star = 360; sfxEvent("star"); }
+  }, [sfxEvent]);
+
+  const openQuiz = useCallback(() => {
+    const s = S.current;
+    let pool = CHALLENGES.map((_, i) => i).filter((i) => !s.usedQ.has(i));
+    if (pool.length === 0) { s.usedQ.clear(); pool = CHALLENGES.map((_, i) => i); }
+    const idx = pool[Math.floor(Math.random() * pool.length)];
+    s.usedQ.add(idx);
+    s.paused = true;
+    setQuizIdx(idx);
+    setQuizTimer(25);
+    setQuizAnswered(false);
+    setQuizSelected(-1);
+    setQuizOpen(true);
+  }, []);
+
+  const answerQuiz = useCallback((opt: number) => {
+    const s = S.current;
+    if (quizAnswered) return;
+    setQuizAnswered(true);
+    setQuizSelected(opt);
+    const c = CHALLENGES[quizIdx];
+    const ok = opt >= 0 && opt === c.ans;
+    if (ok) {
+      s.correct += 1; s.quizScore += 25; s.boost = Math.max(s.boost, 45);
+      setCorrectCount(s.correct); setQuizScore(s.quizScore);
+      addPopup(s.x, s.y, "+25", "#22c55e");
+      sfxEvent("correct");
+    } else {
+      s.quizScore = Math.max(0, s.quizScore - 10);
+      setQuizScore(s.quizScore);
+      addPopup(s.x, s.y, "-10", "#f43f5e");
+      sfxEvent("wrong");
+    }
+  }, [quizAnswered, quizIdx, addPopup, sfxEvent]);
 
   const continueQuiz = useCallback(() => {
-    const s = S.current;
-    s.quizPaused = false;
-    s.pv = Math.max(s.pv, 0.3);
-    answeringRef.current = false;
-    setQuizActive(false);
+    S.current.paused = false;
+    S.current.v = Math.max(S.current.v, 30);
+    setQuizOpen(false);
     setQuizAnswered(false);
-    setQuizCorrect(false);
-    setSelectedOpt(-1);
+    setQuizSelected(-1);
   }, []);
 
-  // Quiz timer — no side effects inside state updater
   useEffect(() => {
-    if (!quizActive || quizAnswered) return;
+    if (!quizOpen || quizAnswered) return;
     if (quizTimer <= 0) {
-      const to = setTimeout(() => answerQuiz(-1), 50);
-      return () => clearTimeout(to);
+      const t = setTimeout(() => answerQuiz(-1), 60);
+      return () => clearTimeout(t);
     }
-    const t = setTimeout(() => setQuizTimer(quizTimer - 1), 1000);
+    const t = setTimeout(() => setQuizTimer((v) => v - 1), 1000);
     return () => clearTimeout(t);
-  }, [quizActive, quizAnswered, quizTimer, answerQuiz]);
+  }, [quizOpen, quizAnswered, quizTimer, answerQuiz]);
 
-  // Quiz keyboard: 1-4 jawab, Enter/Spasi lanjut
   useEffect(() => {
-    if (!quizActive) return;
+    if (!quizOpen) return;
     const h = (e: KeyboardEvent) => {
-      if (["1", "2", "3", "4"].includes(e.key) && !quizAnswered) {
-        e.preventDefault();
-        answerQuiz(parseInt(e.key) - 1);
-      } else if ((e.key === "Enter" || e.key === " ") && quizAnswered) {
-        e.preventDefault();
-        continueQuiz();
-      }
+      if (["1", "2", "3", "4"].includes(e.key) && !quizAnswered) { e.preventDefault(); answerQuiz(parseInt(e.key) - 1); }
+      else if ((e.key === "Enter" || e.key === " ") && quizAnswered) { e.preventDefault(); continueQuiz(); }
     };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
-  }, [quizActive, quizAnswered, answerQuiz, continueQuiz]);
+  }, [quizOpen, quizAnswered, answerQuiz, continueQuiz]);
 
-  // Game loop
+  const finishRace = useCallback(() => {
+    const s = S.current;
+    if (s.finished) return;
+    s.finished = true;
+    s.audio.engine(0, 0);
+    const bonus = [120, 90, 70, 60, 50, 45, 40, 35][Math.min(position - 1, 7)] ?? 30;
+    const total = s.coins * 15 + s.quizScore + bonus;
+    setResult({ score: total, correct: s.correct, position, coins: s.coins });
+    setPhase("results");
+    sfxEvent("finish");
+  }, [position, sfxEvent]);
+
   useEffect(() => {
     const s = S.current;
-    const ek = (e: KeyboardEvent) => { if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) e.preventDefault(); s.keys[e.key.toLowerCase()] = true; };
-    const eu = (e: KeyboardEvent) => { s.keys[e.key.toLowerCase()] = false; };
-    window.addEventListener("keydown", ek);
-    window.addEventListener("keyup", eu);
-
-    s.cdVal = 3; s.cdTime = Date.now(); s.over = false; s.score = 0; s.time = 90; s.lap = 0; s.usedQuestions.clear(); s.combo = 0;
-    setRaceScore(0); setCorrectCount(0); setEduScore(0); setCombo(0);
-
-    const timer = setInterval(() => {
-      if (s.over) return;
-      const el = Date.now() - s.cdTime;
-      const v = 3 - Math.floor(el / 1000);
-      if (v !== s.cdVal && v >= 0) { s.cdVal = v; setCd(v); if (v > 0) sfx("tick"); if (v === 0) { sfx("go"); s.started = true; setTimeout(() => { s.cdVal = -1; setCd(-1); }, 800); } }
-      if (s.started && !s.quizPaused && el > 4200) {
-        s.time--; setTime(s.time);
-        if (s.time <= 10 && s.time > 0) sfx("tick");
-        if (s.time <= 0) { s.over = true; setOver(true); onComplete(s.score, s.combo > 0 ? Math.floor(s.score * 0.3) : 0, 0); }
-      }
-    }, 1000);
-
-    let lt = performance.now();
-    const loop = (now: number) => {
-      if (s.over) { draw(s, now); return; }
-      const dt = Math.min(now - lt, 32); lt = now;
-      if (!s.started) { draw(s, now); requestAnimationFrame(loop); return; }
-
-      // PAUSED for quiz OR instructions
-      if (s.quizPaused || showInstructionsRef.current) { draw(s, now); requestAnimationFrame(loop); return; }
-
-      const k = s.keys;
-      const tc = touch.current;
-      const hasT = tc.active;
-
-      const gas = k["arrowup"] || k["w"] || (hasT && tc.gas);
-      const brake = k["arrowdown"] || k["s"] || (hasT && tc.brake);
-      const steer = ((k["arrowleft"] || k["a"] ? 1 : 0) - (k["arrowright"] || k["d"] ? 1 : 0)) + (hasT ? tc.steerX : 0);
-
-      if (gas) s.pv += 0.15;
-      if (brake) s.pv -= 0.2;
-      s.pa += steer * 0.045;
-
-      const isDrift = !!k[" "];
-      setDrifting(isDrift);
-      s.pv *= isDrift ? 0.93 : 0.97;
-      if (s.boostTimer > 0) { s.boostTimer--; s.pv += 0.02; }
-      if (s.pv > 0.85) s.pv = 0.85;
-      if (s.pv < -0.3) s.pv = -0.3;
-      if (Math.abs(s.pv) < 0.003) s.pv = 0;
-
-      s.px += Math.sin(s.pa) * s.pv * dt * 0.33;
-      s.py += -Math.cos(s.pa) * s.pv * dt * 0.33;
-      s.pz = Math.max(0, s.pz - 0.3);
-
-      // Track bounds
-      const dist = Math.hypot(s.px, s.py);
-      const dTrack = Math.abs(dist - s.trackR);
-      if (dTrack > s.trackW / 2 + 6) {
-        const a = Math.atan2(s.py, s.px);
-        const target = s.trackR + (dist > s.trackR ? s.trackW / 2 + 4 : -(s.trackW / 2 + 4));
-        s.px = Math.cos(a) * target; s.py = Math.sin(a) * target;
-        s.pv *= 0.2; sfx("crash");
-        for (let i = 0; i < 8; i++) s.particles.push({ x: s.px, y: s.py, z: 3, vx: (Math.random() - 0.5) * 5, vy: (Math.random() - 0.5) * 5, vz: Math.random() * 3, life: 20, max: 20, color: "#f97316", size: Math.random() * 3 + 1 });
-      }
-
-      // Camera
-      s.camAngle = lerp(s.camAngle, s.pa * 0.12, 0.03);
-
-      // Lap
-      const curA = Math.atan2(s.py, s.px);
-      const norm = curA < 0 ? curA + Math.PI * 2 : curA;
-      if (norm < 0.3 && s.lastAngle > Math.PI * 2 - 0.3 && !s.crossedStart) {
-        s.crossedStart = true;
-        if (s.pv > 0.05) { s.lap++; setLap(s.lap); if (s.lap >= 3) { s.over = true; setOver(true); onComplete(s.score, Math.floor(s.score * 0.3), 0); } }
-      } else if (norm > Math.PI) s.crossedStart = false;
-      s.lastAngle = norm;
-
-      // Quiz gates — check proximity
-      for (const gate of s.gates) {
-        if (gate.used) continue;
-        const gx = Math.cos(gate.angle) * s.trackR;
-        const gy = Math.sin(gate.angle) * s.trackR;
-        const gd = Math.hypot(gx - s.px, gy - s.py);
-        if (gd < 35) {
-          gate.used = true;
-          startQuiz();
-          break;
-        }
-      }
-
-      // Tokens
-      for (let i = 0; i < s.tokens.length; i++) {
-        const t = s.tokens[i];
-        if (t.taken) { if (t.respawn > 0) { t.respawn--; continue; } const a = Math.random() * Math.PI * 2; const r = s.trackR + (Math.random() - 0.5) * s.trackW * 0.5; t.x = Math.cos(a) * r; t.y = Math.sin(a) * r; t.word = t.good ? GOOD_WORDS[Math.floor(Math.random() * GOOD_WORDS.length)] : BAD_WORDS[Math.floor(Math.random() * BAD_WORDS.length)]; t.taken = false; t.z = 0; continue; }
-        t.z = Math.sin(now * 0.003 + t.bob) * 3 + 5;
-        const td = Math.hypot(t.x - s.px, t.y - s.py);
-        if (td < 26) {
-          t.taken = true; t.respawn = 180;
-          if (t.good) {
-            s.score += 10; sfx("pickup");
-            s.popups.push({ x: t.x, y: t.y, z: 18, text: "+10 " + t.word, color: "#22d3ee", life: 50 });
-            for (let j = 0; j < 6; j++) s.particles.push({ x: t.x, y: t.y, z: t.z, vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4, vz: Math.random() * 2 + 1, life: 22, max: 22, color: "#22d3ee", size: Math.random() * 2.5 + 1 });
-          } else {
-            s.score = Math.max(0, s.score - 6); s.pv *= 0.35; sfx("crash");
-            s.popups.push({ x: t.x, y: t.y, z: 18, text: "-6 " + t.word, color: "#f43f5e", life: 50 });
-          }
-          setRaceScore(s.score);
-        }
-      }
-
-      // Obstacles
-      for (const ob of s.obstacles) {
-        const od = Math.hypot(ob.x - s.px, ob.y - s.py);
-        if (od < 20) {
-          s.pv *= 0.25; sfx("crash");
-          s.popups.push({ x: ob.x, y: ob.y, z: 12, text: "BAHASA GAUL!", color: "#f97316", life: 40 });
-          for (let j = 0; j < 6; j++) s.particles.push({ x: ob.x, y: ob.y, z: 3, vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4, vz: Math.random() * 2, life: 18, max: 18, color: "#f97316", size: Math.random() * 2 + 1 });
-          // Respawn obstacle elsewhere
-          const na = Math.random() * Math.PI * 2;
-          const nr = s.trackR + (Math.random() - 0.5) * s.trackW * 0.3;
-          ob.x = Math.cos(na) * nr; ob.y = Math.sin(na) * nr;
-        }
-      }
-
-      // AI
-      for (const ai of s.ai) {
-        ai.angle += ai.speed * (1 + Math.sin(now * 0.0003 + ai.angle * 2) * 0.12);
-        if (ai.angle > Math.PI * 2) ai.angle -= Math.PI * 2;
-        if (ai.angle < 0.3 && !ai.crossed) { ai.crossed = true; ai.lap++; }
-        else if (ai.angle > Math.PI) ai.crossed = false;
-      }
-
-      // Particles
-      if (isDrift && Math.abs(s.pv) > 0.25) {
-        for (let i = 0; i < 2; i++) s.particles.push({ x: s.px - Math.sin(s.pa) * 8 + (Math.random() - 0.5) * 5, y: s.py + Math.cos(s.pa) * 8 + (Math.random() - 0.5) * 5, z: 1, vx: -Math.sin(s.pa) * s.pv * 0.3, vy: Math.cos(s.pa) * s.pv * 0.3, vz: 0.3, life: 15, max: 15, color: "rgba(168,85,247,0.6)", size: Math.random() * 2 + 1 });
-      }
-      s.particles = s.particles.filter(p => { p.x += p.vx; p.y += p.vy; p.z += p.vz; p.vz -= 0.1; if (p.z < 0) { p.z = 0; p.vz *= -0.3; } p.life--; return p.life > 0; });
-      s.popups = s.popups.filter(p => { p.z += 0.25; p.life--; return p.life > 0; });
-
-      // Position
-      const pProg = s.lap * 1000 + norm * 100;
-      let pos = 1;
-      for (const ai of s.ai) { if (ai.lap * 1000 + ai.angle * 100 > pProg) pos++; }
-      setPosition(pos);
-      setSpeed(Math.abs(s.pv));
-
-      draw(s, now);
-      requestAnimationFrame(loop);
+    const kd = (e: KeyboardEvent) => {
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) e.preventDefault();
+      s.keys[e.key.toLowerCase()] = true;
+      if ((e.key === "x" || e.key === "X" || e.key === "Shift") && !quizOpen) useItem();
     };
+    const ku = (e: KeyboardEvent) => { s.keys[e.key.toLowerCase()] = false; };
+    window.addEventListener("keydown", kd);
+    window.addEventListener("keyup", ku);
+    return () => { window.removeEventListener("keydown", kd); window.removeEventListener("keyup", ku); };
+  }, [quizOpen, useItem]);
 
-    const id = requestAnimationFrame(loop);
-    return () => { window.removeEventListener("keydown", ek); window.removeEventListener("keyup", eu); clearInterval(timer); cancelAnimationFrame(id); };
-  }, [dims, onComplete, startQuiz]);
+  const ch = CHALLENGES[quizIdx];
+  const steerVisRef = useRef(0);
 
-  // ── RENDER ──
-  const draw = (s: typeof S.current, now: number) => {
+  const render = useCallback((now: number) => {
     const c = canvasRef.current;
     if (!c) return;
     const ctx = c.getContext("2d");
     if (!ctx) return;
-    const w = dims.w, h = dims.h;
+    const s = S.current;
+    const d = dims;
+    const f = d.h * 0.95;
+    const horizon = d.h * 0.42;
+    const shake = s.shake > 0 ? s.shake : 0;
+    const camx = s.x - Math.cos(s.h) * CAMD + (Math.random() - 0.5) * shake;
+    const camy = s.y - Math.sin(s.h) * CAMD + (Math.random() - 0.5) * shake;
+    const cosH = Math.cos(s.h), sinH = Math.sin(s.h);
 
-    // Sky
-    const sky = ctx.createLinearGradient(0, 0, 0, h);
-    sky.addColorStop(0, "#050510"); sky.addColorStop(0.3, "#0a0a2e"); sky.addColorStop(0.6, "#0f0a30"); sky.addColorStop(1, "#1a0825");
-    ctx.fillStyle = sky; ctx.fillRect(0, 0, w, h);
+    const proj = (wx: number, wy: number, wz: number) => {
+      const dx = wx - camx, dy = wy - camy;
+      const cz = dx * cosH + dy * sinH;
+      if (cz < 0.2) return null;
+      const cx = -dx * sinH + dy * cosH;
+      const sc = f / cz;
+      return { x: d.w / 2 + cx * sc, y: horizon - (wz - CAMH) * sc, sc };
+    };
 
-    // Nebula
-    for (let i = 0; i < 3; i++) {
-      const nx = w * (0.2 + i * 0.3), ny = h * (0.15 + i * 0.15);
-      const neb = ctx.createRadialGradient(nx, ny, 0, nx, ny, w * 0.3);
-      neb.addColorStop(0, ["rgba(124,58,237,0.06)", "rgba(168,85,247,0.05)", "rgba(192,132,252,0.04)"][i]);
-      neb.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = neb; ctx.fillRect(0, 0, w, h);
+    const skyG = ctx.createLinearGradient(0, 0, 0, horizon);
+    skyG.addColorStop(0, "#4aa8ff");
+    skyG.addColorStop(1, "#cfeeff");
+    ctx.fillStyle = skyG;
+    ctx.fillRect(0, 0, d.w, horizon);
+
+    ctx.fillStyle = "#FFE066";
+    ctx.beginPath();
+    ctx.arc(d.w * 0.76, horizon - d.h * 0.18, d.h * 0.055, 0, Math.PI * 2);
+    ctx.fill();
+
+    const par = -s.h / (Math.PI * 2);
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    for (let i = 0; i < 5; i++) {
+      const cxp = ((((i * 0.23 + par) % 1) + 1) % 1) * (d.w + 200) - 100;
+      const cyp = horizon - d.h * (0.2 + (i % 3) * 0.05);
+      ctx.beginPath();
+      ctx.ellipse(cxp, cyp, 46, 15, 0, 0, Math.PI * 2);
+      ctx.ellipse(cxp + 30, cyp - 8, 32, 13, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.fillStyle = "#2f7d4f";
+    for (let i = 0; i < 8; i++) {
+      const mx = ((((i * 0.14 + par * 0.6) % 1) + 1) % 1) * (d.w + 240) - 120;
+      ctx.beginPath();
+      ctx.moveTo(mx - 70, horizon);
+      ctx.lineTo(mx, horizon - 34 - (i % 3) * 12);
+      ctx.lineTo(mx + 70, horizon);
+      ctx.closePath();
+      ctx.fill();
     }
 
-    // Stars parallax
-    for (let layer = 0; layer < 3; layer++) {
-      const px = s.camAngle * 40 * (layer + 1) * 0.3;
-      for (const star of s.stars) {
-        if (star.layer !== layer) continue;
-        const tw = 0.3 + 0.7 * Math.sin(now * 0.001 + star.b * 8);
-        const sx = ((star.x - px) % w + w) % w;
-        ctx.beginPath(); ctx.arc(sx, star.y, star.r * (0.6 + layer * 0.2), 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${tw * (0.25 + layer * 0.12)})`; ctx.fill();
+    const grassG = ctx.createLinearGradient(0, horizon, 0, d.h);
+    grassG.addColorStop(0, "#4dbd68");
+    grassG.addColorStop(1, "#2f9149");
+    ctx.fillStyle = grassG;
+    ctx.fillRect(0, horizon, d.w, d.h - horizon);
+
+    interface Quad { depth: number; pts: { x: number; y: number }[]; color: string; }
+    const quads: Quad[] = [];
+    const SEG = 160;
+    const step = (Math.PI * 2) / SEG;
+    for (let i = 0; i < SEG; i++) {
+      const a0 = i * step, a1 = (i + 1) * step;
+      const p00 = proj(Math.cos(a0) * RO, Math.sin(a0) * RO, 0);
+      const p10 = proj(Math.cos(a1) * RO, Math.sin(a1) * RO, 0);
+      const p01 = proj(Math.cos(a0) * RI, Math.sin(a0) * RI, 0);
+      const p11 = proj(Math.cos(a1) * RI, Math.sin(a1) * RI, 0);
+      if (!p00 || !p10 || !p01 || !p11) continue;
+      const midA = a0 + step / 2;
+      const midx = Math.cos(midA) * R, midy = Math.sin(midA) * R;
+      const depth = Math.hypot(midx - camx, midy - camy);
+      const rumbo = Math.floor(i / 2) % 2 === 0;
+      const lerpP = (pA: { x: number; y: number }, pB: { x: number; y: number }, t: number) => ({ x: pA.x + (pB.x - pA.x) * t, y: pA.y + (pB.y - pA.y) * t });
+      const o0 = lerpP(p00, p01, 0.08), o1 = lerpP(p10, p11, 0.08);
+      const i0 = lerpP(p00, p01, 0.92), i1 = lerpP(p10, p11, 0.92);
+      quads.push({ depth: depth + 40, pts: [p00, p10, o1, o0], color: rumbo ? "#e74c3c" : "#f8f8f8" });
+      quads.push({ depth: depth + 40, pts: [o1, p11, p01, o0], color: rumbo ? "#f8f8f8" : "#e74c3c" });
+      quads.push({ depth, pts: [o0, o1, i1, i0], color: i % 4 < 2 ? "#3d4257" : "#444a61" });
+      if (i % 4 < 2) {
+        const d0 = proj(Math.cos(a0) * (R - 1.4), Math.sin(a0) * (R - 1.4), 0.1);
+        const d1 = proj(Math.cos(a1) * (R - 1.4), Math.sin(a1) * (R - 1.4), 0.1);
+        const d2 = proj(Math.cos(a1) * (R + 1.4), Math.sin(a1) * (R + 1.4), 0.1);
+        const d3 = proj(Math.cos(a0) * (R + 1.4), Math.sin(a0) * (R + 1.4), 0.1);
+        if (d0 && d1 && d2 && d3) quads.push({ depth: depth + 1, pts: [d0, d1, d2, d3], color: "#e8e8f0" });
       }
-    }
-
-    // Ground
-    const gy = h * 0.4;
-    const grd = ctx.createLinearGradient(0, gy, 0, h);
-    grd.addColorStop(0, "rgba(12,12,40,0.5)"); grd.addColorStop(0.4, "rgba(8,8,30,0.8)"); grd.addColorStop(1, "rgba(5,5,20,1)");
-    ctx.fillStyle = grd; ctx.fillRect(0, gy, w, h - gy);
-
-    // Grid depth
-    ctx.strokeStyle = "rgba(124,58,237,0.04)"; ctx.lineWidth = 1;
-    for (let i = 0; i < 15; i++) { const yy = gy + i * (h - gy) / 15; ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(w, yy); ctx.stroke(); }
-
-    // ── DEPTH SORT ──
-    interface Obj { type: string; depth: number; data: any; }
-    const objs: Obj[] = [];
-
-    // Track surface fill
-    for (let i = 0; i < 60; i++) {
-      const a1 = (i / 60) * Math.PI * 2, a2 = ((i + 1) / 60) * Math.PI * 2;
-      const io1 = project(Math.cos(a1) * (s.trackR + s.trackW / 2), Math.sin(a1) * (s.trackR + s.trackW / 2), 0, s.cx, s.cy, s.sc, s.camAngle);
-      const io2 = project(Math.cos(a2) * (s.trackR + s.trackW / 2), Math.sin(a2) * (s.trackR + s.trackW / 2), 0, s.cx, s.cy, s.sc, s.camAngle);
-      const ii1 = project(Math.cos(a1) * (s.trackR - s.trackW / 2), Math.sin(a1) * (s.trackR - s.trackW / 2), 0, s.cx, s.cy, s.sc, s.camAngle);
-      const ii2 = project(Math.cos(a2) * (s.trackR - s.trackW / 2), Math.sin(a2) * (s.trackR - s.trackW / 2), 0, s.cx, s.cy, s.sc, s.camAngle);
-      const md = (io1.depth + io2.depth + ii1.depth + ii2.depth) / 4;
-      objs.push({ type: "tracksurf", depth: md, data: { io1, io2, ii1, ii2 } });
-    }
-
-    // Track borders
-    for (let ring = 0; ring < 2; ring++) {
-      const r = ring === 0 ? s.trackR + s.trackW / 2 : s.trackR - s.trackW / 2;
-      for (let i = 0; i < 60; i++) {
-        const a1 = (i / 60) * Math.PI * 2, a2 = ((i + 1) / 60) * Math.PI * 2;
-        const p1 = project(Math.cos(a1) * r, Math.sin(a1) * r, 0, s.cx, s.cy, s.sc, s.camAngle);
-        const p2 = project(Math.cos(a2) * r, Math.sin(a2) * r, 0, s.cx, s.cy, s.sc, s.camAngle);
-        objs.push({ type: "trackborder", depth: (p1.depth + p2.depth) / 2, data: { p1, p2, ring } });
-      }
-    }
-
-    // Start/finish
-    const sf1 = project(s.trackR, -3, 0, s.cx, s.cy, s.sc, s.camAngle);
-    const sf2 = project(s.trackR, 3, 0, s.cx, s.cy, s.sc, s.camAngle);
-    objs.push({ type: "startfinish", depth: sf1.depth, data: { p1: sf1, p2: sf2 } });
-
-    // Quiz gates
-    for (const gate of s.gates) {
-      if (gate.used) continue;
-      const gx = Math.cos(gate.angle) * s.trackR;
-      const gy = Math.sin(gate.angle) * s.trackR;
-      const pg = project(gx, gy, 0, s.cx, s.cy, s.sc, s.camAngle);
-      objs.push({ type: "quizgate", depth: pg.depth, data: { proj: pg, angle: gate.angle } });
-    }
-
-    // Tokens
-    for (const t of s.tokens) {
-      if (t.taken) continue;
-      const p = project(t.x, t.y, t.z, s.cx, s.cy, s.sc, s.camAngle);
-      objs.push({ type: "token", depth: p.depth, data: { ...t, proj: p } });
-    }
-
-    // Obstacles
-    for (const ob of s.obstacles) {
-      const p = project(ob.x, ob.y, 4, s.cx, s.cy, s.sc, s.camAngle);
-      objs.push({ type: "obstacle", depth: p.depth, data: { ...ob, proj: p } });
-    }
-
-    // AI
-    for (const ai of s.ai) {
-      const ax = Math.cos(ai.angle) * s.trackR, ay = Math.sin(ai.angle) * s.trackR;
-      const p = project(ax, ay, 3, s.cx, s.cy, s.sc, s.camAngle);
-      objs.push({ type: "kart", depth: p.depth, data: { ...ai, proj: p, isPlayer: false } });
-    }
-
-    // Player
-    const pp = project(s.px, s.py, 3 + s.pz, s.cx, s.cy, s.sc, s.camAngle);
-    objs.push({ type: "kart", depth: pp.depth, data: { color: s.boostTimer > 0 ? "#22d3ee" : kartBody, glow: s.boostTimer > 0 ? "#22d3ee" : kartAccent, angle: s.pa, proj: pp, isPlayer: true, speed: s.pv, drifting } });
-
-    // Particles
-    for (const p of s.particles) {
-      const proj = project(p.x, p.y, p.z, s.cx, s.cy, s.sc, s.camAngle);
-      objs.push({ type: "particle", depth: proj.depth, data: { ...p, proj } });
-    }
-
-    // Popups
-    for (const p of s.popups) {
-      const proj = project(p.x, p.y, p.z, s.cx, s.cy, s.sc, s.camAngle);
-      objs.push({ type: "popup", depth: proj.depth, data: { ...p, proj } });
-    }
-
-    objs.sort((a, b) => a.depth - b.depth);
-
-    for (const obj of objs) {
-      if (obj.type === "tracksurf") {
-        const { io1, io2, ii1, ii2 } = obj.data;
-        ctx.beginPath(); ctx.moveTo(io1.px, io1.py); ctx.lineTo(io2.px, io2.py); ctx.lineTo(ii2.px, ii2.py); ctx.lineTo(ii1.px, ii1.py); ctx.closePath();
-        ctx.fillStyle = "rgba(18,12,45,0.75)"; ctx.fill();
-      }
-      if (obj.type === "trackborder") {
-        const { p1, p2, ring } = obj.data;
-        ctx.beginPath(); ctx.moveTo(p1.px, p1.py); ctx.lineTo(p2.px, p2.py);
-        ctx.strokeStyle = ring === 0 ? "rgba(168,85,247,0.45)" : "rgba(99,102,241,0.35)";
-        ctx.lineWidth = ring === 0 ? 2 : 1.5;
-        ctx.setLineDash(ring === 0 ? [] : [5, 4]); ctx.stroke(); ctx.setLineDash([]);
-      }
-      if (obj.type === "startfinish") {
-        const { p1, p2 } = obj.data;
-        ctx.beginPath(); ctx.moveTo(p1.px, p1.py); ctx.lineTo(p2.px, p2.py);
-        ctx.strokeStyle = "rgba(255,255,255,0.7)"; ctx.lineWidth = 4; ctx.stroke();
-        ctx.setLineDash([4, 4]); ctx.strokeStyle = "#1e293b"; ctx.lineWidth = 2; ctx.stroke(); ctx.setLineDash([]);
-      }
-      if (obj.type === "quizgate") {
-        const { proj: p, angle } = obj.data;
-        const pulse = 0.7 + Math.sin(now * 0.005) * 0.3;
-        const sz = Math.max(12, s.trackR * 0.08) * p.s;
-        ctx.save(); ctx.translate(p.px, p.py);
-        // Gate ring
-        ctx.beginPath(); ctx.arc(0, 0, sz, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(250,204,21,${pulse})`;
-        ctx.lineWidth = 3;
-        ctx.shadowColor = "#facc15"; ctx.shadowBlur = 20 * pulse;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-        // Question mark
-        ctx.font = `900 ${sz * 0.9}px "Arial Black", sans-serif`;
-        ctx.fillStyle = `rgba(250,204,21,${pulse})`;
-        ctx.textAlign = "center"; ctx.textBaseline = "middle";
-        ctx.fillText("?", 0, 0);
-        // Label
-        ctx.font = `800 ${Math.max(7, sz * 0.3)}px "Arial", sans-serif`;
-        ctx.fillStyle = "rgba(255,255,255,0.5)";
-        ctx.fillText("TANTANGAN", 0, sz + 10);
-        ctx.restore();
-      }
-      if (obj.type === "token") {
-        const t = obj.data;
-        const p = t.proj;
-        const pulse = 1 + Math.sin(now * 0.004 + t.bob) * 0.08;
-        const sz = Math.max(7, s.trackR * 0.038) * p.s;
-        const textW = ctx.measureText(`${t.good ? "+" : "−"} ${t.word}`).width;
-        const pw = textW + 16, ph = sz * 1.5;
-        ctx.save(); ctx.translate(p.px, p.py); ctx.scale(pulse, pulse);
-        // Shadow
-        ctx.beginPath(); ctx.ellipse(0, ph * 0.4, pw * 0.35, ph * 0.12, 0, 0, Math.PI * 2); ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fill();
-        // Glow
-        ctx.shadowColor = t.good ? "#22d3ee" : "#f43f5e"; ctx.shadowBlur = 12 * pulse;
-        // Pill
-        ctx.beginPath(); ctx.roundRect(-pw / 2, -ph / 2, pw, ph, ph / 2);
-        const g = ctx.createLinearGradient(-pw / 2, 0, pw / 2, 0);
-        g.addColorStop(0, t.good ? "rgba(34,211,238,0.9)" : "rgba(251,113,133,0.9)");
-        g.addColorStop(1, t.good ? "rgba(14,165,233,0.9)" : "rgba(225,29,72,0.9)");
-        ctx.fillStyle = g; ctx.fill();
-        ctx.shadowBlur = 0;
-        // Highlight
-        ctx.beginPath(); ctx.roundRect(-pw / 2 + 2, -ph / 2 + 1, pw - 4, ph * 0.3, ph * 0.12); ctx.fillStyle = "rgba(255,255,255,0.18)"; ctx.fill();
-        // Text
-        ctx.font = `800 ${sz * 0.8}px "Arial Black", sans-serif`; ctx.fillStyle = "white"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-        ctx.fillText(`${t.good ? "+" : "−"} ${t.word}`, 0, 1);
-        ctx.restore();
-      }
-      if (obj.type === "obstacle") {
-        const ob = obj.data;
-        const p = ob.proj;
-        const sz = Math.max(10, s.trackR * 0.05) * p.s;
-        ctx.save(); ctx.translate(p.px, p.py);
-        // Warning triangle
-        ctx.beginPath(); ctx.moveTo(0, -sz); ctx.lineTo(-sz * 0.8, sz * 0.5); ctx.lineTo(sz * 0.8, sz * 0.5); ctx.closePath();
-        ctx.fillStyle = "rgba(249,115,22,0.85)";
-        ctx.shadowColor = "#f97316"; ctx.shadowBlur = 12;
-        ctx.fill(); ctx.shadowBlur = 0;
-        ctx.strokeStyle = "rgba(255,255,255,0.5)"; ctx.lineWidth = 1.5; ctx.stroke();
-        // Exclamation
-        ctx.font = `900 ${sz * 0.7}px "Arial Black", sans-serif`;
-        ctx.fillStyle = "white"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-        ctx.fillText("!", 0, sz * 0.15);
-        ctx.restore();
-      }
-      if (obj.type === "kart") {
-        const d = obj.data;
-        const p = d.proj;
-        const sz = Math.max(9, s.trackR * 0.055) * p.s;
-        ctx.save(); ctx.translate(p.px, p.py);
-        // Shadow
-        ctx.beginPath(); ctx.ellipse(2, sz * 0.45, sz * 0.45, sz * 0.12, 0, 0, Math.PI * 2); ctx.fillStyle = "rgba(0,0,0,0.35)"; ctx.fill();
-        ctx.rotate((d.angle || 0) + Math.PI / 2);
-        // Glow
-        ctx.shadowColor = d.glow; ctx.shadowBlur = d.isPlayer ? 18 : 10;
-        // Body
-        ctx.beginPath(); ctx.roundRect(-sz * 0.32, -sz * 0.6, sz * 0.64, sz * 1.2, sz * 0.16);
-        const bg = ctx.createLinearGradient(0, -sz * 0.6, 0, sz * 0.6); bg.addColorStop(0, d.glow); bg.addColorStop(1, d.color);
-        ctx.fillStyle = bg; ctx.fill();
-        // Highlight
-        ctx.beginPath(); ctx.roundRect(-sz * 0.22, -sz * 0.5, sz * 0.44, sz * 0.4, sz * 0.1); ctx.fillStyle = "rgba(255,255,255,0.12)"; ctx.fill();
-        ctx.shadowBlur = 0;
-        // Head
-        ctx.beginPath(); ctx.arc(0, -sz * 0.12, sz * 0.2, 0, Math.PI * 2); ctx.fillStyle = "#f1c9a5"; ctx.fill(); ctx.strokeStyle = "rgba(255,255,255,0.4)"; ctx.lineWidth = 1.2; ctx.stroke();
-        // Eyes
-        ctx.fillStyle = "#1e293b"; ctx.beginPath(); ctx.arc(-sz * 0.06, -sz * 0.14, sz * 0.04, 0, Math.PI * 2); ctx.arc(sz * 0.06, -sz * 0.14, sz * 0.04, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(-sz * 0.05, -sz * 0.15, sz * 0.013, 0, Math.PI * 2); ctx.arc(sz * 0.07, -sz * 0.15, sz * 0.013, 0, Math.PI * 2); ctx.fill();
-        // Wheels
-        ctx.fillStyle = "#0f172a";
-        ctx.fillRect(-sz * 0.42, -sz * 0.38, sz * 0.14, sz * 0.1); ctx.fillRect(sz * 0.28, -sz * 0.38, sz * 0.14, sz * 0.1);
-        ctx.fillRect(-sz * 0.42, sz * 0.28, sz * 0.14, sz * 0.1); ctx.fillRect(sz * 0.28, sz * 0.28, sz * 0.14, sz * 0.1);
-        ctx.fillStyle = `${d.glow}33`; ctx.fillRect(-sz * 0.42, -sz * 0.38, sz * 0.14, sz * 0.1); ctx.fillRect(sz * 0.28, -sz * 0.38, sz * 0.14, sz * 0.1);
-        ctx.restore();
-        // Player arrow
-        if (d.isPlayer) {
-          ctx.save(); ctx.translate(p.px, p.py - sz * 0.85); ctx.translate(0, Math.sin(now * 0.005) * 3);
-          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-4, -7); ctx.lineTo(4, -7); ctx.closePath();
-          ctx.fillStyle = d.glow; ctx.shadowColor = d.glow; ctx.shadowBlur = 8; ctx.fill(); ctx.shadowBlur = 0;
-          ctx.restore();
+      if (i < 2) {
+        const cols = 8;
+        for (let cc = 0; cc < cols; cc++) {
+          const r0 = RI + ((RO - RI) / cols) * cc;
+          const r1 = r0 + (RO - RI) / cols;
+          const q0 = proj(Math.cos(a0) * r0, Math.sin(a0) * r0, 0.2);
+          const q1 = proj(Math.cos(a1) * r0, Math.sin(a1) * r0, 0.2);
+          const q2 = proj(Math.cos(a1) * r1, Math.sin(a1) * r1, 0.2);
+          const q3 = proj(Math.cos(a0) * r1, Math.sin(a0) * r1, 0.2);
+          if (q0 && q1 && q2 && q3) quads.push({ depth: depth + 2, pts: [q0, q1, q2, q3], color: (i + cc) % 2 === 0 ? "#ffffff" : "#1f2430" });
         }
       }
-      if (obj.type === "particle") {
-        const p = obj.data;
-        ctx.globalAlpha = p.life / p.max;
-        ctx.beginPath(); ctx.arc(p.proj.px, p.proj.py, p.size * (p.life / p.max) * p.proj.s, 0, Math.PI * 2);
-        ctx.fillStyle = p.color; ctx.fill();
-      }
-      if (obj.type === "popup") {
-        const p = obj.data;
-        ctx.globalAlpha = p.life / 60;
-        ctx.font = `900 ${Math.max(10, s.trackR * 0.05) * p.proj.s}px "Arial Black", sans-serif`;
-        ctx.textAlign = "center"; ctx.textBaseline = "bottom";
-        ctx.shadowColor = p.color; ctx.shadowBlur = 8;
-        ctx.fillStyle = p.color; ctx.fillText(p.text, p.proj.px, p.proj.py);
-        ctx.shadowBlur = 0;
-      }
+    }
+
+    for (const pad of s.pads) {
+      const a0 = pad.a - 0.05, a1 = pad.a + 0.05;
+      const q0 = proj(Math.cos(a0) * (R - 12), Math.sin(a0) * (R - 12), 0.3);
+      const q1 = proj(Math.cos(a1) * (R - 12), Math.sin(a1) * (R - 12), 0.3);
+      const q2 = proj(Math.cos(a1) * (R + 12), Math.sin(a1) * (R + 12), 0.3);
+      const q3 = proj(Math.cos(a0) * (R + 12), Math.sin(a0) * (R + 12), 0.3);
+      if (q0 && q1 && q2 && q3) quads.push({ depth: 5, pts: [q0, q1, q2, q3], color: "#ff9f1a" });
+    }
+
+    quads.sort((a, b) => b.depth - a.depth);
+    for (const q of quads) {
+      ctx.beginPath();
+      ctx.moveTo(q.pts[0].x, q.pts[0].y);
+      for (let i = 1; i < 4; i++) ctx.lineTo(q.pts[i].x, q.pts[i].y);
+      ctx.closePath();
+      ctx.fillStyle = q.color;
+      ctx.fill();
+    }
+
+    interface Bill { depth: number; draw: () => void; }
+    const bills: Bill[] = [];
+
+    for (const gate of s.gates) {
+      const gx = Math.cos(gate.a) * R, gy = Math.sin(gate.a) * R;
+      const p = proj(gx, gy, 12);
+      if (!p) continue;
+      const depth = Math.hypot(gx - camx, gy - camy);
+      bills.push({
+        depth, draw: () => {
+          const rad = 16 * p.sc;
+          const pulse = 0.75 + Math.sin(now * 0.005) * 0.25;
+          ctx.save();
+          ctx.strokeStyle = `rgba(250,204,21,${pulse})`;
+          ctx.lineWidth = Math.max(2, 4 * p.sc);
+          ctx.shadowColor = "#facc15";
+          ctx.shadowBlur = 18 * pulse;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, rad, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+          ctx.font = `900 ${rad * 1.1}px "Righteous", "Arial Black", sans-serif`;
+          ctx.fillStyle = `rgba(250,204,21,${pulse})`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("?", p.x, p.y);
+          ctx.restore();
+        },
+      });
+    }
+
+    for (const box of s.boxes) {
+      if (box.taken > 0) continue;
+      const bx = Math.cos(box.a) * R, by = Math.sin(box.a) * R;
+      const p = proj(bx, by, 9 + Math.sin(now * 0.004 + box.a) * 1.5);
+      if (!p) continue;
+      const depth = Math.hypot(bx - camx, by - camy);
+      bills.push({
+        depth, draw: () => {
+          const sz = 9 * p.sc;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(now * 0.002 + box.a);
+          const g = ctx.createLinearGradient(-sz, -sz, sz, sz);
+          g.addColorStop(0, "rgba(255,255,255,0.35)");
+          g.addColorStop(0.5, "rgba(167,139,250,0.55)");
+          g.addColorStop(1, "rgba(56,189,248,0.5)");
+          ctx.fillStyle = g;
+          ctx.strokeStyle = "rgba(255,255,255,0.9)";
+          ctx.lineWidth = Math.max(1, 1.5 * p.sc);
+          ctx.beginPath();
+          ctx.rect(-sz, -sz, sz * 2, sz * 2);
+          ctx.fill();
+          ctx.stroke();
+          ctx.rotate(-(now * 0.002 + box.a));
+          ctx.font = `900 ${sz * 1.3}px "Righteous", sans-serif`;
+          ctx.fillStyle = "rgba(255,255,255,0.95)";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("?", 0, sz * 0.1);
+          ctx.restore();
+        },
+      });
+    }
+
+    for (const coin of s.coinsArr) {
+      if (coin.taken > 0) continue;
+      const cx2 = Math.cos(coin.a) * (R + coin.lat), cy2 = Math.sin(coin.a) * (R + coin.lat);
+      const p = proj(cx2, cy2, 6 + Math.sin(now * 0.005 + coin.a * 3) * 2);
+      if (!p) continue;
+      const depth = Math.hypot(cx2 - camx, cy2 - camy);
+      bills.push({
+        depth, draw: () => {
+          const rad = 5.5 * p.sc;
+          const sq = Math.max(0.25, Math.abs(Math.cos(now * 0.004 + coin.a)));
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.scale(sq, 1);
+          ctx.beginPath();
+          ctx.arc(0, 0, rad, 0, Math.PI * 2);
+          ctx.fillStyle = "#FFD34D";
+          ctx.shadowColor = "#FFD34D";
+          ctx.shadowBlur = 8;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+          ctx.strokeStyle = "#B8860B";
+          ctx.lineWidth = Math.max(1, rad * 0.18);
+          ctx.stroke();
+          ctx.restore();
+        },
+      });
+    }
+
+    for (const b of s.bananas) {
+      const p = proj(b.x, b.y, 3);
+      if (!p) continue;
+      const depth = Math.hypot(b.x - camx, b.y - camy);
+      bills.push({
+        depth, draw: () => {
+          ctx.font = `${12 * p.sc}px serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("🍌", p.x, p.y);
+        },
+      });
+    }
+
+    for (const sh of s.shells) {
+      const p = proj(sh.x, sh.y, 4);
+      if (!p) continue;
+      const depth = Math.hypot(sh.x - camx, sh.y - camy);
+      bills.push({
+        depth, draw: () => {
+          const rad = 5 * p.sc;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, rad, 0, Math.PI * 2);
+          ctx.fillStyle = sh.kind === "green" ? "#22c55e" : "#ef4444";
+          ctx.shadowColor = sh.kind === "green" ? "#22c55e" : "#ef4444";
+          ctx.shadowBlur = 10;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+          ctx.strokeStyle = "rgba(255,255,255,0.8)";
+          ctx.lineWidth = Math.max(1, rad * 0.25);
+          ctx.stroke();
+        },
+      });
+    }
+
+    const drawKartSprite = (sx: number, sy: number, size: number, body: string, accent: string, tilt: number, spinR: number, starHue: number | null) => {
+      ctx.save();
+      ctx.translate(sx, sy);
+      ctx.beginPath();
+      ctx.ellipse(0, size * 0.32, size * 0.5, size * 0.14, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(0,0,0,0.3)";
+      ctx.fill();
+      ctx.rotate(tilt + spinR);
+      const bCol = starHue !== null ? `hsl(${starHue},95%,60%)` : body;
+      const aCol = starHue !== null ? `hsl(${(starHue + 60) % 360},95%,75%)` : accent;
+      ctx.fillStyle = "#1c1f2b";
+      const wl = size * 0.22, ww = size * 0.13;
+      ctx.fillRect(-size * 0.52, -size * 0.34, wl, ww);
+      ctx.fillRect(size * 0.30, -size * 0.34, wl, ww);
+      ctx.fillRect(-size * 0.52, size * 0.16, wl, ww);
+      ctx.fillRect(size * 0.30, size * 0.16, wl, ww);
+      const g = ctx.createLinearGradient(0, -size * 0.45, 0, size * 0.4);
+      g.addColorStop(0, aCol);
+      g.addColorStop(1, bCol);
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.roundRect(-size * 0.42, -size * 0.42, size * 0.84, size * 0.8, size * 0.16);
+      ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,0.22)";
+      ctx.beginPath();
+      ctx.roundRect(-size * 0.3, -size * 0.34, size * 0.6, size * 0.26, size * 0.1);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0, -size * 0.18, size * 0.2, 0, Math.PI * 2);
+      ctx.fillStyle = "#f1c9a5";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0, -size * 0.2, size * 0.22, Math.PI, 0);
+      ctx.fillStyle = aCol;
+      ctx.fill();
+      ctx.fillStyle = "#1c1f2b";
+      ctx.beginPath();
+      ctx.roundRect(-size * 0.14, -size * 0.2, size * 0.28, size * 0.09, size * 0.04);
+      ctx.fill();
+      ctx.restore();
+    };
+
+    for (const ai of s.ai) {
+      const ax = Math.cos(ai.a) * (R + ai.lat), ay = Math.sin(ai.a) * (R + ai.lat);
+      const p = proj(ax, ay, 0);
+      if (!p) continue;
+      const depth = Math.hypot(ax - camx, ay - camy);
+      bills.push({
+        depth, draw: () => {
+          const size = 15 * p.sc;
+          if (size < 2) return;
+          drawKartSprite(p.x, p.y, size, ai.color, ai.accent, 0, ai.spin > 0 ? now * 0.02 : 0, null);
+        },
+      });
+    }
+
+    bills.sort((a, b) => b.depth - a.depth);
+    for (const b of bills) b.draw();
+
+    for (const p of s.particles) {
+      const pp = proj(p.x, p.y, p.z);
+      if (!pp) continue;
+      ctx.globalAlpha = p.life / p.max;
+      ctx.beginPath();
+      ctx.arc(pp.x, pp.y, Math.max(1, p.size * pp.sc), 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
     }
     ctx.globalAlpha = 1;
 
-    // Center label
-    const cp = project(0, 0, 0, s.cx, s.cy, s.sc, s.camAngle);
-    ctx.font = `900 ${Math.max(12, s.trackR * 0.09)}px "Arial Black", sans-serif`;
-    ctx.fillStyle = "rgba(168,85,247,0.12)"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillText("PRIMA+", cp.px, cp.py);
-
-    // Countdown
-    if (s.cdVal > 0) {
-      ctx.font = `900 ${Math.min(w, h) * 0.28}px "Arial Black", sans-serif`;
-      ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.shadowColor = "#a855f7"; ctx.shadowBlur = 40; ctx.fillStyle = "white";
-      ctx.fillText(String(s.cdVal), w / 2, h * 0.33); ctx.shadowBlur = 0;
-    } else if (s.cdVal === 0) {
-      ctx.font = `900 ${Math.min(w, h) * 0.2}px "Arial Black", sans-serif`;
-      ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.shadowColor = "#22c55e"; ctx.shadowBlur = 40; ctx.fillStyle = "#22c55e";
-      ctx.fillText("GO!", w / 2, h * 0.33); ctx.shadowBlur = 0;
+    const kartY = d.h * (d.h < 520 ? 0.6 : 0.72);
+    const kartSize = Math.max(64, Math.min(d.h * 0.17, 120));
+    if (s.boost > 0) {
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.arc(d.w / 2 + (Math.random() - 0.5) * kartSize * 0.5, kartY + kartSize * (0.35 + i * 0.12), kartSize * (0.1 + Math.random() * 0.08), 0, Math.PI * 2);
+        ctx.fillStyle = i === 0 ? "rgba(255,200,60,0.8)" : "rgba(255,120,40,0.55)";
+        ctx.fill();
+      }
     }
+    const starHue = s.star > 0 ? (now * 0.4) % 360 : null;
+    drawKartSprite(d.w / 2, kartY - (s.hop > 0 ? s.hop * kartSize * 0.5 : 0), kartSize, kartBody, kartAccent, -steerVisRef.current * 0.14, s.spin > 0 ? now * 0.02 : 0, starHue);
 
-    // Vignette
-    const vig = ctx.createRadialGradient(w / 2, h / 2, w * 0.25, w / 2, h / 2, w * 0.6);
-    vig.addColorStop(0, "rgba(0,0,0,0)"); vig.addColorStop(1, "rgba(0,0,0,0.35)");
-    ctx.fillStyle = vig; ctx.fillRect(0, 0, w, h);
-
-    // Combo display
-    if (s.combo > 1) {
-      ctx.font = `900 ${Math.max(14, w * 0.02)}px "Arial Black", sans-serif`;
-      ctx.textAlign = "right"; ctx.textBaseline = "top";
-      ctx.fillStyle = "#facc15"; ctx.shadowColor = "#facc15"; ctx.shadowBlur = 10;
-      ctx.fillText(`COMBO x${s.combo}`, w - 16, h * 0.48);
-      ctx.shadowBlur = 0;
+    for (const p of s.popups) {
+      ctx.globalAlpha = Math.min(1, p.life / 30);
+      ctx.font = `900 ${Math.max(16, d.h * 0.032)}px "Righteous", "Arial Black", sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "rgba(20,20,40,0.9)";
+      ctx.strokeText(p.text, p.sx, p.sy);
+      ctx.fillStyle = p.color;
+      ctx.fillText(p.text, p.sx, p.sy);
     }
+    ctx.globalAlpha = 1;
+
+    const mapSize = Math.max(74, Math.min(112, d.w * 0.11));
+    const mapX = d.w - mapSize - 14;
+    const mapY = 74;
+    ctx.save();
+    ctx.fillStyle = "rgba(15,18,40,0.72)";
+    ctx.beginPath();
+    ctx.roundRect(mapX - 6, mapY - 6, mapSize + 12, mapSize + 12, 12);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,0.35)";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    const mr = mapSize / 2 - 8;
+    const mx0 = mapX + mapSize / 2, my0 = mapY + mapSize / 2;
+    ctx.beginPath();
+    ctx.arc(mx0, my0, mr, 0, Math.PI * 2);
+    ctx.strokeStyle = "#8b93b8";
+    ctx.lineWidth = ((RO - RI) / R) * mr;
+    ctx.stroke();
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(mx0 + Math.cos(Math.PI / 2) * (RI / R) * mr, my0 + Math.sin(Math.PI / 2) * (RI / R) * mr);
+    ctx.lineTo(mx0 + Math.cos(Math.PI / 2) * (RO / R) * mr, my0 + Math.sin(Math.PI / 2) * (RO / R) * mr);
+    ctx.stroke();
+    for (const ai of s.ai) {
+      ctx.beginPath();
+      ctx.arc(mx0 + Math.cos(ai.a) * mr, my0 + Math.sin(ai.a) * mr, 3, 0, Math.PI * 2);
+      ctx.fillStyle = ai.color;
+      ctx.fill();
+    }
+    const pt = Math.atan2(s.y, s.x);
+    ctx.beginPath();
+    ctx.arc(mx0 + Math.cos(pt) * mr, my0 + Math.sin(pt) * mr, 4.5, 0, Math.PI * 2);
+    ctx.fillStyle = "#FFD34D";
+    ctx.strokeStyle = "#1c1f2b";
+    ctx.lineWidth = 1.5;
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }, [dims, kartBody, kartAccent]);
+
+  useEffect(() => {
+    let raf = 0;
+    let last = performance.now();
+    const loop = (now: number) => {
+      raf = requestAnimationFrame(loop);
+      const s = S.current;
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+
+      if (phase === "race" && s.started && !s.paused && !s.finished) {
+        s.raceTime += dt;
+        const remaining = RACE_TIME - s.raceTime;
+        setTimeLeft(Math.max(0, Math.ceil(remaining)));
+        if (remaining <= 0) { finishRace(); }
+
+        const k = s.keys;
+        const t = s.touch;
+        const gas = !!(k["arrowup"] || k["w"] || t.gas);
+        const brake = !!(k["arrowdown"] || k["s"] || t.brake);
+        const left = !!(k["arrowleft"] || k["a"] || t.left);
+        const right = !!(k["arrowright"] || k["d"] || t.right);
+        const driftKey = !!(k[" "] || k["z"] || t.drift);
+        const steer = (left ? -1 : 0) + (right ? 1 : 0);
+        s.steerVis = s.steerVis * 0.85 + steer * 0.15;
+        steerVisRef.current = s.steerVis;
+
+        const maxV = (MAXBASE + s.coins * 1.5) * (s.star > 0 ? 1.22 : 1);
+        if (s.boost > 0) s.boost -= 60 * dt;
+        if (s.star > 0) s.star -= 60 * dt;
+        if (s.shake > 0) s.shake -= 1;
+        if (s.hop > 0) s.hop -= 60 * dt;
+        const boosting = s.boost > 0;
+        const cap = boosting ? 215 : maxV;
+
+        if (s.spin > 0) {
+          s.spin -= dt;
+          s.v = Math.max(0, s.v - 200 * dt);
+          s.drifting = false;
+          s.charge = 0;
+        } else {
+          if (gas) s.v = Math.min(cap, s.v + (boosting ? 340 : 150) * dt);
+          else s.v -= s.v * 0.9 * dt;
+          if (brake) s.v = Math.max(0, s.v - 240 * dt);
+
+          const canSteer = 0.3 + 0.7 * Math.min(s.v / MAXBASE, 1);
+          const turnRate = 1.7 * canSteer;
+
+          if (driftKey && !s.drifting && steer !== 0 && s.v > 70) {
+            s.drifting = true;
+            s.driftDir = steer > 0 ? 1 : -1;
+            s.hop = 0.22;
+          }
+          if (s.drifting) {
+            if (!driftKey || s.v < 45) {
+              const c = s.charge;
+              if (c > 2.6) { s.boost = Math.max(s.boost, 95); sfxEvent("boost"); }
+              else if (c > 1.7) { s.boost = Math.max(s.boost, 65); sfxEvent("boost"); }
+              else if (c > 0.85) { s.boost = Math.max(s.boost, 42); }
+              s.drifting = false;
+              s.charge = 0;
+            } else {
+              s.charge += dt;
+              s.h += s.driftDir * turnRate * (0.75 + 0.45 * steer * s.driftDir) * dt * 1.55;
+              s.x += -Math.sin(s.h) * s.driftDir * s.v * 0.22 * dt;
+              s.y += Math.cos(s.h) * s.driftDir * s.v * 0.22 * dt;
+              const tier = s.charge > 2.6 ? "#d78cff" : s.charge > 1.7 ? "#ffb347" : "#57c7ff";
+              if (Math.random() < 0.7) {
+                s.particles.push({
+                  x: s.x - Math.cos(s.h) * 10 + (Math.random() - 0.5) * 6,
+                  y: s.y - Math.sin(s.h) * 10 + (Math.random() - 0.5) * 6,
+                  z: 1, vx: (Math.random() - 0.5) * 30, vy: (Math.random() - 0.5) * 30, vz: 20,
+                  life: 14, max: 14, color: tier, size: 2.2,
+                });
+              }
+            }
+          } else {
+            s.h += steer * turnRate * dt;
+          }
+
+          s.x += Math.cos(s.h) * s.v * dt;
+          s.y += Math.sin(s.h) * s.v * dt;
+
+          const dist = Math.hypot(s.x, s.y);
+          const offroad = dist > RO || dist < RI;
+          if (offroad) {
+            if (s.v > 62) s.v = Math.max(62, s.v - 260 * dt);
+            if (Math.random() < 0.5) {
+              s.particles.push({
+                x: s.x + (Math.random() - 0.5) * 10, y: s.y + (Math.random() - 0.5) * 10, z: 1,
+                vx: (Math.random() - 0.5) * 20, vy: (Math.random() - 0.5) * 20, vz: 25,
+                life: 16, max: 16, color: "#7a5a3a", size: 2.4,
+              });
+            }
+          }
+          if (dist > RO + 22) {
+            const a = Math.atan2(s.y, s.x);
+            s.x = Math.cos(a) * (RO + 22); s.y = Math.sin(a) * (RO + 22);
+            s.v *= 0.45; s.shake = 6; sfxEvent("bump");
+          }
+          if (dist < RI - 22) {
+            const a = Math.atan2(s.y, s.x);
+            s.x = Math.cos(a) * (RI - 22); s.y = Math.sin(a) * (RI - 22);
+            s.v *= 0.45; s.shake = 6; sfxEvent("bump");
+          }
+
+          for (const pad of s.pads) {
+            if (angDiff(Math.atan2(s.y, s.x), pad.a) < 0.045 && dist > RI && dist < RO) {
+              if (s.boost < 40) sfxEvent("boost");
+              s.boost = Math.max(s.boost, 50);
+            }
+          }
+
+          for (let i = 0; i < s.coinsArr.length; i++) {
+            const cn = s.coinsArr[i];
+            if (cn.taken > 0) { cn.taken--; continue; }
+            const cx2 = Math.cos(cn.a) * (R + cn.lat), cy2 = Math.sin(cn.a) * (R + cn.lat);
+            if (Math.hypot(cx2 - s.x, cy2 - s.y) < 14) {
+              cn.taken = 900;
+              if (s.coins < 10) s.coins += 1;
+              setCoinCount(s.coins);
+              addPopup(cx2, cy2, "+15", "#FFD34D");
+              sfxEvent("coin");
+            }
+          }
+
+          for (let i = 0; i < s.boxes.length; i++) {
+            const bx = s.boxes[i];
+            if (bx.taken > 0) { bx.taken--; continue; }
+            const bx2 = Math.cos(bx.a) * R, by2 = Math.sin(bx.a) * R;
+            if (Math.hypot(bx2 - s.x, by2 - s.y) < 16) {
+              bx.taken = 240;
+              giveItem();
+            }
+          }
+
+          for (let i = s.bananas.length - 1; i >= 0; i--) {
+            const b = s.bananas[i];
+            b.life -= 1;
+            if (b.life <= 0) { s.bananas.splice(i, 1); continue; }
+            if (Math.hypot(b.x - s.x, b.y - s.y) < 13) {
+              s.bananas.splice(i, 1);
+              if (s.star > 0) continue;
+              s.spin = 1.2; s.v = 0;
+              s.coins = Math.max(0, s.coins - 3);
+              setCoinCount(s.coins);
+              addPopup(s.x, s.y, "Terpeleset!", "#f43f5e");
+              s.shake = 8; sfxEvent("hit");
+            }
+          }
+
+          for (let i = s.shells.length - 1; i >= 0; i--) {
+            const sh = s.shells[i];
+            sh.life -= dt;
+            if (sh.life <= 0) { s.shells.splice(i, 1); continue; }
+            if (sh.kind === "green") {
+              sh.x += sh.vx * dt; sh.y += sh.vy * dt;
+              const sd = Math.hypot(sh.x, sh.y);
+              if (sd > RO - 4 || sd < RI + 4) {
+                const nx = sh.x / sd, ny = sh.y / sd;
+                const vn = sh.vx * nx + sh.vy * ny;
+                sh.vx -= 2 * vn * nx; sh.vy -= 2 * vn * ny;
+                sh.x = (sd > RO - 4 ? RO - 5 : RI + 5) * nx;
+                sh.y = (sd > RO - 4 ? RO - 5 : RI + 5) * ny;
+                sh.bounces++;
+                if (sh.bounces > 3) { s.shells.splice(i, 1); continue; }
+              }
+              if (Math.hypot(sh.x - s.x, sh.y - s.y) < 13 && s.star <= 0) {
+                s.shells.splice(i, 1);
+                s.spin = 1.2; s.v = 0; s.shake = 8; sfxEvent("hit");
+                continue;
+              }
+              for (let j = 0; j < s.ai.length; j++) {
+                const ai = s.ai[j];
+                const ax = Math.cos(ai.a) * (R + ai.lat), ay = Math.sin(ai.a) * (R + ai.lat);
+                if (Math.hypot(sh.x - ax, sh.y - ay) < 14) {
+                  if (ai.spin <= 0) { ai.spin = 1.2; addPopup(ax, ay, "+40", "#22d3ee"); s.quizScore += 40; setQuizScore(s.quizScore); }
+                  s.shells.splice(i, 1);
+                  break;
+                }
+              }
+            }
+          }
+
+          const curT = Math.atan2(s.y, s.x);
+          let dT = curT - s.prevT;
+          if (dT > Math.PI) dT -= Math.PI * 2;
+          if (dT < -Math.PI) dT += Math.PI * 2;
+          s.prog += dT;
+          if (s.prevT < Math.PI / 2 && curT >= Math.PI / 2 && dT > 0 && dT < 0.5 && s.v > 20) {
+            s.lap += 1;
+            setLap(s.lap);
+            sfxEvent("lap");
+            if (s.lap >= 3) { finishRace(); }
+          }
+          s.prevT = curT;
+
+          let rank = 1;
+          for (const ai of s.ai) { if (ai.prog > s.prog) rank++; }
+          setPosition(rank);
+
+          for (const gate of s.gates) {
+            if (gate.cd > 0) { gate.cd--; continue; }
+            if (angDiff(curT, gate.a) < 0.05 && dist > RI && dist < RO) {
+              gate.cd = 480;
+              openQuiz();
+              break;
+            }
+          }
+        }
+
+        for (const ai of s.ai) {
+          if (ai.spin > 0) { ai.spin -= dt; ai.v = Math.max(0, ai.v - 200 * dt); }
+          else {
+            const rubber = Math.max(0.86, Math.min(1.14, 1 + (s.prog - ai.prog) * 0.22));
+            const target = ai.baseV * rubber * (ai.itemT < 60 ? 1.3 : 1);
+            ai.v = Math.min(target, ai.v + 130 * dt);
+            if (ai.itemT === 60) {
+              if (Math.random() < 0.5) {
+                s.bananas.push({ x: Math.cos(ai.a) * (R + ai.lat) - Math.sin(ai.a) * 20, y: Math.sin(ai.a) * (R + ai.lat) + Math.cos(ai.a) * 20, life: 1600 });
+              }
+            }
+            if (ai.itemT <= 0) ai.itemT = 500 + Math.random() * 600;
+            ai.itemT--;
+          }
+          ai.a += (ai.v * dt) / (R + ai.lat);
+          if (ai.a > Math.PI * 2) ai.a -= Math.PI * 2;
+          ai.lat = ai.baseLat + Math.sin(now * 0.0005 + ai.phase) * 10;
+          if (ai.a > ai.prog) ai.prog = ai.a;
+          const ax = Math.cos(ai.a) * (R + ai.lat), ay = Math.sin(ai.a) * (R + ai.lat);
+          if (Math.hypot(ax - s.x, ay - s.y) < 16) {
+            if (s.star > 0 && ai.spin <= 0) { ai.spin = 1.2; addPopup(ax, ay, "+40", "#22d3ee"); s.quizScore += 40; setQuizScore(s.quizScore); }
+            else if (s.spin <= 0) { s.v *= 0.82; ai.v *= 0.82; }
+          }
+        }
+
+        s.particles = s.particles.filter((p) => {
+          p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt;
+          p.vz -= 140 * dt;
+          if (p.z < 0) { p.z = 0; p.vz *= -0.3; }
+          p.life -= 1;
+          return p.life > 0;
+        });
+        s.popups = s.popups.filter((p) => { p.sy -= 0.8; p.life--; return p.life > 0; });
+
+        const freq = 65 + (s.v / MAXBASE) * 130 + (s.boost > 0 ? 50 : 0);
+        s.audio.engine(freq, 0.05);
+      } else if (phase !== "race") {
+        s.audio.engine(60, 0);
+      }
+
+      render(now);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [phase, dims, render, finishRace, giveItem, openQuiz, addPopup, sfxEvent]);
+
+  const press = (key: "left" | "right" | "gas" | "brake" | "drift", val: boolean) => ({
+    onPointerDown: (e: React.PointerEvent) => { e.preventDefault(); S.current.touch[key] = val; },
+    onPointerUp: () => { S.current.touch[key] = false; },
+    onPointerLeave: () => { S.current.touch[key] = false; },
+    onPointerCancel: () => { S.current.touch[key] = false; },
+  });
+
+  const btnStyle: React.CSSProperties = {
+    display: "flex", alignItems: "center", justifyContent: "center",
+    background: "rgba(20,22,48,0.82)", border: "2px solid rgba(255,255,255,0.55)",
+    borderRadius: 18, color: "white", fontFamily: "'Righteous', 'Arial Black', sans-serif",
+    userSelect: "none", touchAction: "none", WebkitUserSelect: "none",
+    boxShadow: "0 3px 10px rgba(0,0,0,0.35)",
   };
 
-  // Touch handlers
-  const onTouchStart = useCallback((e: React.TouchEvent) => {
-    e.preventDefault();
-    const t = e.touches[0]; const r = containerRef.current?.getBoundingClientRect();
-    if (!r) return;
-    touch.current = { active: true, sx: t.clientX - r.left, steerX: 0, gas: (t.clientY - r.top) < r.height * 0.55, brake: (t.clientY - r.top) >= r.height * 0.55 };
-  }, []);
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    e.preventDefault(); if (!touch.current.active) return;
-    const t = e.touches[0]; const r = containerRef.current?.getBoundingClientRect(); if (!r) return;
-    const x = t.clientX - r.left, y = t.clientY - r.top;
-    touch.current.steerX = Math.max(-1, Math.min(1, (x - touch.current.sx) / (r.width * 0.1)));
-    touch.current.gas = y < r.height * 0.55; touch.current.brake = y >= r.height * 0.55;
-  }, []);
-  const onTouchEnd = useCallback(() => { touch.current = { active: false, steerX: 0, gas: false, brake: false, sx: 0 }; }, []);
-
-  const ch = CHALLENGES[quizQ];
+  const fmtTime = `${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, "0")}`;
 
   return (
-    <div ref={containerRef} style={{ width: "100vw", height: "100vh", position: "relative", overflow: "hidden", touchAction: "none" }}>
-      <canvas ref={canvasRef} width={dims.w} height={dims.h} style={{ width: "100%", height: "100%", display: "block", touchAction: "none" }}
-        onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} />
+    <div ref={wrapRef} style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden", touchAction: "none", background: "#4aa8ff" }}>
+      <canvas ref={canvasRef} width={dims.w} height={dims.h} style={{ width: "100%", height: "100%", display: "block" }} />
 
-      {/* INSTRUCTIONS OVERLAY */}
-      {showInstructions && (
-        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(5,5,20,0.9)", backdropFilter: "blur(16px)", zIndex: 200 }}>
-          <div style={{ padding: "32px 36px", borderRadius: 24, background: "rgba(15,15,50,0.95)", border: "1px solid rgba(124,58,237,0.4)", maxWidth: 520, width: "92%", textAlign: "center", animation: "popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both" }}>
-            <p style={{ fontFamily: "'Arial Black'", fontSize: 28, fontWeight: 900, color: "white", margin: "0 0 4px" }}>🏁 Language Kart</p>
-            <p style={{ fontFamily: "Arial", fontSize: 13, color: "rgba(255,255,255,0.45)", margin: "0 0 24px" }}>Balapan + Edukasi Bahasa Indonesia</p>
-
-            <div style={{ display: "grid", gap: 12, textAlign: "left", marginBottom: 24 }}>
-              <div style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "10px 14px", borderRadius: 12, background: "rgba(255,255,255,0.04)" }}>
-                <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>⌨️</span>
-                <div>
-                  <p style={{ fontFamily: "'Arial Black'", fontSize: 14, color: "#22d3ee", margin: "0 0 2px" }}>Kontrol</p>
-                  <p style={{ fontFamily: "Arial", fontSize: 12, color: "rgba(255,255,255,0.6)", margin: 0, lineHeight: 1.4 }}>
-                    <b style={{ color: "white" }}>WASD / Panah</b> = Setir kart<br/>
-                    <b style={{ color: "white" }}>Spasi</b> = Drift (belok tajam)<br/>
-                    <b style={{ color: "white" }}>HP</b> = Sentuh kiri/kanan = setir, atas = gas, bawah = rem
-                  </p>
-                </div>
+      {phase === "race" && (
+        <>
+          <div style={{ position: "absolute", top: "calc(10px + env(safe-area-inset-top, 0px))", left: 12, right: 12, display: "flex", justifyContent: "space-between", alignItems: "flex-start", zIndex: 30, pointerEvents: "none", gap: 8 }}>
+            <div style={{ width: "clamp(52px, 9vmin, 68px)", height: "clamp(52px, 9vmin, 68px)", borderRadius: "50%", background: item ? "rgba(30,32,64,0.92)" : "rgba(30,32,64,0.6)", border: `3px solid ${item ? "#FFD34D" : "rgba(255,255,255,0.5)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "clamp(24px, 5vmin, 32px)", boxShadow: item ? "0 0 14px rgba(255,211,77,0.5)" : "none" }}>
+              {item ? ITEMS[item].icon : ""}
+            </div>
+            <div style={{ textAlign: "center", background: "rgba(20,22,48,0.78)", borderRadius: 14, padding: "6px 16px", border: "2px solid rgba(255,255,255,0.35)" }}>
+              <div style={{ fontFamily: "'Righteous', 'Arial Black', sans-serif", fontSize: "clamp(16px, 3.4vmin, 24px)", color: "white", textShadow: "2px 2px 0 #1c1f2b", lineHeight: 1.1 }}>
+                LAP {Math.min(lap + 1, 3)}/3
               </div>
-
-              <div style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "10px 14px", borderRadius: 12, background: "rgba(255,255,255,0.04)" }}>
-                <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>💎</span>
-                <div>
-                  <p style={{ fontFamily: "'Arial Black'", fontSize: 14, color: "#22d3ee", margin: "0 0 2px" }}>Kata Terapung</p>
-                  <p style={{ fontFamily: "Arial", fontSize: 12, color: "rgba(255,255,255,0.6)", margin: 0, lineHeight: 1.4 }}>
-                    <b style={{ color: "#22d3ee" }}>Biru</b> = kata Indonesia yang baik → <b style={{ color: "#22d3ee" }}>+10</b><br/>
-                    <b style={{ color: "#f43f5e" }}>Merah</b> = bahasa gaul/asing → <b style={{ color: "#f43f5e" }}>-6</b> + kart melambat
-                  </p>
-                </div>
-              </div>
-
-              <div style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "10px 14px", borderRadius: 12, background: "rgba(255,255,255,0.04)" }}>
-                <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>❓</span>
-                <div>
-                  <p style={{ fontFamily: "'Arial Black'", fontSize: 14, color: "#facc15", margin: "0 0 2px" }}>Tantangan Bahasa</p>
-                  <p style={{ fontFamily: "Arial", fontSize: 12, color: "rgba(255,255,255,0.6)", margin: 0, lineHeight: 1.4 }}>
-                    Lewati gerbang <b style={{ color: "#facc15" }}>?</b> = quiz muncul.<br/>
-                    Jawab benar = <b style={{ color: "#22c55e" }}>+20 poin + speed boost</b><br/>
-                    Jawab salah = <b style={{ color: "#f43f5e" }}>-5 poin + kart melambat</b>
-                  </p>
-                </div>
-              </div>
-
-              <div style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "10px 14px", borderRadius: 12, background: "rgba(255,255,255,0.04)" }}>
-                <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>⚠️</span>
-                <div>
-                  <p style={{ fontFamily: "'Arial Black'", fontSize: 14, color: "#f97316", margin: "0 0 2px" }}>Rintangan</p>
-                  <p style={{ fontFamily: "Arial", fontSize: 12, color: "rgba(255,255,255,0.6)", margin: 0, lineHeight: 1.4 }}>
-                    Hati-hati dengan <b style={{ color: "#f97316" }}>segi tiga oranye</b> di track!<br/>
-                    Itu rintangan bahasa gaul — nabrak = kart melambat drastis.
-                  </p>
-                </div>
+              <div style={{ fontFamily: "'Righteous', sans-serif", fontSize: "clamp(11px, 2.2vmin, 15px)", color: "#FFD34D", lineHeight: 1.3 }}>
+                🪙 {coinCount}/10 · ⏱ {fmtTime}
               </div>
             </div>
+            <button
+              onClick={() => { const m = !muted; setMuted(m); S.current.audio.setMuted(m); }}
+              style={{ ...btnStyle, width: "clamp(40px, 7vmin, 50px)", height: "clamp(40px, 7vmin, 50px)", borderRadius: "50%", fontSize: 18, pointerEvents: "auto", padding: 0 }}
+              aria-label="Suara"
+            >
+              {muted ? "🔇" : "🔊"}
+            </button>
+          </div>
 
-            <p style={{ fontFamily: "Arial", fontSize: 11, color: "rgba(255,255,255,0.35)", margin: "0 0 18px" }}>🎯 Selesaikan 3 lap dalam 90 detik. Kumpulkan poin sebanyak mungkin!</p>
+          <div style={{ position: "absolute", right: 14, bottom: "calc(14px + env(safe-area-inset-bottom, 0px))", zIndex: 30, pointerEvents: "none", textAlign: "right" }}>
+            <div style={{ fontFamily: "'Righteous', 'Arial Black', sans-serif", fontSize: "clamp(54px, 13vmin, 110px)", lineHeight: 0.9, color: POS_COLORS[Math.min(position - 1, 7)], WebkitTextStroke: "3px #1c1f2b", textShadow: "4px 4px 0 rgba(0,0,0,0.35)" }}>
+              {position}<span style={{ fontSize: "0.45em" }}>{posSuffix(position)}</span>
+            </div>
+          </div>
 
-            <button onClick={() => { setShowInstructions(false); showInstructionsRef.current = false; }}
-              style={{ padding: "16px 40px", borderRadius: 16, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "white", fontFamily: "'Arial Black'", fontSize: 18, fontWeight: 900, cursor: "pointer", letterSpacing: "0.05em", boxShadow: "0 4px 20px rgba(124,58,237,0.4)" }}>
-              MULAI BALAPAN 🏁
+          {isTouch && (
+            <>
+              <div style={{ position: "absolute", left: 12, bottom: "calc(12px + env(safe-area-inset-bottom, 0px))", zIndex: 40, display: "flex", flexDirection: "column", gap: 8 }}>
+                <button {...press("drift", true)} style={{ ...btnStyle, width: 74, height: 44, fontSize: 13 }}>DRIFT</button>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button {...press("left", true)} style={{ ...btnStyle, width: 62, height: 62, fontSize: 26 }}>◀</button>
+                  <button {...press("right", true)} style={{ ...btnStyle, width: 62, height: 62, fontSize: 26 }}>▶</button>
+                </div>
+              </div>
+              <div style={{ position: "absolute", right: 12, bottom: "calc(12px + env(safe-area-inset-bottom, 0px))", zIndex: 40, display: "flex", alignItems: "flex-end", gap: 8, paddingRight: "clamp(60px, 14vmin, 110px)" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <button onPointerDown={(e) => { e.preventDefault(); useItem(); }} style={{ ...btnStyle, width: 56, height: 56, borderRadius: "50%", fontSize: 22 }}>🎁</button>
+                  <button {...press("brake", true)} style={{ ...btnStyle, width: 56, height: 44, fontSize: 12 }}>REM</button>
+                </div>
+                <button {...press("gas", true)} style={{ ...btnStyle, width: 78, height: 78, borderRadius: "50%", fontSize: 15, background: "rgba(34,197,94,0.85)", borderColor: "rgba(255,255,255,0.7)" }}>GAS</button>
+              </div>
+            </>
+          )}
+
+          {!isTouch && (
+            <div style={{ position: "absolute", bottom: 10, left: "50%", transform: "translateX(-50%)", zIndex: 30, pointerEvents: "none", background: "rgba(20,22,48,0.65)", borderRadius: 10, padding: "4px 12px", whiteSpace: "nowrap" }}>
+              <span style={{ fontFamily: "'Righteous', sans-serif", fontSize: 11, color: "rgba(255,255,255,0.75)" }}>
+                W/↑ gas · S/↓ rem · A/D setir · Spasi drift · X item
+              </span>
+            </div>
+          )}
+        </>
+      )}
+
+      {phase === "intro" && (
+        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(10,12,30,0.9)", backdropFilter: "blur(10px)", zIndex: 200, padding: 16 }}>
+          <div style={{ padding: "clamp(20px,4vmin,32px) clamp(20px,4vmin,36px)", borderRadius: 24, background: "rgba(22,24,54,0.96)", border: "2px solid rgba(255,211,77,0.45)", maxWidth: 560, width: "100%", maxHeight: "92vh", overflowY: "auto", textAlign: "center" }}>
+            <p style={{ fontFamily: "'Righteous', 'Arial Black', sans-serif", fontSize: "clamp(24px,5vmin,34px)", fontWeight: 900, color: "#FFD34D", margin: 0, textShadow: "3px 3px 0 #1c1f2b" }}>
+              🏁 GRAND PRIX BAHASA
+            </p>
+            <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: "clamp(12px,2.4vmin,15px)", color: "rgba(255,255,255,0.55)", margin: "4px 0 18px" }}>
+              Language Kart · Sirkuit Prima
+            </p>
+            <div style={{ display: "grid", gap: 10, textAlign: "left", marginBottom: 16 }}>
+              {[
+                ["🏆", "Tujuan", "Selesaikan tiga putaran melawan tujuh pembalap lain dan raih posisi terbaik."],
+                ["🪙", "Koin Kata Baku", "Kumpulkan koin di sirkuit. Setiap koin menambah kecepatan tertinggi dan nilai akhir."],
+                ["🎁", "Kotak Item", "Berisi Jamur Kilat, Pisang, Cangkang Hijau, Cangkang Merah, dan Bintang. Gunakan dengan tombol X atau tombol item."],
+                ["🍌", "Jebakan", "Pisang membuat kart terpeleset dan kehilangan tiga koin. Bintang membuatmu kebal sementara."],
+                ["❓", "Gerbang Tantangan", "Lewati lingkaran emas untuk menjawab masalah berbahasa. Jawaban tepat memberi 25 poin dan dorongan kecepatan."],
+                ["⚡", "Drift Mini-Turbo", "Tahan drift saat berbelok; percikan biru, oranye, lalu ungu. Lepaskan untuk dorongan ekstra."],
+              ].map(([ic, tt, dd]) => (
+                <div key={tt} style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "9px 13px", borderRadius: 12, background: "rgba(255,255,255,0.05)" }}>
+                  <span style={{ fontSize: 20, flexShrink: 0 }}>{ic}</span>
+                  <div>
+                    <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 13, color: "#FFD34D", margin: "0 0 2px" }}>{tt}</p>
+                    <p style={{ fontFamily: "Arial, sans-serif", fontSize: 12, color: "rgba(255,255,255,0.72)", margin: 0, lineHeight: 1.45 }}>{dd}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p style={{ fontFamily: "Arial, sans-serif", fontSize: 11, color: "rgba(255,255,255,0.45)", margin: "0 0 16px" }}>
+              {isTouch
+                ? "Layar sentuh: gunakan tombol di layar — kiri/kanan untuk setir, GAS untuk melaju, DRIFT untuk belokan tajam."
+                : "Papan ketik: W/↑ gas · S/↓ rem · A/D atau ←/→ setir · Spasi drift · X item"}
+            </p>
+            <button onClick={startRace} style={{ padding: "15px 42px", borderRadius: 16, background: "linear-gradient(135deg, #f97316, #ef4444)", border: "none", color: "white", fontFamily: "'Righteous', 'Arial Black', sans-serif", fontSize: 19, fontWeight: 900, cursor: "pointer", letterSpacing: "0.04em", boxShadow: "0 5px 22px rgba(239,68,68,0.45)" }}>
+              MULAI BALAPAN
             </button>
           </div>
         </div>
       )}
 
-      {/* HUD */}
-      <div style={{ position: "absolute", top: 10, left: 10, right: 10, display: "flex", justifyContent: "space-between", gap: 6, zIndex: 30, pointerEvents: "none", flexWrap: "wrap" }}>
-        {[{ l: "SKOR", v: raceScore, c: "#22d3ee", i: "★" }, { l: "WAKTU", v: `${time}s`, c: time <= 10 ? "#ef4444" : "#f43f5e", i: "⏱" }, { l: "POS", v: `${position}/4`, c: "#a855f7", i: "🏁" }, { l: "LAP", v: `${Math.min(lap + 1, 3)}/3`, c: "#22c55e", i: "🔄" }, { l: "BENAR", v: correctCount, c: "#facc15", i: "📝" }].map(it => (
-          <div key={it.l} style={{ padding: "4px 10px", borderRadius: 10, background: "rgba(10,10,30,0.88)", border: `1px solid ${it.c}40`, backdropFilter: "blur(12px)", display: "flex", alignItems: "center", gap: 5 }}>
-            <span style={{ fontSize: 12 }}>{it.i}</span>
-            <div><div style={{ fontFamily: "Arial", fontSize: 7, color: "rgba(255,255,255,0.4)", fontWeight: 700, letterSpacing: "0.1em" }}>{it.l}</div>
-              <div style={{ fontFamily: "'Arial Black'", fontSize: 12, color: it.c, fontWeight: 900, lineHeight: 1 }}>{it.v}</div></div>
+      {phase === "count" && (
+        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", zIndex: 150, pointerEvents: "none" }}>
+          <div style={{ display: "flex", gap: 18, marginBottom: 20 }}>
+            {[1, 2, 3].map((n) => (
+              <div key={n} style={{ width: "clamp(30px,7vmin,48px)", height: "clamp(30px,7vmin,48px)", borderRadius: "50%", background: cdStep <= 3 - n + 1 ? "#ef4444" : "rgba(40,40,60,0.7)", border: "3px solid rgba(255,255,255,0.6)", boxShadow: cdStep <= 3 - n + 1 ? "0 0 24px rgba(239,68,68,0.8)" : "none" }} />
+            ))}
           </div>
-        ))}
-      </div>
-
-      {/* Speed */}
-      <div style={{ position: "absolute", bottom: 32, left: 10, zIndex: 30, display: "flex", alignItems: "center", gap: 5, padding: "4px 8px", borderRadius: 8, background: "rgba(10,10,30,0.85)", border: "1px solid rgba(124,58,237,0.3)" }}>
-        <span style={{ fontFamily: "'Arial Black'", fontSize: 7, color: "rgba(255,255,255,0.4)", letterSpacing: "0.1em" }}>SPD</span>
-        <div style={{ width: 70, height: 5, borderRadius: 3, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
-          <div style={{ width: `${Math.min(speed * 118, 100)}%`, height: "100%", borderRadius: 3, background: drifting ? "linear-gradient(90deg,#f97316,#ef4444)" : "linear-gradient(90deg,#22c55e,#06b6d4)", transition: "width 0.08s", boxShadow: drifting ? "0 0 8px #f97316" : "0 0 8px #22c55e" }} />
-        </div>
-        {drifting && <span style={{ fontFamily: "'Arial Black'", fontSize: 8, color: "#f97316", textShadow: "0 0 8px #f97316" }}>DRIFT!</span>}
-        {S.current.boostTimer > 0 && <span style={{ fontFamily: "'Arial Black'", fontSize: 8, color: "#22d3ee", textShadow: "0 0 8px #22d3ee" }}>BOOST!</span>}
-      </div>
-
-      {!over && !quizActive && (
-        <div style={{ position: "absolute", bottom: 6, left: "50%", transform: "translateX(-50%)", zIndex: 30, padding: "2px 8px", borderRadius: 6, background: "rgba(10,10,30,0.6)", whiteSpace: "nowrap" }}>
-          <span style={{ fontFamily: "Arial", fontSize: 8, color: "rgba(255,255,255,0.3)" }}>WASD/Arrows · Spasi drift · Kumpul kata (+10) · Hindari bahasa asing (-6) · Lewati ? untuk quiz (+20)</span>
+          {cdStep === 0 && (
+            <p style={{ fontFamily: "'Righteous', 'Arial Black', sans-serif", fontSize: "clamp(40px,10vmin,80px)", color: "#4ade80", textShadow: "4px 4px 0 #1c1f2b", margin: 0, animation: "popIn 0.3s both" }}>
+              MULAI!
+            </p>
+          )}
         </div>
       )}
 
-      {/* QUIZ OVERLAY */}
-      {quizActive && (
-        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(5,5,20,0.85)", backdropFilter: "blur(12px)", zIndex: 100 }}>
-          <div style={{ padding: "28px 32px", borderRadius: 20, background: "rgba(15,15,50,0.95)", border: "1px solid rgba(250,204,21,0.4)", maxWidth: 560, width: "92%", animation: "popIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both" }}>
-            {/* Timer bar */}
-            <div style={{ width: "100%", height: 5, borderRadius: 3, background: "rgba(255,255,255,0.1)", marginBottom: 18 }}>
-              <div style={{ width: `${(quizTimer / 20) * 100}%`, height: "100%", borderRadius: 3, background: quizTimer <= 5 ? "#ef4444" : "#facc15", transition: "width 1s linear" }} />
+      {quizOpen && (
+        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(8,10,26,0.86)", backdropFilter: "blur(10px)", zIndex: 300, padding: 14 }}>
+          <div style={{ padding: "clamp(18px,3.5vmin,28px) clamp(18px,3.5vmin,32px)", borderRadius: 20, background: "rgba(24,26,58,0.97)", border: "2px solid rgba(250,204,21,0.5)", maxWidth: 600, width: "100%", maxHeight: "92vh", overflowY: "auto", animation: "popIn 0.3s both" }}>
+            <div style={{ width: "100%", height: 5, borderRadius: 3, background: "rgba(255,255,255,0.1)", marginBottom: 16 }}>
+              <div style={{ width: `${(quizTimer / 25) * 100}%`, height: "100%", borderRadius: 3, background: quizTimer <= 6 ? "#ef4444" : "#facc15", transition: "width 1s linear" }} />
             </div>
-
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <span style={{ fontFamily: "'Arial Black'", fontSize: 13, color: "#facc15", letterSpacing: "0.08em" }}>TANTANGAN BAHASA</span>
-              <span style={{ fontFamily: "'Arial Black'", fontSize: 18, color: quizTimer <= 5 ? "#ef4444" : "#facc15" }}>{quizTimer}s</span>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <span style={{ fontFamily: "'Righteous', sans-serif", fontSize: 13, color: "#facc15", letterSpacing: "0.06em" }}>GERBANG TANTANGAN</span>
+              <span style={{ fontFamily: "'Righteous', sans-serif", fontSize: 18, color: quizTimer <= 6 ? "#ef4444" : "#facc15" }}>{quizTimer}s</span>
             </div>
-
-            <p style={{ fontFamily: "'Arial Black'", fontSize: 20, color: "white", margin: "0 0 20px", lineHeight: 1.4 }}>{ch.q}</p>
-
-            <div style={{ display: "grid", gap: 10 }}>
+            <p style={{ fontFamily: "'Righteous', 'Arial Black', sans-serif", fontSize: "clamp(16px,3vmin,20px)", color: "white", margin: "0 0 18px", lineHeight: 1.45 }}>{ch.q}</p>
+            <div style={{ display: "grid", gap: 9 }}>
               {ch.opts.map((opt, i) => {
                 let bg = "rgba(255,255,255,0.06)";
-                let border = "rgba(255,255,255,0.1)";
-                let txtColor = "rgba(255,255,255,0.85)";
+                let border = "rgba(255,255,255,0.12)";
+                let txt = "rgba(255,255,255,0.88)";
                 if (quizAnswered) {
-                  if (i === ch.ans) { bg = "rgba(34,197,94,0.2)"; border = "#22c55e"; txtColor = "#22c55e"; }
-                  else if (i === selectedOpt && i !== ch.ans) { bg = "rgba(239,68,68,0.2)"; border = "#ef4444"; txtColor = "#ef4444"; }
-                } else if (i === selectedOpt) { bg = "rgba(250,204,21,0.15)"; border = "#facc15"; }
+                  if (i === ch.ans) { bg = "rgba(34,197,94,0.18)"; border = "#22c55e"; txt = "#4ade80"; }
+                  else if (i === quizSelected && i !== ch.ans) { bg = "rgba(239,68,68,0.18)"; border = "#ef4444"; txt = "#f87171"; }
+                }
                 return (
                   <button key={i} onClick={() => !quizAnswered && answerQuiz(i)} disabled={quizAnswered}
-                    style={{ padding: "14px 18px", borderRadius: 12, background: bg, border: `1px solid ${border}`, color: txtColor, fontFamily: "Arial", fontSize: 15, fontWeight: 600, textAlign: "left", cursor: quizAnswered ? "default" : "pointer", transition: "all 0.15s", lineHeight: 1.3 }}>
-                    <span style={{ fontFamily: "'Arial Black'", fontSize: 13, color: "rgba(255,255,255,0.35)", marginRight: 10 }}>{String.fromCharCode(65 + i)}.</span>
+                    style={{ padding: "13px 16px", borderRadius: 12, background: bg, border: `1.5px solid ${border}`, color: txt, fontFamily: "Arial, sans-serif", fontSize: "clamp(13px,2.4vmin,15px)", fontWeight: 600, textAlign: "left", cursor: quizAnswered ? "default" : "pointer", lineHeight: 1.4 }}>
+                    <span style={{ fontFamily: "'Righteous', sans-serif", color: "rgba(255,255,255,0.35)", marginRight: 10 }}>{String.fromCharCode(65 + i)}.</span>
                     {opt}
                   </button>
                 );
               })}
             </div>
-
             {quizAnswered && (
               <>
-                <div style={{ marginTop: 16, padding: "12px 16px", borderRadius: 12, background: selectedOpt >= 0 && selectedOpt === ch.ans ? "rgba(34,197,94,0.1)" : "rgba(239,68,68,0.1)", border: `1px solid ${selectedOpt >= 0 && selectedOpt === ch.ans ? "#22c55e44" : "#ef444444"}` }}>
-                  <p style={{ fontFamily: "'Arial Black'", fontSize: 14, color: selectedOpt >= 0 && selectedOpt === ch.ans ? "#22c55e" : "#ef4444", margin: 0, fontWeight: 900 }}>
-                    {selectedOpt >= 0 && selectedOpt === ch.ans ? "✓ Benar! +20 poin" : (selectedOpt < 0 ? "WAKTU HABIS!" : "✗ Salah! -5 poin")}
+                <div style={{ marginTop: 15, padding: "12px 15px", borderRadius: 12, background: quizSelected === ch.ans ? "rgba(34,197,94,0.1)" : "rgba(239,68,68,0.1)", border: `1px solid ${quizSelected === ch.ans ? "#22c55e55" : "#ef444455"}` }}>
+                  <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 14, color: quizSelected === ch.ans ? "#4ade80" : "#f87171", margin: 0 }}>
+                    {quizSelected === ch.ans ? "Tepat! +25 poin" : quizSelected < 0 ? "Waktu habis. -10 poin" : "Belum tepat. -10 poin"}
                   </p>
-                  <p style={{ fontFamily: "Arial", fontSize: 13, color: "rgba(255,255,255,0.6)", margin: "6px 0 0", lineHeight: 1.4 }}>{ch.tip}</p>
+                  <p style={{ fontFamily: "Arial, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.65)", margin: "6px 0 0", lineHeight: 1.5 }}>{ch.tip}</p>
                 </div>
-                <button onClick={continueQuiz} style={{ marginTop: 14, width: "100%", padding: "14px 0", borderRadius: 12, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "white", fontFamily: "'Arial Black'", fontSize: 15, fontWeight: 900, cursor: "pointer", letterSpacing: "0.05em" }}>
-                  LANJUTKAN → (atau tekan Enter)
+                <button onClick={continueQuiz} style={{ marginTop: 14, width: "100%", padding: "14px 0", borderRadius: 12, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "white", fontFamily: "'Righteous', sans-serif", fontSize: 16, fontWeight: 900, cursor: "pointer", letterSpacing: "0.04em" }}>
+                  LANJUTKAN BALAPAN (Enter)
                 </button>
               </>
             )}
@@ -870,19 +1300,45 @@ export default function KartRace3D({
         </div>
       )}
 
-      {over && (
-        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "rgba(5,5,20,0.88)", backdropFilter: "blur(16px)", zIndex: 50 }}>
-          <div style={{ padding: "28px 40px", borderRadius: 20, background: "rgba(15,15,45,0.95)", border: "1px solid rgba(124,58,237,0.5)", textAlign: "center", animation: "popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both" }}>
-            <p style={{ fontFamily: "'Arial Black'", fontSize: "2.2rem", fontWeight: 900, color: "white", margin: 0 }}>SELESAI!</p>
-            <div style={{ display: "flex", gap: 24, justifyContent: "center", margin: "14px 0" }}>
-              <div><p style={{ fontFamily: "Arial", fontSize: 9, color: "rgba(255,255,255,0.4)", margin: 0 }}>SKOR</p><p style={{ fontFamily: "'Arial Black'", fontSize: "1.4rem", color: "#22d3ee", fontWeight: 900, margin: 0 }}>{raceScore}</p></div>
-              <div><p style={{ fontFamily: "Arial", fontSize: 9, color: "rgba(255,255,255,0.4)", margin: 0 }}>BENAR</p><p style={{ fontFamily: "'Arial Black'", fontSize: "1.4rem", color: "#22c55e", fontWeight: 900, margin: 0 }}>{correctCount}</p></div>
+      {phase === "results" && (
+        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(8,10,26,0.9)", backdropFilter: "blur(12px)", zIndex: 250, padding: 16 }}>
+          <div style={{ padding: "clamp(22px,4vmin,34px) clamp(22px,4vmin,42px)", borderRadius: 24, background: "rgba(24,26,58,0.97)", border: "2px solid rgba(255,211,77,0.5)", maxWidth: 460, width: "100%", textAlign: "center", animation: "popIn 0.45s both", maxHeight: "92vh", overflowY: "auto" }}>
+            <p style={{ fontFamily: "'Righteous', 'Arial Black', sans-serif", fontSize: "clamp(28px,6vmin,40px)", color: "#FFD34D", margin: 0, textShadow: "3px 3px 0 #1c1f2b" }}>
+              {result.position === 1 ? "🏆 JUARA!" : "FINIS!"}
+            </p>
+            <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: "clamp(15px,3vmin,20px)", color: "white", margin: "8px 0 4px" }}>
+              Posisi {result.position}<span style={{ fontSize: "0.6em" }}>{posSuffix(result.position)}</span> dari 8 pembalap
+            </p>
+            <div style={{ display: "grid", gap: 6, margin: "16px 0", textAlign: "left", background: "rgba(255,255,255,0.05)", borderRadius: 14, padding: "14px 18px" }}>
+              {[
+                [`Koin kata baku (${result.coins})`, `+${result.coins * 15}`],
+                ["Tantangan terjawab tepat", `${result.correct} benar`],
+                ["Bonus posisi", "sesuai peringkat"],
+              ].map(([a, b]) => (
+                <div key={a} style={{ display: "flex", justifyContent: "space-between", fontFamily: "Arial, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.75)" }}>
+                  <span>{a}</span>
+                  <span style={{ color: "#FFD34D", fontWeight: 700 }}>{b}</span>
+                </div>
+              ))}
             </div>
+            <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: "clamp(26px,5.4vmin,38px)", color: "#4ade80", margin: "0 0 10px", textShadow: "2px 2px 0 #1c1f2b" }}>
+              Skor: {result.score}
+            </p>
+            <p style={{ fontFamily: "Arial, sans-serif", fontSize: 12.5, color: "rgba(255,255,255,0.6)", margin: "0 0 18px", lineHeight: 1.5 }}>
+              {result.position === 1
+                ? "Luar biasa! Kepekaanmu memilih kata dan menyusun strategi menunjukkan kesadaran berbahasa yang matang."
+                : result.position <= 3
+                  ? "Hebat! Sedikit lagi menuju puncak. Terus asah kepekaan berbahasamu."
+                  : "Proses yang baik. Setiap tantangan yang kamu jawab membuatmu makin teliti dalam berbahasa."}
+            </p>
+            <button onClick={() => onComplete(result.score, result.correct, result.position)} style={{ width: "100%", padding: "15px 0", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "white", fontFamily: "'Righteous', sans-serif", fontSize: 16, fontWeight: 900, cursor: "pointer", letterSpacing: "0.04em" }}>
+              SIMPAN HASIL
+            </button>
           </div>
         </div>
       )}
 
-      <style>{`@keyframes popIn{0%{opacity:0;transform:scale(0.85)}100%{opacity:1;transform:scale(1)}}`}</style>
+      <style>{`@keyframes popIn{0%{opacity:0;transform:scale(0.8)}100%{opacity:1;transform:scale(1)}}`}</style>
     </div>
   );
 }
