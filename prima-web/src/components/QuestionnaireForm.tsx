@@ -68,53 +68,63 @@ export function QuestionnaireForm({
   const groups = groupByDimension(items, dimensionByItem);
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form action={formAction}>
       {state?.error ? (
-        <p className="rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-          {state.error}
-        </p>
+        <div style={{
+          padding: "10px 14px", borderRadius: "10px", marginBottom: "16px",
+          background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.2)",
+          fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 700, color: "#fca5a5",
+        }}>⚠️ {state.error}</div>
       ) : null}
 
-      <p className="rounded-lg bg-gray-50 px-4 py-3 text-sm text-gray-700">{instructions}</p>
+      <p style={{
+        padding: "10px 14px", borderRadius: "10px", marginBottom: "16px",
+        background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)",
+        fontFamily: "'Nunito', sans-serif", fontSize: "0.75rem", fontWeight: 600,
+        color: "rgba(255,255,255,0.6)",
+      }}>{instructions}</p>
 
       {groups.map((group, gi) => (
-        <div key={gi} className="space-y-4">
+        <div key={gi} style={{ marginBottom: "20px" }}>
           {group.label ? (
-            <p className="text-sm font-bold uppercase tracking-wide text-red-800">
-              {group.label}
-            </p>
+            <p style={{
+              fontFamily: "'Nunito', sans-serif", fontSize: "0.7rem", fontWeight: 800,
+              letterSpacing: "0.08em", color: "#f472b6", textTransform: "uppercase",
+              marginBottom: "12px",
+            }}>{group.label}</p>
           ) : null}
           {group.items.map((item) => (
-            <div
-              key={item.id}
-              className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
-            >
-              <p className="font-medium text-gray-900">
-                {item.id}. {item.statement}
-              </p>
-              <div className="mt-3 grid grid-cols-4 gap-2">
+            <div key={item.id} style={{
+              padding: "14px", borderRadius: "14px", marginBottom: "10px",
+              background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)",
+            }}>
+              <p style={{
+                fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 700,
+                color: "rgba(255,255,255,0.9)", margin: 0, lineHeight: 1.5,
+              }}>{item.id}. {item.statement}</p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "6px", marginTop: "10px" }}>
                 {options.map((opt) => {
                   const active = selected[item.id] === opt.value;
                   return (
-                    <label
-                      key={opt.value}
-                      className={`flex cursor-pointer items-center justify-center rounded-lg border-2 px-2 py-2 text-sm font-semibold transition ${
-                        active
-                          ? "border-red-600 bg-red-50 text-red-700"
-                          : "border-gray-300 text-gray-600 hover:border-gray-400"
-                      }`}
-                    >
+                    <label key={opt.value} style={{
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      padding: "8px 4px", borderRadius: "10px", cursor: "pointer",
+                      border: active ? "2px solid #f43f5e" : "1px solid rgba(255,255,255,0.08)",
+                      background: active ? "rgba(244,63,94,0.15)" : "rgba(255,255,255,0.03)",
+                      transition: "all 0.2s",
+                    }}>
                       <input
                         type="radio"
                         name={`${namePrefix}${item.id}`}
                         value={opt.value}
                         required
-                        onChange={() =>
-                          setSelected((prev) => ({ ...prev, [item.id]: opt.value }))
-                        }
-                        className="sr-only"
+                        onChange={() => setSelected((prev) => ({ ...prev, [item.id]: opt.value }))}
+                        style={{ display: "none" }}
                       />
-                      {opt.label}
+                      <span style={{
+                        fontFamily: "'Nunito', sans-serif", fontSize: "0.7rem", fontWeight: 700,
+                        color: active ? "#f472b6" : "rgba(255,255,255,0.5)",
+                      }}>{opt.label}</span>
                     </label>
                   );
                 })}
@@ -124,17 +134,23 @@ export function QuestionnaireForm({
         </div>
       ))}
 
-      <div className="flex items-center gap-4">
-        <div className="flex-1">
+      <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "16px" }}>
+        <div style={{ flex: 1 }}>
           <SubmitButton label={submitLabel} pendingLabel="Menyimpan…" />
         </div>
         {!allAnswered ? (
-          <p className="text-xs text-gray-500">
-            {items.length - answeredCount} pernyataan belum dijawab
-          </p>
+          <p style={{
+            fontFamily: "'Nunito', sans-serif", fontSize: "0.65rem", fontWeight: 700,
+            color: "rgba(255,255,255,0.4)",
+          }}>{items.length - answeredCount} belum dijawab</p>
         ) : null}
       </div>
-      {pending ? <p className="text-center text-sm text-gray-500">Menyimpan data…</p> : null}
+      {pending ? (
+        <p style={{
+          textAlign: "center", fontFamily: "'Nunito', sans-serif", fontSize: "0.75rem",
+          fontWeight: 600, color: "rgba(255,255,255,0.4)", marginTop: "8px",
+        }}>Menyimpan data…</p>
+      ) : null}
     </form>
   );
 }

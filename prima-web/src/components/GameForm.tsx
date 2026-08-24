@@ -71,99 +71,142 @@ export function GameForm({
     });
   }
 
+  const cardStyle: React.CSSProperties = {
+    padding: "18px", borderRadius: "16px",
+    background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)",
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between text-sm text-gray-500">
-        <span>
+    <div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+        <span style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.75rem", fontWeight: 700, color: "rgba(255,255,255,0.5)" }}>
           Kasus {Math.min(index + 1, QUIZ_SCENARIOS.length + 1)} dari {QUIZ_SCENARIOS.length + 1}
         </span>
-        <span>Skor sementara: {correctCount}</span>
+        <span style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.75rem", fontWeight: 700, color: "#c084fc" }}>
+          Skor: {correctCount}
+        </span>
       </div>
 
       {!isReflection ? (
-        <div key={scenario.id} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <span className="inline-block rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
-            {scenario.construct}
-          </span>
-          <h2 className="mt-3 text-lg font-bold text-gray-900">{scenario.caseType}</h2>
-          <p className="mt-1 text-sm text-gray-600">{scenario.task}</p>
-          <p className="mt-3 rounded-lg bg-gray-50 px-4 py-3 italic text-gray-700">
-            {scenario.situation}
-          </p>
+        <div key={scenario.id} style={cardStyle}>
+          <span style={{
+            display: "inline-block", padding: "3px 10px", borderRadius: "8px",
+            background: "rgba(244,63,94,0.15)", fontFamily: "'Nunito', sans-serif",
+            fontSize: "0.65rem", fontWeight: 700, color: "#f472b6",
+          }}>{scenario.construct}</span>
+          <h2 style={{
+            fontFamily: "'Righteous', 'Arial Black', Impact, sans-serif",
+            fontSize: "1.1rem", fontWeight: 900, color: "white", margin: "10px 0 0",
+          }}>{scenario.caseType}</h2>
+          <p style={{
+            fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 600,
+            color: "rgba(255,255,255,0.6)", margin: "6px 0 0",
+          }}>{scenario.task}</p>
+          <div style={{
+            padding: "12px 14px", borderRadius: "10px", marginTop: "12px",
+            background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)",
+            fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 600,
+            color: "rgba(255,255,255,0.75)", lineHeight: 1.6, fontStyle: "italic",
+          }}>{scenario.situation}</div>
 
-          <div className="mt-4 space-y-3">
+          <div style={{ marginTop: "14px", display: "flex", flexDirection: "column", gap: "8px" }}>
             {scenario.options.map((opt) => {
               const isChosen = chosen === opt.key;
-              let style = "border-gray-300 hover:border-gray-400";
+              let border = "1px solid rgba(255,255,255,0.08)";
+              let bg = "rgba(255,255,255,0.03)";
+              let textColor = "rgba(255,255,255,0.7)";
+              let badgeBg = "rgba(255,255,255,0.1)";
               if (locked) {
-                if (opt.correct) style = "border-green-600 bg-green-50 text-green-800";
-                else if (isChosen) style = "border-red-600 bg-red-50 text-red-800";
-                else style = "border-gray-200 opacity-60";
+                if (opt.correct) { border = "2px solid #10b981"; bg = "rgba(16,185,129,0.12)"; textColor = "#34d399"; badgeBg = "rgba(16,185,129,0.2)"; }
+                else if (isChosen) { border = "2px solid #f43f5e"; bg = "rgba(244,63,94,0.12)"; textColor = "#fb7185"; badgeBg = "rgba(244,63,94,0.2)"; }
+                else { opacity: 0.4 }
               } else if (isChosen) {
-                style = "border-red-600 bg-red-50 text-red-700";
+                border = "2px solid #f43f5e"; bg = "rgba(244,63,94,0.12)"; textColor = "#fb7185";
               }
               return (
-                <button
-                  key={opt.key}
-                  type="button"
-                  onClick={() => choose(opt.key)}
-                  disabled={locked}
-                  className={`flex w-full items-start gap-3 rounded-lg border-2 px-4 py-3 text-left text-sm transition ${style} disabled:cursor-not-allowed`}
+                <button key={opt.key} type="button" onClick={() => choose(opt.key)} disabled={locked}
+                  style={{
+                    display: "flex", alignItems: "flex-start", gap: "10px",
+                    padding: "12px 14px", borderRadius: "12px", border, background: bg,
+                    cursor: locked ? "not-allowed" : "pointer", textAlign: "left",
+                    transition: "all 0.2s", opacity: locked && !opt.correct && !isChosen ? 0.4 : 1,
+                  }}
                 >
-                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-bold text-gray-700">
-                    {opt.key.toUpperCase()}
-                  </span>
-                  <span>{opt.text}</span>
+                  <span style={{
+                    width: "26px", height: "26px", borderRadius: "50%", flexShrink: 0,
+                    background: badgeBg, display: "flex", alignItems: "center", justifyContent: "center",
+                    fontFamily: "'Righteous', sans-serif", fontSize: "0.7rem", fontWeight: 900, color: textColor,
+                  }}>{opt.key.toUpperCase()}</span>
+                  <span style={{
+                    fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 600,
+                    color: textColor, lineHeight: 1.5,
+                  }}>{opt.text}</span>
                 </button>
               );
             })}
           </div>
 
           {locked ? (
-            <div className="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-900">
-              <p className="font-semibold">
+            <div style={{
+              marginTop: "14px", padding: "12px 14px", borderRadius: "12px",
+              background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.15)",
+            }}>
+              <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 700, color: "#fbbf24", margin: 0 }}>
                 {chosen && scenario.options.find((o) => o.key === chosen)?.correct
                   ? "Tepat! Pilihanmu sesuai konteks."
                   : "Coba perhatikan kembali konteksnya."}
               </p>
-              <p className="mt-1">{scenario.feedback}</p>
+              <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.75rem", fontWeight: 600, color: "rgba(255,255,255,0.6)", margin: "6px 0 0", lineHeight: 1.5 }}>
+                {scenario.feedback}
+              </p>
             </div>
           ) : null}
 
           {locked ? (
-            <button
-              type="button"
-              onClick={next}
-              className="mt-4 rounded-lg bg-red-700 px-6 py-2.5 font-semibold text-white transition hover:bg-red-800"
-            >
+            <button type="button" onClick={next} style={{
+              marginTop: "14px", padding: "10px 24px", borderRadius: "12px",
+              fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 800,
+              color: "white", border: "none", cursor: "pointer",
+              background: "linear-gradient(135deg, #7c3aed, #a855f7)",
+              boxShadow: "0 3px 0 #5b21b6, 0 4px 12px rgba(124,58,237,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
+            }}>
               {index < QUIZ_SCENARIOS.length - 1 ? "Kasus Berikutnya →" : "Lanjut ke Refleksi →"}
             </button>
           ) : null}
         </div>
       ) : (
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <span className="inline-block rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
-            REFLECT — Why Did You Choose It?
-          </span>
-          <h2 className="mt-3 text-lg font-bold text-gray-900">Refleksi Pilihan Bahasa</h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Jawablah keempat pertanyaan berikut untuk mengubah kuis menjadi proses language awareness.
-          </p>
+        <div style={cardStyle}>
+          <span style={{
+            display: "inline-block", padding: "3px 10px", borderRadius: "8px",
+            background: "rgba(139,92,246,0.15)", fontFamily: "'Nunito', sans-serif",
+            fontSize: "0.65rem", fontWeight: 700, color: "#c084fc",
+          }}>REFLECT — Why Did You Choose It?</span>
+          <h2 style={{
+            fontFamily: "'Righteous', 'Arial Black', Impact, sans-serif",
+            fontSize: "1.1rem", fontWeight: 900, color: "white", margin: "10px 0 0",
+          }}>Refleksi Pilihan Bahasa</h2>
+          <p style={{
+            fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 600,
+            color: "rgba(255,255,255,0.6)", margin: "6px 0 0",
+          }}>Jawablah keempat pertanyaan berikut untuk mengubah kuis menjadi proses language awareness.</p>
 
-          <div className="mt-4 space-y-4">
+          <div style={{ marginTop: "14px", display: "flex", flexDirection: "column", gap: "12px" }}>
             {reflectionQuestions.map((q, i) => (
               <div key={i}>
-                <label className="mb-1 block text-sm font-semibold text-gray-700">
-                  {i + 1}. {q}
-                </label>
+                <label style={{
+                  fontFamily: "'Nunito', sans-serif", fontSize: "0.75rem", fontWeight: 700,
+                  color: "rgba(255,255,255,0.8)", display: "block", marginBottom: "6px",
+                }}>{i + 1}. {q}</label>
                 <textarea
-                  ref={(el) => {
-                    reflectionRefs.current[i] = el;
+                  ref={(el) => { reflectionRefs.current[i] = el; }}
+                  rows={3} required placeholder="Tuliskan jawabanmu…"
+                  style={{
+                    width: "100%", borderRadius: "10px", padding: "10px 14px",
+                    fontSize: "0.8rem", fontWeight: 600, color: "white",
+                    background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
+                    outline: "none", resize: "vertical", boxSizing: "border-box",
+                    fontFamily: "'Nunito', sans-serif",
                   }}
-                  rows={3}
-                  required
-                  placeholder="Tuliskan jawabanmu…"
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-200"
                 />
               </div>
             ))}
@@ -172,31 +215,35 @@ export function GameForm({
       )}
 
       {error ? (
-        <p className="rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</p>
+        <div style={{
+          marginTop: "12px", padding: "10px 14px", borderRadius: "10px",
+          background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.2)",
+          fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 700, color: "#fca5a5",
+        }}>⚠️ {error}</div>
       ) : null}
 
       {isReflection ? (
-        <div className="flex flex-col gap-3">
-          <button
-            type="button"
-            onClick={submit}
-            disabled={isPending}
-            className="w-full rounded-lg bg-red-700 px-6 py-3 font-semibold text-white transition hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-50"
-          >
+        <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
+          <button type="button" onClick={submit} disabled={isPending} style={{
+            width: "100%", padding: "12px", borderRadius: "12px",
+            fontFamily: "'Nunito', sans-serif", fontSize: "0.85rem", fontWeight: 800,
+            color: "white", border: "none", cursor: isPending ? "not-allowed" : "pointer",
+            opacity: isPending ? 0.5 : 1,
+            background: "linear-gradient(135deg, #7c3aed, #a855f7)",
+            boxShadow: "0 3px 0 #5b21b6, 0 4px 12px rgba(124,58,237,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
+          }}>
             {isPending ? "Menyimpan…" : "Selesai Kuis → Lanjut ke Posttest"}
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              setIndex(QUIZ_SCENARIOS.length - 1);
-              setChosen(selections[QUIZ_SCENARIOS[QUIZ_SCENARIOS.length - 1].id] ?? null);
-              setLocked(true);
-              setError(null);
-            }}
-            className="text-sm font-medium text-gray-500 underline hover:text-gray-700"
-          >
-            ← Kembali ke kasus sebelumnya
-          </button>
+          <button type="button" onClick={() => {
+            setIndex(QUIZ_SCENARIOS.length - 1);
+            setChosen(selections[QUIZ_SCENARIOS[QUIZ_SCENARIOS.length - 1].id] ?? null);
+            setLocked(true);
+            setError(null);
+          }} style={{
+            fontFamily: "'Nunito', sans-serif", fontSize: "0.7rem", fontWeight: 700,
+            color: "rgba(255,255,255,0.4)", background: "none", border: "none",
+            cursor: "pointer", textDecoration: "underline",
+          }}>← Kembali ke kasus sebelumnya</button>
         </div>
       ) : null}
     </div>

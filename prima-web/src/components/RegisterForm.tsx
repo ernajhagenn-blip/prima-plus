@@ -19,83 +19,91 @@ export function RegisterForm() {
   const selectedKelas = showCustom ? customKelas : kelas;
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form action={formAction}>
       {state?.error ? (
-        <div className="rounded-xl border-2 border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-600">
-          ⚠️ {state.error}
-        </div>
+        <div style={{
+          padding: "10px 14px", borderRadius: "10px", marginBottom: "12px",
+          background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.2)",
+          fontFamily: "'Nunito', sans-serif", fontSize: "0.75rem", fontWeight: 700, color: "#fca5a5",
+        }}>⚠️ {state.error}</div>
       ) : null}
 
-      <div>
-        <label className="mb-1.5 block text-sm font-black text-gray-800">👤 Nama Lengkap</label>
-        <input
-          name="name"
-          type="text"
-          required
-          placeholder="Tulis nama kamu..."
-          className="w-full rounded-xl border-2 border-cyan-200 bg-white/80 px-4 py-3 text-sm font-semibold text-gray-800 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+      <div style={{ marginBottom: "10px" }}>
+        <label style={{
+          fontFamily: "'Nunito', sans-serif", fontSize: "0.7rem", fontWeight: 800,
+          color: "rgba(255,255,255,0.7)", display: "block", marginBottom: "6px",
+        }}>👤 Nama Lengkap</label>
+        <input name="name" type="text" required placeholder="Tulis nama kamu..."
+          style={{
+            width: "100%", borderRadius: "10px", padding: "10px 12px",
+            fontSize: "0.8rem", fontWeight: 600, color: "white",
+            background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)",
+            outline: "none", boxSizing: "border-box",
+          }}
         />
       </div>
 
-      <div>
-        <label className="mb-1.5 block text-sm font-black text-gray-800">🎓 Jenjang</label>
-        <div className="grid grid-cols-2 gap-2">
+      <div style={{ marginBottom: "10px" }}>
+        <label style={{
+          fontFamily: "'Nunito', sans-serif", fontSize: "0.7rem", fontWeight: 800,
+          color: "rgba(255,255,255,0.7)", display: "block", marginBottom: "6px",
+        }}>🎓 Jenjang</label>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
           {JENJANG.map((j) => (
-            <button
-              key={j.label}
-              type="button"
+            <button key={j.label} type="button"
               onClick={() => { setJenjang(j.label === "SMP/MTs" ? "SMP" : "SMA"); setKelas(""); setShowCustom(false); }}
-              className="rounded-xl border-2 py-3 text-sm font-bold transition"
               style={{
-                border: (jenjang === "SMP" && j.label === "SMP/MTs") || (jenjang === "SMA" && j.label === "SMA/MA") ? "3px solid #42A5F5" : "2px solid rgba(0,0,0,0.08)",
-                background: (jenjang === "SMP" && j.label === "SMP/MTs") || (jenjang === "SMA" && j.label === "SMA/MA") ? "linear-gradient(135deg, #BBDEFB, #E3F2FD)" : "rgba(255,255,255,0.8)",
-                color: (jenjang === "SMP" && j.label === "SMP/MTs") || (jenjang === "SMA" && j.label === "SMA/MA") ? "#1565C0" : "#757575",
+                padding: "10px", borderRadius: "10px", fontSize: "0.75rem", fontWeight: 700,
+                cursor: "pointer", transition: "all 0.2s",
+                border: (jenjang === "SMP" && j.label === "SMP/MTs") || (jenjang === "SMA" && j.label === "SMA/MA")
+                  ? "2px solid #a855f7" : "1px solid rgba(255,255,255,0.1)",
+                background: (jenjang === "SMP" && j.label === "SMP/MTs") || (jenjang === "SMA" && j.label === "SMA/MA")
+                  ? "rgba(168,85,247,0.15)" : "rgba(255,255,255,0.05)",
+                color: (jenjang === "SMP" && j.label === "SMP/MTs") || (jenjang === "SMA" && j.label === "SMA/MA")
+                  ? "#c084fc" : "rgba(255,255,255,0.5)",
               }}
-            >
-              {j.label}
-            </button>
+            >{j.label}</button>
           ))}
         </div>
       </div>
 
       {jenjang && (
-        <div>
-          <label className="mb-1.5 block text-sm font-black text-gray-800">📋 Kelas</label>
-          <div className="grid grid-cols-3 gap-2">
+        <div style={{ marginBottom: "10px" }}>
+          <label style={{
+            fontFamily: "'Nunito', sans-serif", fontSize: "0.7rem", fontWeight: 800,
+            color: "rgba(255,255,255,0.7)", display: "block", marginBottom: "6px",
+          }}>📋 Kelas</label>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "6px" }}>
             {JENJANG.find((j) => (jenjang === "SMP" ? j.label === "SMP/MTs" : j.label === "SMA/MA"))?.kelas.map((k) => (
-              <button
-                key={k}
-                type="button"
-                onClick={() => { setKelas(k); setShowCustom(false); }}
-                className="rounded-xl border-2 py-3 text-sm font-bold transition"
+              <button key={k} type="button" onClick={() => { setKelas(k); setShowCustom(false); }}
                 style={{
-                  border: kelas === k && !showCustom ? "3px solid #FF7043" : "2px solid rgba(0,0,0,0.08)",
-                  background: kelas === k && !showCustom ? "linear-gradient(135deg, #FFE0B2, #FFF3E0)" : "rgba(255,255,255,0.8)",
-                  color: kelas === k && !showCustom ? "#E65100" : "#757575",
+                  padding: "10px", borderRadius: "10px", fontSize: "0.75rem", fontWeight: 700,
+                  cursor: "pointer", transition: "all 0.2s",
+                  border: kelas === k && !showCustom ? "2px solid #ec4899" : "1px solid rgba(255,255,255,0.1)",
+                  background: kelas === k && !showCustom ? "rgba(236,72,153,0.15)" : "rgba(255,255,255,0.05)",
+                  color: kelas === k && !showCustom ? "#f472b6" : "rgba(255,255,255,0.5)",
                 }}
-              >
-                {k}
-              </button>
+              >{k}</button>
             ))}
-            <button
-              type="button"
-              onClick={() => setShowCustom(true)}
-              className="rounded-xl border-2 py-3 text-sm font-bold transition"
+            <button type="button" onClick={() => setShowCustom(true)}
               style={{
-                border: showCustom ? "3px solid #FF7043" : "2px solid rgba(0,0,0,0.08)",
-                background: showCustom ? "linear-gradient(135deg, #FFE0B2, #FFF3E0)" : "rgba(255,255,255,0.8)",
-                color: showCustom ? "#E65100" : "#757575",
+                padding: "10px", borderRadius: "10px", fontSize: "0.75rem", fontWeight: 700,
+                cursor: "pointer", transition: "all 0.2s",
+                border: showCustom ? "2px solid #ec4899" : "1px solid rgba(255,255,255,0.1)",
+                background: showCustom ? "rgba(236,72,153,0.15)" : "rgba(255,255,255,0.05)",
+                color: showCustom ? "#f472b6" : "rgba(255,255,255,0.5)",
               }}
-            >
-              ✏️ Lainnya
-            </button>
+            >✏️ Lainnya</button>
           </div>
           {showCustom && (
-            <input
-              value={customKelas}
-              onChange={(e) => setCustomKelas(e.target.value)}
+            <input value={customKelas} onChange={(e) => setCustomKelas(e.target.value)}
               placeholder="Tulis kelas kamu..."
-              className="mt-2 w-full rounded-xl border-2 border-orange-200 bg-white/80 px-4 py-2.5 text-sm font-semibold text-gray-800 outline-none focus:border-orange-400"
+              style={{
+                marginTop: "8px", width: "100%", borderRadius: "10px", padding: "10px 12px",
+                fontSize: "0.8rem", fontWeight: 600, color: "white",
+                background: "rgba(255,255,255,0.08)", border: "1px solid rgba(236,72,153,0.3)",
+                outline: "none", boxSizing: "border-box",
+              }}
             />
           )}
           <input type="hidden" name="kelas" value={selectedKelas} />
@@ -104,9 +112,19 @@ export function RegisterForm() {
 
       <input type="hidden" name="name" />
 
-      <div className="rounded-xl border-2 border-blue-100 bg-blue-50/80 px-4 py-3 text-xs text-blue-700">
-        <p className="font-black">🎯 Alur kamu:</p>
-        <ol className="mt-1 list-decimal space-y-0.5 pl-4 font-semibold">
+      <div style={{
+        padding: "12px 14px", borderRadius: "12px", marginTop: "8px",
+        background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.15)",
+      }}>
+        <p style={{
+          fontFamily: "'Nunito', sans-serif", fontSize: "0.7rem", fontWeight: 800,
+          color: "#93c5fd", margin: 0,
+        }}>🎯 Alur kamu:</p>
+        <ol style={{
+          fontFamily: "'Nunito', sans-serif", fontSize: "0.65rem", fontWeight: 600,
+          color: "rgba(255,255,255,0.5)", margin: "4px 0 0", paddingLeft: "16px",
+          lineHeight: 1.8,
+        }}>
           <li>Pretest — 15 pernyataan</li>
           <li>Belajar — 6 modul interaktif</li>
           <li>Main — 8 kasus + 6 mini game</li>
@@ -115,8 +133,15 @@ export function RegisterForm() {
         </ol>
       </div>
 
-      <SubmitButton label="🚀 Mulai!" pendingLabel="Masuk..." />
-      {pending && <p className="text-center text-xs text-gray-500">Menyimpan...</p>}
+      <div style={{ marginTop: "12px" }}>
+        <SubmitButton label="🚀 Mulai!" pendingLabel="Masuk..." />
+      </div>
+      {pending && (
+        <p style={{
+          textAlign: "center", fontFamily: "'Nunito', sans-serif", fontSize: "0.65rem",
+          fontWeight: 700, color: "rgba(255,255,255,0.4)", marginTop: "6px",
+        }}>Menyimpan...</p>
+      )}
     </form>
   );
 }

@@ -28,50 +28,54 @@ export default function EpisodeDecision({ episode }: { episode: Episode }) {
   const chosen = episode.options.find((o) => o.key === selected) ?? null;
 
   return (
-    <div className="rounded-2xl border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 p-4 shadow-md">
+    <div style={{
+      padding: "16px", borderRadius: "18px",
+      background: "rgba(255,255,255,0.06)", backdropFilter: "blur(16px)",
+      border: "1px solid rgba(251,191,36,0.15)",
+    }}>
       {/* Question */}
-      <div className="mb-3 flex items-start gap-2">
-        <span className="mt-0.5 text-lg">❓</span>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", marginBottom: "14px" }}>
+        <span style={{ fontSize: "1.1rem" }}>❓</span>
         <div>
-          <p className="text-[10px] font-black uppercase tracking-wider text-amber-600">Keputusan</p>
-          <p className="mt-0.5 text-sm font-semibold text-gray-800">{episode.decisionPrompt}</p>
+          <p style={{
+            fontFamily: "'Nunito', sans-serif", fontSize: "0.6rem", fontWeight: 800,
+            letterSpacing: "0.08em", color: "#fbbf24", textTransform: "uppercase", margin: 0,
+          }}>Keputusan</p>
+          <p style={{
+            fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 700,
+            color: "rgba(255,255,255,0.9)", margin: "4px 0 0", lineHeight: 1.5,
+          }}>{episode.decisionPrompt}</p>
         </div>
       </div>
 
       {/* Options */}
-      <div className="space-y-2">
+      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
         {episode.options.map((o, i) => {
           const isSelected = selected === o.key;
           const letters = ["A", "B", "C", "D"];
           return (
-            <label
-              key={o.key}
-              className="flex cursor-pointer items-center gap-3 rounded-xl border-2 p-3 transition-all"
-              style={{
-                border: isSelected ? "#EF5350" : "#e5e7eb",
-                background: isSelected ? "linear-gradient(135deg, #FFF3E0, #FFEBEE)" : "white",
-                boxShadow: isSelected ? "0 2px 8px rgba(239,83,80,0.2)" : "0 1px 3px rgba(0,0,0,0.05)",
-              }}
-            >
-              <input
-                type="radio"
-                name="opt"
-                value={o.key}
-                checked={isSelected}
+            <label key={o.key} style={{
+              display: "flex", alignItems: "center", gap: "10px",
+              padding: "10px 12px", borderRadius: "12px", cursor: "pointer",
+              border: isSelected ? "2px solid #f43f5e" : "1px solid rgba(255,255,255,0.08)",
+              background: isSelected ? "rgba(244,63,94,0.15)" : "rgba(255,255,255,0.03)",
+              transition: "all 0.2s",
+            }}>
+              <input type="radio" name="opt" value={o.key} checked={isSelected}
                 onChange={() => { setSelected(o.key); setRevealed(false); }}
-                className="sr-only"
+                style={{ display: "none" }}
               />
-              <div
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-black text-white"
-                style={{
-                  background: isSelected
-                    ? "linear-gradient(135deg, #EF5350, #D32F2F)"
-                    : "linear-gradient(135deg, #BDBDBD, #9E9E9E)",
-                }}
-              >
-                {letters[i]}
-              </div>
-              <span className="text-sm font-semibold text-gray-800">{o.text}</span>
+              <div style={{
+                width: "28px", height: "28px", borderRadius: "8px", flexShrink: 0,
+                background: isSelected ? "linear-gradient(135deg, #f43f5e, #e11d48)" : "rgba(255,255,255,0.1)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontFamily: "'Righteous', sans-serif", fontSize: "0.7rem", fontWeight: 900,
+                color: "white",
+              }}>{letters[i]}</div>
+              <span style={{
+                fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 600,
+                color: "rgba(255,255,255,0.85)",
+              }}>{o.text}</span>
             </label>
           );
         })}
@@ -83,44 +87,53 @@ export default function EpisodeDecision({ episode }: { episode: Episode }) {
           type="button"
           disabled={!selected}
           onClick={() => setRevealed(true)}
-          className="mt-3 w-full rounded-xl py-3 text-sm font-black text-white disabled:opacity-40"
           style={{
-            background: "linear-gradient(180deg, #EF5350 0%, #D32F2F 100%)",
-            boxShadow: "0 3px 0 #8B0000, 0 4px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.3)",
-            border: "2px solid #C62828",
+            marginTop: "12px", width: "100%", padding: "12px", borderRadius: "12px",
+            fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 800,
+            color: "white", border: "none", cursor: selected ? "pointer" : "not-allowed",
+            opacity: selected ? 1 : 0.4,
+            background: "linear-gradient(135deg, #f43f5e, #e11d48)",
+            boxShadow: "0 3px 0 #be123c, 0 4px 12px rgba(244,63,94,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
           }}
-        >
-          💡 Lihat Umpan Balik
-        </button>
+        >💡 Lihat Umpan Balik</button>
       )}
 
       {/* Feedback panel */}
       {revealed && chosen && (
-        <div className="mt-3 space-y-2" style={{ animation: "feedbackIn 0.4s ease-out both" }}>
+        <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "8px", animation: "feedbackIn 0.4s ease-out both" }}>
           {/* Verdict badge */}
-          <div
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-black"
-            style={{
-              background: chosen.best ? "linear-gradient(135deg, #66BB6A, #43A047)" : "linear-gradient(135deg, #FFA726, #F57C00)",
-              color: "white",
-              boxShadow: chosen.best ? "0 2px 0 #2E7D32" : "0 2px 0 #E65100",
-            }}
-          >
+          <div style={{
+            display: "inline-flex", alignSelf: "flex-start", alignItems: "center", gap: "6px",
+            padding: "4px 12px", borderRadius: "8px",
+            background: chosen.best ? "linear-gradient(135deg, #10b981, #059669)" : "linear-gradient(135deg, #f97316, #ea580c)",
+            fontFamily: "'Nunito', sans-serif", fontSize: "0.7rem", fontWeight: 800, color: "white",
+            boxShadow: chosen.best ? "0 2px 0 #047857" : "0 2px 0 #c2410c",
+          }}>
             {chosen.best ? "✅ Pilihan Paling Sadar" : "⚡ Pilihan Terkait Kebiasaan"}
           </div>
 
           {/* Feedback layers */}
-          <div className="rounded-xl bg-white/80 p-3 shadow-sm" style={{ border: "1px solid rgba(0,0,0,0.05)" }}>
+          <div style={{
+            padding: "12px", borderRadius: "14px",
+            background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)",
+          }}>
             {(["observation", "context", "languageEffect", "alternative", "reflection", "transfer"] as const).map((k) => {
               const meta = LAYER_META[k];
               return (
-                <div key={k} className="flex items-start gap-2 border-b border-gray-100 py-2 last:border-0">
-                  <span className="mt-0.5 text-sm">{meta.icon}</span>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: meta.color }}>
-                      {LAYER_LABELS[k]}
-                    </p>
-                    <p className="mt-0.5 text-xs leading-relaxed text-gray-700">{chosen.feedback[k]}</p>
+                <div key={k} style={{
+                  display: "flex", alignItems: "flex-start", gap: "8px",
+                  padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.04)",
+                }}>
+                  <span style={{ fontSize: "0.85rem", marginTop: "2px" }}>{meta.icon}</span>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <p style={{
+                      fontFamily: "'Nunito', sans-serif", fontSize: "0.55rem", fontWeight: 800,
+                      letterSpacing: "0.08em", color: meta.color, textTransform: "uppercase", margin: 0,
+                    }}>{LAYER_LABELS[k]}</p>
+                    <p style={{
+                      fontFamily: "'Nunito', sans-serif", fontSize: "0.72rem", fontWeight: 600,
+                      color: "rgba(255,255,255,0.65)", margin: "3px 0 0", lineHeight: 1.5,
+                    }}>{chosen.feedback[k]}</p>
                   </div>
                 </div>
               );
@@ -132,18 +145,13 @@ export default function EpisodeDecision({ episode }: { episode: Episode }) {
             <input type="hidden" name="episodeId" value={episode.id} />
             <input type="hidden" name="card" value={episode.cardReward} />
             <input type="hidden" name="skill" value={episode.skillReward} />
-            <button
-              type="submit"
-              className="w-full rounded-xl py-3 text-sm font-black text-white"
-              style={{
-                background: "linear-gradient(180deg, #FFD54F 0%, #FFA726 50%, #FF8F00 100%)",
-                boxShadow: "0 3px 0 #E65100, 0 4px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.4)",
-                border: "2px solid #F57C00",
-                color: "#BF360C",
-              }}
-            >
-              🎁 Klaim Hadiah & Lanjut →
-            </button>
+            <button type="submit" style={{
+              width: "100%", padding: "12px", borderRadius: "12px",
+              fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 800,
+              color: "#78350f", border: "none", cursor: "pointer",
+              background: "linear-gradient(135deg, #fbbf24, #f59e0b)",
+              boxShadow: "0 3px 0 #b45309, 0 4px 12px rgba(245,158,11,0.3), inset 0 1px 0 rgba(255,255,255,0.3)",
+            }}>🎁 Klaim Hadiah & Lanjut →</button>
           </form>
         </div>
       )}

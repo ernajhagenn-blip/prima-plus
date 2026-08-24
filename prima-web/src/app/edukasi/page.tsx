@@ -8,42 +8,65 @@ export default async function EdukasiPage() {
   const modules = getEduModules();
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10">
-      <div className="relative mb-6 overflow-hidden rounded-3xl border-2 border-red-200 bg-white/70 p-6 shadow-lg backdrop-blur-md">
-        <div className="absolute left-0 top-0 h-full w-1.5 rounded-l-3xl bg-gradient-to-b from-red-500 to-pink-500" />
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-red-500 to-pink-500 px-3 py-1 text-xs font-black text-white shadow-md">
-          📚 KNOWLEDGE CENTER
-        </span>
-        <h1 className="mt-2 text-2xl font-black text-gray-900">
-          🧠 Materi Kesadaran BerBahasa
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          {p.name} · Kelas {p.kelas}
-        </p>
-        <p className="mt-3 text-sm leading-relaxed text-gray-600">
-          Bacalah keenam modul berikut dengan saksama. Setiap modul berisi kasus
-          nyata yang relevan dengan kehidupan sehari-harimu. Setelah selesai,
-          lanjut ke kuis untuk menguji pemahamanmu.
-        </p>
-      </div>
-
-      {modules.length === 0 ? (
-        <div className="rounded-3xl border-2 border-amber-200 bg-amber-50/70 p-6 text-sm text-amber-900 backdrop-blur-sm shadow-md">
-          ⚠️ Belum ada materi edukasi. Silakan lanjut ke kuis.
+    <div style={{ minHeight: "100vh", width: "100%", padding: "1.5rem", boxSizing: "border-box" as const }}>
+      <div style={{ maxWidth: "40rem", margin: "0 auto" }}>
+        <div style={{
+          marginBottom: "1.5rem", padding: "1.5rem", borderRadius: "20px",
+          background: "rgba(255,255,255,0.06)", backdropFilter: "blur(16px)",
+          border: "1px solid rgba(16,185,129,0.2)", position: "relative", overflow: "hidden",
+        }}>
+          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "4px",
+            background: "linear-gradient(180deg, #10b981, #06b6d4)", borderRadius: "20px 0 0 20px" }} />
+          <span style={{
+            display: "inline-flex", alignItems: "center", gap: "6px",
+            padding: "4px 12px", borderRadius: "8px",
+            background: "linear-gradient(135deg, #10b981, #06b6d4)",
+            fontFamily: "'Nunito', sans-serif", fontSize: "0.7rem", fontWeight: 800,
+            color: "white", letterSpacing: "0.05em",
+          }}>📚 KNOWLEDGE CENTER</span>
+          <h1 style={{
+            fontFamily: "'Righteous', 'Arial Black', Impact, sans-serif",
+            fontSize: "clamp(1.2rem, 4vw, 1.5rem)", fontWeight: 900, color: "white",
+            margin: "8px 0 0", textShadow: "0 2px 8px rgba(0,0,0,0.3)",
+          }}>🧠 Materi Kesadaran BerBahasa</h1>
+          <p style={{
+            fontFamily: "'Nunito', sans-serif", fontSize: "0.75rem", fontWeight: 700,
+            color: "rgba(255,255,255,0.5)", margin: "4px 0 0",
+          }}>{p.name} · Kelas {p.kelas}</p>
+          <p style={{
+            fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 600,
+            color: "rgba(255,255,255,0.6)", margin: "12px 0 0", lineHeight: 1.6,
+          }}>
+            Bacalah keenam modul berikut dengan saksama. Setiap modul berisi kasus
+            nyata yang relevan dengan kehidupan sehari-harimu.
+          </p>
         </div>
-      ) : (
-        <EduModuleList modules={modules} />
-      )}
 
-      <form action={completeEdu} className="mt-6">
-        <button
-          type="submit"
-          className="w-full rounded-2xl bg-gradient-to-r from-red-600 to-pink-500 px-6 py-3.5 text-sm font-black text-white shadow-lg transition hover:from-red-700 hover:to-pink-600 hover:shadow-xl active:scale-[0.98]"
-          style={{ boxShadow: "0 4px 0 #B71C1C, inset 0 2px 0 rgba(255,255,255,0.3)" }}
-        >
-          🚀 Saya sudah membaca semua modul — Lanjut ke Kuis →
-        </button>
-      </form>
+        {modules.length === 0 ? (
+          <div style={{
+            padding: "1.5rem", borderRadius: "20px",
+            background: "rgba(255,255,255,0.06)", backdropFilter: "blur(16px)",
+            border: "1px solid rgba(251,191,36,0.2)",
+            fontFamily: "'Nunito', sans-serif", fontSize: "0.85rem", fontWeight: 700,
+            color: "#fbbf24",
+          }}>⚠️ Belum ada materi edukasi. Silakan lanjut ke kuis.</div>
+        ) : (
+          <EduModuleList modules={modules} />
+        )}
+
+        <form action={completeEdu} style={{ marginTop: "1.5rem" }}>
+          <button type="submit" style={{
+            width: "100%", padding: "14px", borderRadius: "16px",
+            fontFamily: "'Righteous', 'Arial Black', Impact, sans-serif",
+            fontSize: "0.9rem", fontWeight: 900, color: "white", border: "none", cursor: "pointer",
+            background: "linear-gradient(135deg, #10b981, #059669)",
+            boxShadow: "0 4px 0 #047857, 0 6px 16px rgba(16,185,129,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
+            transition: "all 0.15s",
+          }}>
+            🚀 Saya sudah membaca semua modul — Lanjut ke Kuis →
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
