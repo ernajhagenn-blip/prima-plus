@@ -25,7 +25,6 @@ export default class SceneErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error) {
-    // eslint-disable-next-line no-console
     console.error("[SceneErrorBoundary]", error);
   }
 
@@ -36,26 +35,52 @@ export default class SceneErrorBoundary extends Component<
   render() {
     if (!this.state.webgl) {
       return (
-        <div className="flex h-full w-full items-center justify-center rounded-2xl border border-rose-400/40 bg-rose-500/10 p-6 text-center">
-          <div>
-            <p className="text-lg font-black text-rose-200">WebGL tidak tersedia</p>
-            <p className="mt-1 text-xs text-white/70">
-              Browser ini tidak mendukung WebGL (3D). Coba buka di Chrome/Edge terbaru dengan
-              &quot;Hardware Acceleration&quot; aktif, atau pakai mode Desktop.
-            </p>
+        this.props.fallback || (
+          <div
+            className="flex h-full w-full items-center justify-center p-6 text-center"
+            style={{
+              background: "linear-gradient(135deg, #87CEEB 0%, #A5D6A7 50%, #81C784 100%)",
+              borderRadius: 20,
+            }}
+          >
+            <div>
+              <p
+                className="text-2xl font-black"
+                style={{
+                  color: "#FFD54F",
+                  textShadow: "0 2px 0 #E65100, 0 3px 0 #BF360C, 0 4px 12px rgba(0,0,0,0.2)",
+                }}
+              >
+                🎮 WebGL Diperlukan
+              </p>
+              <p className="mt-2 text-sm font-semibold text-white/80">
+                Buka di Chrome/Edge dengan Hardware Acceleration aktif untuk pengalaman 3D terbaik.
+              </p>
+            </div>
           </div>
-        </div>
+        )
       );
     }
     if (this.state.error) {
       return (
-        <div className="h-full w-full overflow-auto rounded-2xl border border-amber-400/40 bg-amber-500/10 p-4 text-left">
-          <p className="text-sm font-black text-amber-200">{this.props.label || "Scene"} gagal dimuat:</p>
-          <pre className="mt-2 whitespace-pre-wrap text-[11px] text-white/80">{this.state.error.message}</pre>
-          <pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap text-[10px] text-white/50">
-            {this.state.error.stack}
-          </pre>
-        </div>
+        this.props.fallback || (
+          <div
+            className="flex h-full w-full items-center justify-center p-6 text-center"
+            style={{
+              background: "linear-gradient(135deg, #FFD54F 0%, #FFA726 50%, #FF7043 100%)",
+              borderRadius: 20,
+            }}
+          >
+            <div>
+              <p
+                className="text-xl font-black"
+                style={{ color: "#fff", textShadow: "0 2px 4px rgba(0,0,0,0.2)" }}
+              >
+                🏎️ {this.props.label || "Scene"} sedang dimuat...
+              </p>
+            </div>
+          </div>
+        )
       );
     }
     return this.props.children;

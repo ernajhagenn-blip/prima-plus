@@ -32,14 +32,14 @@ export default function WorldHub({
       <div className="mx-auto max-w-2xl">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-cyan-300/60">PRIMA CITY</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-cyan-600">PRIMA CITY</p>
             <h1 className="text-3xl font-black">Mau ngapain sekarang?</h1>
           </div>
           <KaraAvatar className="h-24 w-24" />
         </div>
 
         {/* progress */}
-        <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md">
+        <div className="mt-5 rounded-2xl border-2 border-cyan-200 bg-white/70 p-4 backdrop-blur-md">
           <div className="flex items-center justify-between text-sm">
             <span className="font-bold">Progress Belajar</span>
             <span className="text-cyan-200/70">{episodesDone}/{total} episode</span>
@@ -63,7 +63,7 @@ export default function WorldHub({
         </Link>
 
         {/* portals */}
-        <p className="mt-6 text-xs font-bold uppercase tracking-wide text-white/50">ATAU MAIN LANGSUNG</p>
+        <p className="mt-6 text-xs font-bold uppercase tracking-wide text-gray-500">ATAU MAIN LANGSUNG</p>
         <div className="mt-2 grid grid-cols-2 gap-3">
           {PORTALS.map((p, i) => (
             <div
@@ -84,9 +84,9 @@ export default function WorldHub({
 
         {/* quick stats */}
         <div className="mt-5 grid grid-cols-3 gap-2 text-center text-xs">
-          <div className="rounded-xl bg-white/5 p-2"><p className="text-lg font-black text-cyan-300">{cards}</p><p className="text-white/50">Kartu</p></div>
-          <div className="rounded-xl bg-white/5 p-2"><p className="text-lg font-black text-rose-300">{gameScores.language_kart ?? 0}</p><p className="text-white/50">Skor Kart</p></div>
-          <div className="rounded-xl bg-white/5 p-2"><p className="text-lg font-black text-amber-300">{gameScores.lompat_kata ?? 0}</p><p className="text-white/50">Skor Lompat</p></div>
+          <div className="rounded-xl border border-cyan-100 bg-white/60 p-2"><p className="text-lg font-black text-cyan-600">{cards}</p><p className="text-gray-500">Kartu</p></div>
+          <div className="rounded-xl border border-rose-100 bg-white/60 p-2"><p className="text-lg font-black text-rose-500">{gameScores.language_kart ?? 0}</p><p className="text-gray-500">Skor Kart</p></div>
+          <div className="rounded-xl border border-amber-100 bg-white/60 p-2"><p className="text-lg font-black text-amber-500">{gameScores.lompat_kata ?? 0}</p><p className="text-gray-500">Skor Lompat</p></div>
         </div>
 
         <div className="mt-5 flex items-center justify-center gap-4 text-xs">

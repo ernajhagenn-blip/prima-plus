@@ -136,17 +136,17 @@ export default function ContextMatchPage() {
 
   if (phase === "start") {
     return (
-      <div className="flex min-h-dvh flex-col items-center justify-center bg-[#060b1e] px-4 text-white">
+      <div className="flex min-h-dvh flex-col items-center justify-center px-4">
         <div className="animate-scale-in w-full max-w-md text-center">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-cyan-500 to-blue-600 text-4xl shadow-lg shadow-cyan-500/20">
             🎯
           </div>
           <h1 className="mt-6 text-3xl font-black">Context Match</h1>
-          <p className="mt-3 text-sm text-white/40">
+          <p className="mt-3 text-sm text-gray-500">
             Pilih ragam bahasa yang tepat untuk setiap situasi. Kamu punya{" "}
             <span className="font-bold text-cyan-400">{TIMER_SECONDS} detik</span> per soal.
           </p>
-          <div className="mt-6 space-y-2 text-left text-xs text-white/30">
+          <div className="mt-6 space-y-2 text-left text-xs text-gray-400">
             <div className="flex items-start gap-2">
               <span className="mt-0.5 text-cyan-400">●</span>
               <span>10 soal — pilih ragam: Formal, Informal, Casual, atau Akademik</span>
@@ -168,7 +168,7 @@ export default function ContextMatchPage() {
           </button>
           <button
             onClick={() => router.push("/games")}
-            className="mt-3 text-xs text-white/25 transition hover:text-white/50"
+            className="mt-3 text-xs text-gray-400 transition hover:text-gray-500"
           >
             ← Kembali ke Arcade
           </button>
@@ -179,28 +179,28 @@ export default function ContextMatchPage() {
 
   if (phase === "result") {
     return (
-      <div className="flex min-h-dvh flex-col items-center justify-center bg-[#060b1e] px-4 text-white">
+      <div className="flex min-h-dvh flex-col items-center justify-center px-4">
         <div className="animate-scale-in w-full max-w-md text-center">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 text-4xl">
             🏆
           </div>
           <h1 className="mt-6 text-3xl font-black">Selesai!</h1>
-          <p className="mt-2 text-sm text-white/40">Context Match</p>
+          <p className="mt-2 text-sm text-gray-500">Context Match</p>
 
           <div className="mt-8 grid grid-cols-3 gap-3">
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
               <p className="text-3xl font-black text-cyan-400">{xp}</p>
-              <p className="mt-1 text-[11px] text-white/30">XP Earned</p>
+              <p className="mt-1 text-[11px] text-gray-400">XP Earned</p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
               <p className="text-3xl font-black text-emerald-400">{accuracy}%</p>
-              <p className="mt-1 text-[11px] text-white/30">Akurasi</p>
+              <p className="mt-1 text-[11px] text-gray-400">Akurasi</p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
               <p className="text-3xl font-black text-amber-400">
                 {answers.filter(Boolean).length}/{QUESTIONS.length}
               </p>
-              <p className="mt-1 text-[11px] text-white/30">Benar</p>
+              <p className="mt-1 text-[11px] text-gray-400">Benar</p>
             </div>
           </div>
 
@@ -215,13 +215,13 @@ export default function ContextMatchPage() {
                 setShowFeedback(false);
                 setAnswers([]);
               }}
-              className="flex-1 rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-bold text-white transition hover:bg-white/10 hover:scale-103 active:scale-97"
+              className="flex-1 rounded-xl border border-gray-200 bg-white/70 py-3 text-sm font-bold text-gray-900 transition hover:bg-white/80 hover:scale-103 active:scale-97"
             >
               Main Lagi
             </button>
             <button
               onClick={() => router.push("/games")}
-              className="flex-1 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 py-3 text-sm font-bold text-white transition hover:scale-103 active:scale-97"
+              className="flex-1 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 py-3 text-sm font-bold text-gray-900 transition hover:scale-103 active:scale-97"
             >
               ke Arcade →
             </button>
@@ -232,12 +232,12 @@ export default function ContextMatchPage() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col bg-[#060b1e] text-white">
+    <div className="flex min-h-dvh flex-col text-gray-800">
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 pt-4 pb-2">
         <button
           onClick={() => router.push("/games")}
-          className="rounded-lg bg-white/5 px-3 py-1.5 text-xs font-bold text-white/50 transition hover:bg-white/10"
+          className="rounded-lg bg-white/70 px-3 py-1.5 text-xs font-bold text-gray-500 transition hover:bg-white/80"
         >
           ✕
         </button>
@@ -245,17 +245,17 @@ export default function ContextMatchPage() {
           <p className="text-[10px] font-black uppercase tracking-widest text-cyan-300/40">
             Context Match
           </p>
-          <p className="text-sm font-bold text-white">
+          <p className="text-sm font-bold text-gray-900">
             {currentQ + 1} / {QUESTIONS.length}
           </p>
         </div>
-        <div className="rounded-lg bg-white/5 px-3 py-1.5 text-xs font-bold text-cyan-400">
+        <div className="rounded-lg bg-white/70 px-3 py-1.5 text-xs font-bold text-cyan-400">
           {xp} XP
         </div>
       </div>
 
       {/* Timer */}
-      <div className="mx-4 mt-2 h-1.5 overflow-hidden rounded-full bg-white/5">
+      <div className="mx-4 mt-2 h-1.5 overflow-hidden rounded-full bg-white/70">
         <div
           className={`h-full rounded-full transition-all duration-500 ${
             timerPct > 50
@@ -271,11 +271,11 @@ export default function ContextMatchPage() {
       {/* Question */}
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-6">
         <div key={currentQ} className="animate-slide-in-left w-full max-w-lg">
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-md">
+          <div className="rounded-2xl border border-gray-200 bg-white/70 p-6 backdrop-blur-md">
             <p className="text-xs font-bold uppercase tracking-wider text-cyan-400/60">
               Skenario
             </p>
-            <p className="mt-2 text-base font-semibold text-white leading-relaxed">
+            <p className="mt-2 text-base font-semibold text-gray-800 leading-relaxed">
               {q.scenario}
             </p>
             <div className="mt-3 flex items-center gap-2">
@@ -289,7 +289,7 @@ export default function ContextMatchPage() {
             {q.options.map((opt) => {
               const isCorrect = opt === q.correctRegister;
               const isSelected = opt === selected;
-              let btnStyle = "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]";
+              let btnStyle = "border-gray-200 bg-white/70 hover:border-gray-300 hover:bg-white/90";
               if (showFeedback && isCorrect) btnStyle = "border-emerald-400/60 bg-emerald-500/15";
               if (showFeedback && isSelected && !isCorrect) btnStyle = "border-rose-400/60 bg-rose-500/15";
 
@@ -307,9 +307,9 @@ export default function ContextMatchPage() {
           </div>
 
           {showFeedback && (
-            <div className="mt-4 animate-fade-in rounded-xl border border-white/10 bg-white/5 p-4">
-              <p className="text-xs font-bold text-white/50">Penjelasan:</p>
-              <p className="mt-1 text-sm text-white/70">{q.explanation}</p>
+            <div className="mt-4 animate-fade-in rounded-xl border border-gray-200 bg-white/70 p-4">
+              <p className="text-xs font-bold text-gray-500">Penjelasan:</p>
+              <p className="mt-1 text-sm text-gray-600">{q.explanation}</p>
             </div>
           )}
         </div>

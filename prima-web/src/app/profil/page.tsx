@@ -12,10 +12,10 @@ export default async function ProfilePage() {
   if (!p) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-8">
-        <Link href="/" className="text-xs font-semibold text-red-700">
+        <Link href="/" className="text-xs font-bold text-blue-500 hover:text-blue-600">
           ← PRIMA CITY
         </Link>
-        <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="mt-4 rounded-3xl border-2 border-blue-200 bg-white/70 p-5 shadow-lg backdrop-blur-md">
           <h1 className="text-lg font-black text-gray-900">Profil Pemain</h1>
           <p className="mt-1 text-sm text-gray-600">
             Buat profil untuk melacak skill, kartu, dan progres kesadaran
@@ -36,11 +36,11 @@ export default async function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <Link href="/" className="text-xs font-semibold text-red-700">
+      <Link href="/" className="text-xs font-bold text-blue-500 hover:text-blue-600">
         ← PRIMA CITY
       </Link>
 
-      <div className="mt-3 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="mt-3 rounded-3xl border-2 border-blue-200 bg-white/70 p-5 shadow-lg backdrop-blur-md">
         <h1 className="text-xl font-black text-gray-900">{p.name}</h1>
         <p className="text-sm text-gray-500">
           {p.kelas} · Kode {p.code}
@@ -60,8 +60,8 @@ export default async function ProfilePage() {
             return (
               <div
                 key={s.key}
-                className={`rounded-xl border p-3 ${
-                  on ? "border-red-300 bg-red-50" : "border-gray-200 bg-white"
+                className={`rounded-xl border-2 p-3 transition-all ${
+                  on ? "border-green-300 bg-green-50/70 shadow-md backdrop-blur-sm" : "border-gray-200 bg-white/50"
                 }`}
               >
                 <p className="text-sm font-bold text-gray-900">
@@ -80,10 +80,10 @@ export default async function ProfilePage() {
           {EPISODES.map((e) => (
             <div
               key={e.id}
-              className={`flex items-center justify-between rounded-xl border p-3 ${
+              className={`flex items-center justify-between rounded-xl border-2 p-3 transition-all ${
                 eps.has(e.id)
-                  ? "border-green-300 bg-green-50"
-                  : "border-gray-200 bg-white"
+                  ? "border-green-300 bg-green-50/70 shadow-md backdrop-blur-sm"
+                  : "border-gray-200 bg-white/50"
               }`}
             >
               <span className="text-sm text-gray-800">{e.title}</span>
@@ -92,7 +92,7 @@ export default async function ProfilePage() {
               ) : (
                 <Link
                   href={`/episode/${e.id}`}
-                  className="text-xs font-semibold text-red-700"
+                  className="text-xs font-bold text-red-500 hover:text-red-600"
                 >
                   mainkan →
                 </Link>
@@ -119,19 +119,20 @@ export default async function ProfilePage() {
       <div className="mt-6 flex flex-wrap gap-2">
         <Link
           href="/episode/1"
-          className="rounded-lg bg-red-700 px-4 py-2 text-xs font-semibold text-white"
+          className="rounded-xl bg-gradient-to-r from-red-500 to-pink-500 px-4 py-2 text-xs font-black text-white shadow-md transition hover:shadow-lg"
+          style={{ boxShadow: "0 3px 0 #B71C1C, inset 0 2px 0 rgba(255,255,255,0.3)" }}
         >
           Lanjut Episode
         </Link>
         <Link
           href="/games/language-kart"
-          className="rounded-lg border border-red-700 px-4 py-2 text-xs font-semibold text-red-700"
+          className="rounded-xl border-2 border-red-400 bg-white/60 px-4 py-2 text-xs font-bold text-red-500 backdrop-blur-sm transition hover:bg-white/80"
         >
           Main Game
         </Link>
         <Link
           href="/boss"
-          className="rounded-lg border border-gray-700 px-4 py-2 text-xs font-semibold text-gray-700"
+          className="rounded-xl border-2 border-purple-300 bg-white/60 px-4 py-2 text-xs font-bold text-purple-500 backdrop-blur-sm transition hover:bg-white/80"
         >
           Tantang Boss
         </Link>
@@ -142,8 +143,8 @@ export default async function ProfilePage() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-gray-50 p-3 text-center">
-      <p className="text-lg font-black text-red-700">{value}</p>
+    <div className="rounded-xl border-2 border-cyan-200 bg-white/60 p-3 text-center backdrop-blur-sm shadow-sm">
+      <p className="text-lg font-black text-red-500">{value}</p>
       <p className="text-xs text-gray-500">{label}</p>
     </div>
   );
@@ -152,7 +153,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mt-5">
-      <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500">
+      <h2 className="text-sm font-black uppercase tracking-wide text-gray-500">
         {title}
       </h2>
       <div className="mt-2">{children}</div>

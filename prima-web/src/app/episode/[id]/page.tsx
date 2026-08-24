@@ -23,15 +23,15 @@ export default async function EpisodePage({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <Link href="/" className="text-xs font-semibold text-red-700">
+      <Link href="/" className="text-xs font-bold text-blue-500 hover:text-blue-600">
         ← PRIMA CITY
       </Link>
 
-      <div className="mt-3 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <p className="text-xs font-bold uppercase tracking-wide text-red-700">
+      <div className="mt-3 rounded-3xl border-2 border-rose-200 bg-white/70 p-5 shadow-lg backdrop-blur-md">
+        <span className="inline-block rounded-full bg-gradient-to-r from-rose-400 to-pink-500 px-3 py-1 text-xs font-black text-white shadow-md">
           {episode.subtitle}
-        </p>
-        <h1 className="mt-1 text-xl font-black text-gray-900">
+        </span>
+        <h1 className="mt-2 text-xl font-black text-gray-900">
           {episode.title}
         </h1>
       </div>
@@ -40,13 +40,13 @@ export default async function EpisodePage({
         {episode.panels.map((panel, i) => (
           <div
             key={i}
-            className="flex gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"
+            className="flex gap-3 rounded-2xl border-2 border-rose-100 bg-white/60 p-4 shadow-md backdrop-blur-sm"
           >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-700 text-xs font-black text-white">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-rose-400 to-pink-500 text-xs font-black text-white shadow-sm">
               {panel.speaker.slice(0, 3)}
             </div>
             <div>
-              <p className="text-xs font-bold text-gray-500">{panel.speaker}</p>
+              <p className="text-xs font-bold text-rose-500">{panel.speaker}</p>
               <p className="text-sm text-gray-800">{panel.text}</p>
             </div>
           </div>
@@ -56,7 +56,7 @@ export default async function EpisodePage({
       {p ? (
         <EpisodeDecision episode={episode} />
       ) : (
-        <div className="mt-5 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="mt-5 rounded-3xl border-2 border-rose-200 bg-white/70 p-5 shadow-lg backdrop-blur-md">
           <p className="text-sm font-bold text-gray-900">
             Buat profil untuk menyimpan progres episode
           </p>
@@ -70,7 +70,7 @@ export default async function EpisodePage({
         {prev ? (
           <Link
             href={`/episode/${prev.id}`}
-            className="text-xs font-semibold text-gray-500"
+            className="text-xs font-bold text-gray-400 hover:text-gray-600"
           >
             ← {prev.title}
           </Link>
@@ -80,12 +80,12 @@ export default async function EpisodePage({
         {next ? (
           <Link
             href={`/episode/${next.id}`}
-            className="text-xs font-semibold text-red-700"
+            className="text-xs font-bold text-red-500 hover:text-red-600"
           >
             Episode berikutnya →
           </Link>
         ) : (
-          <Link href="/profil" className="text-xs font-semibold text-red-700">
+          <Link href="/profil" className="text-xs font-bold text-red-500 hover:text-red-600">
             Lihat Profil →
           </Link>
         )}

@@ -169,14 +169,14 @@ export default function RacingGame({ onComplete }: { onComplete: (score: number)
   return (
     <div className="relative">
       <div className="mb-2 flex items-center justify-between text-sm">
-        <span className="font-bold text-cyan-300">Skor: {score}</span>
-        <span className="font-bold text-rose-300">Waktu: {time}s</span>
+        <span className="font-bold text-cyan-600">Skor: {score}</span>
+        <span className="font-bold text-rose-500">Waktu: {time}s</span>
       </div>
       <canvas
         ref={canvasRef}
         width={W}
         height={H}
-        className="w-full rounded-2xl border border-white/10 bg-[#0c1330]"
+        className="w-full rounded-2xl border-2 border-red-200 bg-[#0c1330]"
       />
       {pop && (
         <div

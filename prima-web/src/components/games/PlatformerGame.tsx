@@ -164,9 +164,9 @@ export default function PlatformerGame({ onComplete }: { onComplete: (score: num
   return (
     <div className="relative">
       <div className="mb-2 text-sm">
-        <span className="font-bold text-cyan-300">Skor: {score}</span>
+        <span className="font-bold text-cyan-600">Skor: {score}</span>
       </div>
-      <canvas ref={canvasRef} width={W} height={H} className="w-full rounded-2xl border border-white/10 bg-[#0b1130]" />
+      <canvas ref={canvasRef} width={W} height={H} className="w-full rounded-2xl border-2 border-cyan-200 bg-[#0b1130]" />
       {pop && (
         <div className={`pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-bold ${pop.good ? "bg-cyan-400/20 text-cyan-200" : "bg-rose-500/20 text-rose-200"}`}>
           {pop.text}

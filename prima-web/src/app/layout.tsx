@@ -26,25 +26,42 @@ export default function RootLayout({
       lang="id"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-gray-50">
-        <header className="border-b border-gray-200 bg-white">
-          <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-700 font-black text-white">
+      <body className="min-h-full flex flex-col">
+        <header
+          className="border-b-4 border-cyan-400"
+          style={{
+            background: "linear-gradient(135deg, #EF5350 0%, #FF7043 40%, #FFB300 100%)",
+            boxShadow: "0 4px 20px rgba(255,112,67,0.3)",
+          }}
+        >
+          <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-xl font-black text-white"
+              style={{
+                background: "linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)",
+                boxShadow: "0 3px 0 #0D47A1, inset 0 2px 0 rgba(255,255,255,0.3)",
+              }}
+            >
               P+
             </div>
             <div>
-              <p className="text-sm font-bold leading-tight text-gray-900">
+              <p className="text-sm font-black leading-tight text-white drop-shadow-sm">
                 PRIMA+ — Kesadaran Berbahasa Remaja
               </p>
-              <p className="text-xs text-gray-500">
-                Penguatan Loyalitas Bahasa Indonesia di Lingkungan Sekolah
+              <p className="text-xs font-semibold text-white/80">
+                Penguatan Loyalitas Bahasa Indonesia
               </p>
             </div>
           </div>
         </header>
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-gray-200 bg-white">
-          <div className="mx-auto max-w-3xl px-4 py-4 text-center text-xs text-gray-400">
+        <footer
+          className="border-t-4 border-cyan-400"
+          style={{
+            background: "linear-gradient(135deg, #66BB6A 0%, #43A047 100%)",
+          }}
+        >
+          <div className="mx-auto max-w-3xl px-4 py-3 text-center text-xs font-bold text-white/90 drop-shadow-sm">
             PRIMA+ · OPSI 2026 · Ilmu Sosial Humaniora — Bahasa dan Sastra
           </div>
         </footer>

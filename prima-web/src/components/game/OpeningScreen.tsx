@@ -1,89 +1,25 @@
 "use client";
 
-import { useMemo, useCallback, useRef, useState, useEffect } from "react";
+import { useMemo, useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+import SceneErrorBoundary from "./SceneErrorBoundary";
+
+const OpeningScene = dynamic(() => import("./OpeningScene"), { ssr: false });
 
 const CHARACTERS = [
-  { name: "NARA", color: "#ef4444" },
-  { name: "RAGA", color: "#3b82f6" },
-  { name: "KIRA", color: "#a855f7" },
-  { name: "BIMO", color: "#22c55e" },
-  { name: "ALYA", color: "#f472b6" },
-  { name: "DAVA", color: "#f97316" },
-  { name: "MIRA", color: "#06b6d4" },
-  { name: "SENA", color: "#eab308" },
+  { name: "NARA", color: "#EF5350" },
+  { name: "RAGA", color: "#FFA726" },
+  { name: "KIRA", color: "#AB47BC" },
+  { name: "BIMO", color: "#66BB6A" },
+  { name: "ALYA", color: "#42A5F5" },
+  { name: "DAVA", color: "#FFEE58" },
+  { name: "MIRA", color: "#26C6DA" },
+  { name: "SENA", color: "#EC407A" },
 ];
 
-function CloudLayer() {
-  const clouds = useMemo(
-    () =>
-      Array.from({ length: 7 }, (_, i) => ({
-        id: i,
-        top: `${5 + Math.random() * 30}%`,
-        size: 0.6 + Math.random() * 1.2,
-        speed: 30 + Math.random() * 50,
-        delay: -(Math.random() * 60),
-        opacity: 0.5 + Math.random() * 0.5,
-      })),
-    [],
-  );
-
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" style={{ zIndex: 2 }}>
-      {clouds.map((c) => (
-        <div
-          key={c.id}
-          className="cloud"
-          style={{
-            top: c.top,
-            transform: `scale(${c.size})`,
-            animationDuration: `${c.speed}s`,
-            animationDelay: `${c.delay}s`,
-            opacity: c.opacity,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-function SparkleParticles() {
-  const particles = useMemo(
-    () =>
-      Array.from({ length: 30 }, (_, i) => ({
-        id: i,
-        left: `${Math.random() * 100}%`,
-        top: `${5 + Math.random() * 60}%`,
-        size: Math.random() * 4 + 2,
-        delay: Math.random() * 5,
-        duration: Math.random() * 2 + 1.5,
-      })),
-    [],
-  );
-
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" style={{ zIndex: 3 }}>
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          className="sparkle"
-          style={{
-            left: p.left,
-            top: p.top,
-            width: p.size,
-            height: p.size,
-            animationDelay: `${p.delay}s`,
-            animationDuration: `${p.duration}s`,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-function CharacterIcons() {
-  const radius = 120;
-
+function CharacterRing() {
+  const radius = 100;
   return (
     <div className="relative mt-4 h-2 w-full" style={{ zIndex: 10 }}>
       <div className="character-ring" style={{ position: "relative", width: 0, height: 0, margin: "0 auto" }}>
@@ -91,31 +27,28 @@ function CharacterIcons() {
           const angle = (i / CHARACTERS.length) * 2 * Math.PI - Math.PI / 2;
           const x = Math.cos(angle) * radius;
           const y = Math.sin(angle) * radius;
-
           return (
             <div
               key={char.name}
               title={char.name}
-              className="character-icon"
               style={{
                 position: "absolute",
-                left: `${x - 14}px`,
-                top: `${y - 14}px`,
-                width: 28,
-                height: 28,
+                left: `${x - 16}px`,
+                top: `${y - 16}px`,
+                width: 32,
+                height: 32,
                 borderRadius: "50%",
-                backgroundColor: char.color,
-                border: "2.5px solid white",
-                boxShadow: `0 2px 8px rgba(0,0,0,0.25), 0 0 0 2px ${char.color}`,
+                background: `linear-gradient(135deg, ${char.color}, ${char.color}cc)`,
+                border: "3px solid white",
+                boxShadow: `0 3px 0 ${char.color}88, 0 4px 12px rgba(0,0,0,0.25), 0 0 20px ${char.color}44`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: '"Arial Black", sans-serif',
-                fontSize: "0.6rem",
+                fontSize: "0.65rem",
                 fontWeight: 900,
                 color: "white",
-                letterSpacing: "0.02em",
-                textShadow: "0 1px 2px rgba(0,0,0,0.4)",
+                textShadow: "0 1px 3px rgba(0,0,0,0.4)",
                 animationDelay: `${i * 0.1}s`,
               }}
             >
@@ -145,15 +78,12 @@ export default function OpeningScreen() {
     <div
       ref={containerRef}
       className="fixed inset-0 overflow-hidden"
-      style={{ background: "#87CEEB" }}
+      style={{ background: "linear-gradient(180deg, #4FC3F7 0%, #81D4FA 30%, #B3E5FC 60%, #E1F5FE 100%)" }}
       onMouseMove={handleMouseMove}
     >
-      <div className="sky-gradient" />
-      <div className="grass-layer" />
-      <div className="grass-hills" />
-
-      <CloudLayer />
-      <SparkleParticles />
+      <SceneErrorBoundary label="Opening Scene">
+        <OpeningScene />
+      </SceneErrorBoundary>
 
       <div
         className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
@@ -164,19 +94,19 @@ export default function OpeningScreen() {
         }}
       >
         <div style={{ animation: "logoDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both" }}>
-          <h1 className="logo-text" style={{ transform: `translateX(${mousePos.x * -6}px) translateY(${mousePos.y * -4}px)` }}>
+          <h1
+            className="logo-text"
+            style={{ transform: `translateX(${mousePos.x * -6}px) translateY(${mousePos.y * -4}px)` }}
+          >
             PRIMA<span className="logo-plus">+</span>
           </h1>
         </div>
 
-        <p
-          className="tagline-text"
-          style={{ animation: "fadeUp 0.7s 0.3s ease-out both" }}
-        >
+        <p className="tagline-text" style={{ animation: "fadeUp 0.7s 0.3s ease-out both" }}>
           BAHASA KITA. PILIHAN KITA.
         </p>
 
-        <CharacterIcons />
+        <CharacterRing />
 
         <button
           onClick={() => router.push("/intro")}
@@ -192,77 +122,8 @@ export default function OpeningScreen() {
       </div>
 
       <style>{`
-        .sky-gradient {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(180deg, #5EC6FF 0%, #7DD3FC 15%, #87CEEB 30%, #A8D8EA 50%, #B8E6B8 70%, #4CAF50 82%, #388E3C 88%, #2E7D32 100%);
-          z-index: 0;
-        }
-        .grass-layer {
-          position: absolute;
-          bottom: 0; left: 0; right: 0;
-          height: 18%;
-          background: linear-gradient(180deg, #4CAF50 0%, #388E3C 40%, #2E7D32 100%);
-          z-index: 1;
-          border-radius: 50% 50% 0 0 / 20% 20% 0 0;
-        }
-        .grass-hills {
-          position: absolute;
-          bottom: 0; left: 0; right: 0;
-          height: 14%;
-          background: linear-gradient(180deg, #66BB6A 0%, #43A047 50%, #2E7D32 100%);
-          z-index: 1;
-          border-radius: 40% 60% 0 0 / 30% 30% 0 0;
-        }
-        .cloud {
-          position: absolute;
-          width: 180px; height: 60px;
-          background: white;
-          border-radius: 60px;
-          animation: cloudDrift linear infinite;
-          z-index: 2;
-        }
-        .cloud::before {
-          content: "";
-          position: absolute;
-          top: -28px; left: 28px;
-          width: 80px; height: 80px;
-          background: white;
-          border-radius: 50%;
-        }
-        .cloud::after {
-          content: "";
-          position: absolute;
-          top: -16px; left: 80px;
-          width: 56px; height: 56px;
-          background: white;
-          border-radius: 50%;
-        }
-        @keyframes cloudDrift {
-          from { left: -220px; }
-          to { left: calc(100% + 220px); }
-        }
-        .sparkle {
-          position: absolute;
-          border-radius: 50%;
-          background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,230,100,0.9) 40%, rgba(255,215,0,0) 70%);
-          animation: sparkleAnim 2s ease-in-out infinite;
-          z-index: 3;
-        }
-        @keyframes sparkleAnim {
-          0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
-          50% { opacity: 1; transform: scale(1) rotate(180deg); }
-        }
         .character-ring { animation: spinRingSlow 30s linear infinite; }
-        @keyframes spinRingSlow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        .character-icon { animation: iconBounce 3s ease-in-out infinite; }
-        @keyframes iconBounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-3px); }
-        }
+        @keyframes spinRingSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .logo-text {
           font-family: "Arial Black", "Impact", "Trebuchet MS", sans-serif;
           font-size: clamp(5rem, 20vw, 13rem);
@@ -291,7 +152,7 @@ export default function OpeningScreen() {
           font-weight: 900;
           letter-spacing: 0.28em;
           color: #FFFFFF;
-          text-shadow: -2px -2px 0 #1A237E, 2px -2px 0 #1A237E, -2px 2px 0 #1A237E, 2px 2px 0 #1A237E, -2px 0 0 #1A237E, 2px 0 0 #1A237E, 0 -2px 0 #1A237E, 0 2px 0 #1A237E, 0 4px 12px rgba(0,0,0,0.3);
+          text-shadow: -2px -2px 0 #1565C0, 2px -2px 0 #1565C0, -2px 2px 0 #1565C0, 2px 2px 0 #1565C0, 0 3px 8px rgba(0,0,0,0.3);
           margin-top: 0.5rem;
           position: relative;
           z-index: 10;
@@ -316,6 +177,7 @@ export default function OpeningScreen() {
           transition: transform 0.15s, box-shadow 0.15s;
         }
         .cta-btn:hover {
+          transform: translateY(-2px);
           box-shadow: 0 7px 0 #8B0000, 0 9px 0 #6B0000, 0 14px 32px rgba(0,0,0,0.35), 0 0 40px rgba(255,82,82,0.5), inset 0 2px 0 rgba(255,255,255,0.35), inset 0 -2px 0 rgba(0,0,0,0.15);
         }
         .cta-btn:active {
@@ -333,7 +195,7 @@ export default function OpeningScreen() {
           font-size: 0.7rem;
           font-weight: 700;
           letter-spacing: 0.2em;
-          color: rgba(255,255,255,0.7);
+          color: rgba(255,255,255,0.8);
           text-shadow: 0 1px 4px rgba(0,0,0,0.25);
           z-index: 10;
         }

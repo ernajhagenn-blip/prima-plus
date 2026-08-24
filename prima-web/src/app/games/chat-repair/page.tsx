@@ -186,16 +186,16 @@ export default function ChatRepairPage() {
 
   if (phase === "start") {
     return (
-      <div className="flex min-h-dvh flex-col items-center justify-center bg-[#060b1e] px-4 text-white">
+      <div className="flex min-h-dvh flex-col items-center justify-center px-4">
         <div className="animate-scale-in w-full max-w-md text-center">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-rose-500 to-pink-600 text-4xl shadow-lg shadow-rose-500/20">
             💬
           </div>
           <h1 className="mt-6 text-3xl font-black">Chat Repair</h1>
-          <p className="mt-3 text-sm text-white/40">
+          <p className="mt-3 text-sm text-gray-500">
             Perbaiki pesan chat yang ambigu, canggung, atau salah arah. Pilih rephrase terbaik dari 4 opsi.
           </p>
-          <div className="mt-6 space-y-2 text-left text-xs text-white/30">
+          <div className="mt-6 space-y-2 text-left text-xs text-gray-400">
             <div className="flex items-start gap-2">
               <span className="mt-0.5 text-rose-400">●</span>
               <span>10 pesan chat yang perlu diperbaiki</span>
@@ -217,7 +217,7 @@ export default function ChatRepairPage() {
           </button>
           <button
             onClick={() => router.push("/games")}
-            className="mt-3 text-xs text-white/25 transition hover:text-white/50"
+            className="mt-3 text-xs text-gray-400 transition hover:text-gray-500"
           >
             ← Kembali ke Arcade
           </button>
@@ -228,27 +228,27 @@ export default function ChatRepairPage() {
 
   if (phase === "result") {
     return (
-      <div className="flex min-h-dvh flex-col items-center justify-center bg-[#060b1e] px-4 text-white">
+      <div className="flex min-h-dvh flex-col items-center justify-center px-4">
         <div className="animate-scale-in w-full max-w-md text-center">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-rose-500/20 to-pink-600/20 text-4xl">
             🏆
           </div>
           <h1 className="mt-6 text-3xl font-black">Selesai!</h1>
-          <p className="mt-2 text-sm text-white/40">Chat Repair</p>
+          <p className="mt-2 text-sm text-gray-500">Chat Repair</p>
           <div className="mt-8 grid grid-cols-3 gap-3">
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
               <p className="text-3xl font-black text-rose-400">{xp}</p>
-              <p className="mt-1 text-[11px] text-white/30">XP Earned</p>
+              <p className="mt-1 text-[11px] text-gray-400">XP Earned</p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
               <p className="text-3xl font-black text-emerald-400">{accuracy}%</p>
-              <p className="mt-1 text-[11px] text-white/30">Akurasi</p>
+              <p className="mt-1 text-[11px] text-gray-400">Akurasi</p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
               <p className="text-3xl font-black text-amber-400">
                 {answers.filter(Boolean).length}/{QUESTIONS.length}
               </p>
-              <p className="mt-1 text-[11px] text-white/30">Benar</p>
+              <p className="mt-1 text-[11px] text-gray-400">Benar</p>
             </div>
           </div>
           <div className="mt-6 flex gap-3">
@@ -262,13 +262,13 @@ export default function ChatRepairPage() {
                 setShowFeedback(false);
                 setAnswers([]);
               }}
-              className="flex-1 rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-bold text-white transition hover:bg-white/10 hover:scale-103 active:scale-97"
+              className="flex-1 rounded-xl border border-gray-200 bg-white/70 py-3 text-sm font-bold text-gray-900 transition hover:bg-white/80 hover:scale-103 active:scale-97"
             >
               Main Lagi
             </button>
             <button
               onClick={() => router.push("/games")}
-              className="flex-1 rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 py-3 text-sm font-bold text-white transition hover:scale-103 active:scale-97"
+              className="flex-1 rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 py-3 text-sm font-bold text-gray-900 transition hover:scale-103 active:scale-97"
             >
               ke Arcade →
             </button>
@@ -279,11 +279,11 @@ export default function ChatRepairPage() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col bg-[#060b1e] text-white">
+    <div className="flex min-h-dvh flex-col text-gray-800">
       <div className="flex items-center justify-between px-4 pt-4 pb-2">
         <button
           onClick={() => router.push("/games")}
-          className="rounded-lg bg-white/5 px-3 py-1.5 text-xs font-bold text-white/50 transition hover:bg-white/10"
+          className="rounded-lg bg-white/70 border border-gray-200 px-3 py-1.5 text-xs font-bold text-gray-500 transition hover:bg-white/80"
         >
           ✕
         </button>
@@ -291,16 +291,16 @@ export default function ChatRepairPage() {
           <p className="text-[10px] font-black uppercase tracking-widest text-rose-300/40">
             Chat Repair
           </p>
-          <p className="text-sm font-bold text-white">
+          <p className="text-sm font-bold text-gray-900">
             {currentQ + 1} / {QUESTIONS.length}
           </p>
         </div>
-        <div className="rounded-lg bg-white/5 px-3 py-1.5 text-xs font-bold text-rose-400">
+        <div className="rounded-lg bg-white/70 border border-gray-200 px-3 py-1.5 text-xs font-bold text-rose-400">
           {xp} XP
         </div>
       </div>
 
-      <div className="mx-4 mt-2 h-1.5 overflow-hidden rounded-full bg-white/5">
+      <div className="mx-4 mt-2 h-1.5 overflow-hidden rounded-full bg-white/70 border border-gray-200">
         <div
           className={`h-full rounded-full transition-all duration-500 ${
             timerPct > 50
@@ -315,12 +315,12 @@ export default function ChatRepairPage() {
 
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-6">
         <div key={currentQ} className="animate-slide-in-left w-full max-w-lg">
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-md">
+          <div className="rounded-2xl border border-gray-200 bg-white/70 p-6 backdrop-blur-md">
             <p className="text-xs font-bold uppercase tracking-wider text-rose-400/60">
               Pesan yang perlu diperbaiki
             </p>
             <div className="mt-3 rounded-xl border border-rose-500/20 bg-rose-500/5 p-4">
-              <p className="text-sm text-white/80 leading-relaxed">&quot;{q.broken}&quot;</p>
+              <p className="text-sm text-gray-700 leading-relaxed">&quot;{q.broken}&quot;</p>
             </div>
             <div className="mt-3 flex items-center gap-2">
               <span className="rounded-md bg-rose-500/10 px-2 py-0.5 text-[11px] font-bold text-rose-400">
@@ -333,7 +333,7 @@ export default function ChatRepairPage() {
             {q.options.map((opt, i) => {
               const isCorrect = opt === q.correctRephrase;
               const isSelected = opt === selected;
-              let btnStyle = "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]";
+              let btnStyle = "border-gray-200 bg-white/70 hover:border-gray-300 hover:bg-white/90";
               if (showFeedback && isCorrect) btnStyle = "border-emerald-400/60 bg-emerald-500/15";
               if (showFeedback && isSelected && !isCorrect) btnStyle = "border-rose-400/60 bg-rose-500/15";
 
@@ -344,7 +344,7 @@ export default function ChatRepairPage() {
                   disabled={showFeedback}
                   className={`w-full rounded-xl border p-4 text-left text-sm transition-all ${btnStyle} ${!showFeedback ? "hover:scale-[1.02] active:scale-[0.98]" : ""}`}
                 >
-                  <span className="mr-2 text-[11px] text-white/20">{String.fromCharCode(65 + i)}.</span>
+                  <span className="mr-2 text-[11px] text-gray-400">{String.fromCharCode(65 + i)}.</span>
                   {opt}
                 </button>
               );
@@ -352,9 +352,9 @@ export default function ChatRepairPage() {
           </div>
 
           {showFeedback && (
-            <div className="mt-4 animate-fade-in rounded-xl border border-white/10 bg-white/5 p-4">
-              <p className="text-xs font-bold text-white/50">Penjelasan:</p>
-              <p className="mt-1 text-sm text-white/70">{q.explanation}</p>
+            <div className="mt-4 animate-fade-in rounded-xl border border-gray-200 bg-white/70 p-4">
+              <p className="text-xs font-bold text-gray-500">Penjelasan:</p>
+              <p className="mt-1 text-sm text-gray-600">{q.explanation}</p>
             </div>
           )}
         </div>

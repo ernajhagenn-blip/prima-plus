@@ -10,18 +10,21 @@ export default async function PosttestPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
-      <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h1 className="text-xl font-black text-gray-900">Posttest Loyalitas Berbahasa</h1>
+      <div className="mb-6 rounded-3xl border-2 border-orange-200 bg-white/70 p-6 shadow-lg backdrop-blur-md">
+        <span className="inline-block rounded-full bg-gradient-to-r from-orange-400 to-red-500 px-3 py-1 text-xs font-black text-white shadow-md">
+          TAHAP 3 / 4
+        </span>
+        <h1 className="mt-2 text-xl font-black text-gray-900">Posttest Loyalitas Berbahasa</h1>
         <p className="mt-1 text-sm text-gray-600">
-          Responden: {p.name} · Kelas {p.kelas} — tahap 3 dari 4
+          Responden: {p.name} · Kelas {p.kelas}
         </p>
-        <p className="mt-3 text-sm text-gray-700">
+        <p className="mt-3 text-sm leading-relaxed text-gray-700">
           Kuesioner ini mengukur sikap dan loyalitas berbahasa Indonesia setelah
           menggunakan PRIMA+. Jawablah sesuai keadaanmu saat ini.
         </p>
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-3xl border-2 border-orange-200 bg-white/70 p-6 shadow-lg backdrop-blur-md">
         <QuestionnaireForm
           action={submitPosttest}
           items={items}

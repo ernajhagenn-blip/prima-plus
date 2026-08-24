@@ -9,11 +9,11 @@ export default async function EdukasiPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
-      <div className="mb-6 rounded-2xl border border-gray-200 bg-white/80 p-6 shadow-sm backdrop-blur-sm">
-        <p className="text-xs font-bold uppercase tracking-wide text-red-700">
-          Tahap Edukasi
-        </p>
-        <h1 className="mt-1 text-2xl font-black text-gray-900">
+      <div className="mb-6 rounded-3xl border-2 border-red-200 bg-white/70 p-6 shadow-lg backdrop-blur-md">
+        <span className="inline-block rounded-full bg-gradient-to-r from-red-500 to-pink-500 px-3 py-1 text-xs font-black text-white shadow-md">
+          KNOWLEDGE CENTER
+        </span>
+        <h1 className="mt-2 text-2xl font-black text-gray-900">
           Materi Kesadaran BerBahasa
         </h1>
         <p className="mt-1 text-sm text-gray-500">
@@ -27,7 +27,7 @@ export default async function EdukasiPage() {
       </div>
 
       {modules.length === 0 ? (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">
+        <div className="rounded-3xl border-2 border-amber-200 bg-amber-50/70 p-6 text-sm text-amber-900 backdrop-blur-sm shadow-md">
           Belum ada materi edukasi. Silakan lanjut ke kuis.
         </div>
       ) : (
@@ -37,7 +37,8 @@ export default async function EdukasiPage() {
       <form action={completeEdu} className="mt-6">
         <button
           type="submit"
-          className="w-full rounded-xl bg-gradient-to-r from-red-700 to-red-600 px-6 py-3.5 text-sm font-bold text-white shadow-md transition hover:from-red-800 hover:to-red-700 hover:shadow-lg active:scale-[0.98]"
+          className="w-full rounded-2xl bg-gradient-to-r from-red-600 to-pink-500 px-6 py-3.5 text-sm font-black text-white shadow-lg transition hover:from-red-700 hover:to-pink-600 hover:shadow-xl active:scale-[0.98]"
+          style={{ boxShadow: "0 4px 0 #B71C1C, inset 0 2px 0 rgba(255,255,255,0.3)" }}
         >
           Saya sudah membaca semua modul — Lanjut ke Kuis →
         </button>

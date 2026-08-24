@@ -19,14 +19,14 @@ export default async function CardsPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <Link href="/" className="text-xs font-semibold text-red-700">
+      <Link href="/" className="text-xs font-bold text-blue-500 hover:text-blue-600">
         ← PRIMA CITY
       </Link>
-      <div className="mt-3 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <p className="text-xs font-bold uppercase tracking-wide text-red-700">
+      <div className="mt-3 rounded-3xl border-2 border-yellow-200 bg-white/70 p-5 shadow-lg backdrop-blur-md">
+        <span className="inline-block rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 px-3 py-1 text-xs font-black text-white shadow-md">
           NUSANTARA ISLAND
-        </p>
-        <h1 className="mt-1 text-xl font-black text-gray-900">Language Cards</h1>
+        </span>
+        <h1 className="mt-2 text-xl font-black text-gray-900">Language Cards</h1>
         <p className="mt-2 text-sm text-gray-600">
           Kumpulkan kartu dari tiap pengalaman. Kartu yang sudah kamu miliki
           ditandai <span className="font-semibold text-green-600">✓</span>.
@@ -36,7 +36,7 @@ export default async function CardsPage() {
       <div className="mt-5 space-y-5">
         {Array.from(byCat.entries()).map(([cat, cards]) => (
           <div key={cat}>
-            <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500">
+            <h2 className="text-sm font-black uppercase tracking-wide text-gray-500">
               {cat}
             </h2>
             <div className="mt-2 grid gap-2 sm:grid-cols-2">
@@ -45,10 +45,10 @@ export default async function CardsPage() {
                 return (
                   <div
                     key={c.id}
-                    className={`rounded-xl border p-3 ${
+                    className={`rounded-xl border-2 p-3 transition-all ${
                       isOwned
-                        ? "border-green-300 bg-green-50"
-                        : "border-gray-200 bg-white"
+                        ? "border-green-300 bg-green-50/70 shadow-md backdrop-blur-sm"
+                        : "border-gray-200 bg-white/50"
                     }`}
                   >
                     <div className="flex items-center justify-between">

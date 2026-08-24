@@ -2,8 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { KARTS, STAT_META } from "@/components/game/karts";
 import { useJourney } from "@/lib/store";
+import SceneErrorBoundary from "./SceneErrorBoundary";
+
+const KartScene = dynamic(() => import("./KartScene"), { ssr: false });
 
 function StatBar({
   label,
@@ -20,10 +24,10 @@ function StatBar({
 }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="w-20 text-right text-[11px] font-bold uppercase tracking-wider text-gray-400">
+      <span className="w-20 text-right text-[11px] font-bold uppercase tracking-wider text-gray-500">
         {label}
       </span>
-      <div className="relative h-3 flex-1 overflow-hidden rounded-full bg-gray-200">
+      <div className="relative h-3 flex-1 overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.3)" }}>
         <div
           className={`absolute inset-y-0 left-0 rounded-full bg-gradient-to-r ${gradient}`}
           style={{
@@ -56,34 +60,51 @@ export default function KartSelectScreen() {
 
   return (
     <div
-      className="fixed inset-0 flex flex-col overflow-hidden text-gray-800"
+      className="fixed inset-0 flex flex-col overflow-hidden"
       style={{
-        background: "linear-gradient(180deg, #5EC6FF 0%, #7DD3FC 20%, #A8D8EA 45%, #E0F2FE 65%, #BAE6FD 100%)",
+        background: "linear-gradient(180deg, #4FC3F7 0%, #81D4FA 30%, #B3E5FC 60%, #E1F5FE 100%)",
       }}
     >
-      <div className="pointer-events-none absolute inset-0">
-        <div
-          className="absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full blur-[160px] transition-colors duration-700"
-          style={{ background: `${selected.body}20` }}
-        />
-      </div>
+      <SceneErrorBoundary label="Kart Select">
+        <KartScene body={selected.body} accent={selected.accent} />
+      </SceneErrorBoundary>
 
       <div className="relative z-10 flex items-center justify-between px-4 pt-4 pb-2">
         <button
           onClick={() => router.back()}
-          className="rounded-xl border border-gray-200 bg-white/70 px-4 py-2 text-sm font-bold text-gray-600 backdrop-blur-md transition hover:bg-white/90"
+          className="rounded-xl px-4 py-2 text-sm font-bold text-white backdrop-blur-md transition-all duration-200"
+          style={{
+            background: "rgba(255,255,255,0.3)",
+            border: "2px solid rgba(255,255,255,0.4)",
+            boxShadow: "0 3px 0 rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.1)",
+          }}
         >
           ← Kembali
         </button>
         <div className="text-center">
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-400">GARAGE</p>
-          <h1 className="text-lg font-black text-gray-800">Pilih Kart</h1>
+          <p
+            className="text-[10px] font-black uppercase tracking-[0.4em]"
+            style={{
+              color: "#FFD54F",
+              textShadow: "0 2px 0 #E65100, 0 3px 8px rgba(0,0,0,0.2)",
+            }}
+          >
+            GARAGE
+          </p>
+          <h1
+            className="text-lg font-black"
+            style={{
+              color: "#1A237E",
+              textShadow: "0 1px 4px rgba(255,255,255,0.6)",
+            }}
+          >
+            Pilih Kart
+          </h1>
         </div>
         <div className="w-20" />
       </div>
 
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4">
-        {/* Big kart preview */}
         <div
           className="mb-6 flex flex-col items-center"
           key={selected.key}
@@ -94,18 +115,23 @@ export default function KartSelectScreen() {
             style={{
               background: `linear-gradient(135deg, ${selected.body}, ${selected.accent})`,
               boxShadow: `0 8px 0 ${selected.body}88, 0 12px 30px rgba(0,0,0,0.2), 0 0 40px ${selected.trail}44`,
-              border: "4px solid rgba(255,255,255,0.5)",
+              border: "4px solid rgba(255,255,255,0.6)",
             }}
           >
             <span className="drop-shadow-lg">{KART_EMOJI[selected.key] || "🏎️"}</span>
           </div>
-          <p className="mt-3 text-xl font-black text-gray-800" style={{ textShadow: `0 2px 20px ${selected.body}44` }}>
+          <p
+            className="mt-3 text-xl font-black"
+            style={{
+              color: "#1A237E",
+              textShadow: `0 2px 20px ${selected.body}44`,
+            }}
+          >
             {selected.name}
           </p>
-          <p className="mt-1 text-xs text-gray-500">{selected.trait}</p>
+          <p className="mt-1 text-xs text-gray-600">{selected.trait}</p>
         </div>
 
-        {/* Kart selector */}
         <div className="grid w-full max-w-lg grid-cols-4 gap-2">
           {KARTS.map((k) => {
             const active = k.key === selected.key;
@@ -118,9 +144,10 @@ export default function KartSelectScreen() {
                 onMouseLeave={() => setHovered(null)}
                 className="relative overflow-hidden rounded-xl border-2 p-2.5 text-left transition-all duration-200"
                 style={{
+                  cursor: "pointer",
                   background: active
-                    ? `linear-gradient(135deg, ${k.body}22, ${k.accent}11)`
-                    : "rgba(255,255,255,0.6)",
+                    ? `linear-gradient(135deg, ${k.body}33, ${k.accent}22)`
+                    : "rgba(255,255,255,0.5)",
                   borderColor: active ? k.body : "rgba(255,255,255,0.5)",
                   boxShadow: active
                     ? `0 4px 0 ${k.body}66, 0 6px 16px rgba(0,0,0,0.15), 0 0 20px ${k.body}33`
@@ -146,18 +173,22 @@ export default function KartSelectScreen() {
           })}
         </div>
 
-        {/* Stats */}
         <div
-          className="mt-4 w-full max-w-lg rounded-2xl border border-gray-200 bg-white/70 p-4 backdrop-blur-md"
+          className="mt-4 w-full max-w-lg rounded-2xl p-4 backdrop-blur-md"
           key={`stats-${selected.key}`}
-          style={{ animation: "fadeUp 0.3s ease-out both" }}
+          style={{
+            animation: "fadeUp 0.3s ease-out both",
+            background: "rgba(255,255,255,0.5)",
+            border: "2px solid rgba(255,255,255,0.4)",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+          }}
         >
           <div className="mb-3 flex items-center gap-2">
             <div
               className="h-3 w-3 rounded-full"
               style={{ background: selected.body, boxShadow: `0 0 8px ${selected.body}88` }}
             />
-            <span className="text-xs font-black uppercase tracking-wider text-gray-400">
+            <span className="text-xs font-black uppercase tracking-wider text-gray-500">
               Statistik {selected.name}
             </span>
           </div>
@@ -184,7 +215,7 @@ export default function KartSelectScreen() {
           }}
           className="mx-auto flex w-full max-w-md items-center justify-center gap-3 rounded-2xl py-4 text-lg font-black text-white transition-all duration-200"
           style={{
-            background: `linear-gradient(135deg, ${selected.body}, ${selected.accent})`,
+            background: `linear-gradient(180deg, ${selected.body} 0%, ${selected.accent} 100%)`,
             boxShadow: `0 5px 0 ${selected.body}88, 0 8px 20px rgba(0,0,0,0.25), inset 0 2px 0 rgba(255,255,255,0.3)`,
           }}
         >
