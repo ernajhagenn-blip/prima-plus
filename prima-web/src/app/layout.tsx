@@ -13,13 +13,13 @@ export default function RootLayout({
     <html lang="id" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         <header
-          className="border-b-3 border-cyan-400"
+          className="sticky top-0 z-50 border-b-3 border-cyan-400"
           style={{
             background: "linear-gradient(135deg, #EF5350 0%, #FF7043 40%, #FFB300 100%)",
             boxShadow: "0 2px 12px rgba(255,112,67,0.3)",
           }}
         >
-          <div className="mx-auto flex max-w-2xl items-center gap-2 px-3 py-2">
+          <div className="mx-auto flex max-w-5xl items-center gap-2 px-4 py-2 sm:px-6">
             <div
               className="flex h-8 w-8 items-center justify-center rounded-lg font-black text-white shadow-sm"
               style={{
@@ -40,7 +40,7 @@ export default function RootLayout({
           className="border-t-2 border-green-300"
           style={{ background: "linear-gradient(135deg, #66BB6A 0%, #43A047 100%)" }}
         >
-          <div className="mx-auto max-w-2xl px-3 py-1.5 text-center text-[10px] font-bold text-white/90">
+          <div className="mx-auto max-w-5xl px-4 py-1.5 text-center text-[10px] font-bold text-white/90 sm:px-6">
             OPSI 2026 · Ilmu Sosial Humaniora
           </div>
         </footer>
