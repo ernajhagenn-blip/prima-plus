@@ -2,12 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
 import { HEROES } from "@/components/game/Hero";
 import { useJourney } from "@/lib/store";
-import SceneErrorBoundary from "./SceneErrorBoundary";
-
-const SelectScene = dynamic(() => import("./SelectScene"), { ssr: false });
 
 const HAT_EMOJI: Record<string, string> = {
   cap: "🧢",
@@ -31,7 +27,6 @@ export default function SelectScreen() {
   const characterKey = useJourney((s) => s.characterKey);
   const setCharacter = useJourney((s) => s.setCharacter);
   const selected = HEROES.find((h) => h.key === characterKey) ?? HEROES[0];
-  const [hovered, setHovered] = useState<string | null>(null);
 
   return (
     <div
@@ -40,9 +35,11 @@ export default function SelectScreen() {
         background: "linear-gradient(180deg, #4FC3F7 0%, #81D4FA 30%, #B3E5FC 60%, #E1F5FE 100%)",
       }}
     >
-      <SceneErrorBoundary label="Character Select">
-        <SelectScene color={selected.body} accent={selected.accent} />
-      </SceneErrorBoundary>
+      {/* Floating Clouds */}
+      <div className="pointer-events-none absolute inset-0" style={{ zIndex: 1 }}>
+        <div className="sel-cloud sc1" />
+        <div className="sel-cloud sc2" />
+      </div>
 
       <div className="relative z-10 flex items-center justify-between p-4">
         <button
@@ -111,13 +108,10 @@ export default function SelectScreen() {
         <div className="grid w-full max-w-lg grid-cols-4 gap-3">
           {HEROES.map((h) => {
             const active = h.key === characterKey;
-            const isHovered = h.key === hovered;
             return (
               <button
                 key={h.key}
                 onClick={() => setCharacter(h.key)}
-                onMouseEnter={() => setHovered(h.key)}
-                onMouseLeave={() => setHovered(null)}
                 className="relative flex flex-col items-center rounded-2xl p-3 transition-all duration-200"
                 style={{
                   cursor: "pointer",
@@ -127,10 +121,8 @@ export default function SelectScreen() {
                   border: active ? `3px solid ${h.body}` : "2px solid rgba(255,255,255,0.5)",
                   boxShadow: active
                     ? `0 4px 0 ${h.body}66, 0 6px 16px rgba(0,0,0,0.15), 0 0 20px ${h.accent}33`
-                    : isHovered
-                    ? "0 4px 12px rgba(0,0,0,0.1)"
                     : "0 2px 6px rgba(0,0,0,0.06)",
-                  transform: active ? "translateY(-4px)" : isHovered ? "translateY(-2px)" : "none",
+                  transform: active ? "translateY(-4px)" : "none",
                 }}
               >
                 <div
@@ -180,6 +172,40 @@ export default function SelectScreen() {
         @keyframes charPop {
           0% { opacity: 0; transform: scale(0.6); }
           100% { opacity: 1; transform: scale(1); }
+        }
+        .sel-cloud {
+          position: absolute;
+          background: white;
+          border-radius: 50px;
+          opacity: 0.5;
+        }
+        .sel-cloud::before,
+        .sel-cloud::after {
+          content: "";
+          position: absolute;
+          background: white;
+          border-radius: 50%;
+        }
+        .sc1 {
+          width: 90px; height: 30px;
+          top: 10%; left: 15%;
+          animation: selCloudDrift 22s linear infinite;
+        }
+        .sc1::before { width: 38px; height: 38px; top: -20px; left: 14px; }
+        .sc1::after { width: 52px; height: 44px; top: -22px; left: 34px; }
+
+        .sc2 {
+          width: 70px; height: 24px;
+          top: 18%; left: 70%;
+          animation: selCloudDrift 18s linear infinite;
+          animation-delay: -8s;
+        }
+        .sc2::before { width: 30px; height: 30px; top: -16px; left: 10px; }
+        .sc2::after { width: 42px; height: 36px; top: -18px; left: 26px; }
+
+        @keyframes selCloudDrift {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(calc(-100vw - 200px)); }
         }
       `}</style>
     </div>

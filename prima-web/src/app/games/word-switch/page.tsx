@@ -92,7 +92,7 @@ function highlightSentence(sentence: string, word: string) {
   return (
     <>
       {parts[0]}
-      <span className="inline-block rounded bg-amber-500/20 px-1.5 py-0.5 font-bold text-amber-400 underline decoration-amber-400/40 decoration-wavy underline-offset-4">
+      <span className="inline-block rounded bg-amber-500/20 px-1.5 py-0.5 font-bold text-amber-700 underline decoration-amber-500/40 decoration-wavy underline-offset-4">
         {word}
       </span>
       {parts[1]}
@@ -141,21 +141,21 @@ export default function WordSwitchPage() {
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-amber-500 to-orange-600 text-4xl shadow-lg shadow-amber-500/20">
             🔤
           </div>
-          <h1 className="mt-6 text-3xl font-black">Word Switch</h1>
+          <h1 className="mt-6 text-3xl font-black text-gray-900">🔤 Word Switch</h1>
           <p className="mt-3 text-sm text-gray-500">
             Ganti kata yang salah, informal, atau tidak baku dengan padanan yang tepat.
           </p>
-          <div className="mt-6 space-y-2 text-left text-xs text-gray-400">
+          <div className="mt-6 space-y-2 text-left text-xs text-gray-500">
             <div className="flex items-start gap-2">
-              <span className="mt-0.5 text-amber-400">●</span>
+              <span className="mt-0.5 text-amber-600">●</span>
               <span>10 kalimat dengan kata yang perlu diganti</span>
             </div>
             <div className="flex items-start gap-2">
-              <span className="mt-0.5 text-amber-400">●</span>
+              <span className="mt-0.5 text-amber-600">●</span>
               <span>Pilih pengganti terbaik dari 4 opsi</span>
             </div>
             <div className="flex items-start gap-2">
-              <span className="mt-0.5 text-amber-400">●</span>
+              <span className="mt-0.5 text-amber-600">●</span>
               <span>Setiap jawaban benar = +{XP_PER_CORRECT} XP</span>
             </div>
           </div>
@@ -167,7 +167,7 @@ export default function WordSwitchPage() {
           </button>
           <button
             onClick={() => router.push("/games")}
-            className="mt-3 text-xs text-gray-400 transition hover:text-gray-500"
+            className="mt-3 text-xs font-bold text-gray-500 transition hover:text-gray-700"
           >
             ← Kembali ke Arcade
           </button>
@@ -186,19 +186,19 @@ export default function WordSwitchPage() {
           <h1 className="mt-6 text-3xl font-black">Selesai!</h1>
           <p className="mt-2 text-sm text-gray-500">Word Switch</p>
           <div className="mt-8 grid grid-cols-3 gap-3">
-            <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
-              <p className="text-3xl font-black text-amber-400">{xp}</p>
-              <p className="mt-1 text-[11px] text-gray-400">XP Earned</p>
+            <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
+              <p className="text-3xl font-black text-amber-700">{xp}</p>
+              <p className="mt-1 text-[11px] text-gray-500">XP Earned</p>
             </div>
-            <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
-              <p className="text-3xl font-black text-emerald-400">{accuracy}%</p>
-              <p className="mt-1 text-[11px] text-gray-400">Akurasi</p>
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
+              <p className="text-3xl font-black text-emerald-700">{accuracy}%</p>
+              <p className="mt-1 text-[11px] text-gray-500">Akurasi</p>
             </div>
-            <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
-              <p className="text-3xl font-black text-amber-400">
+            <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
+              <p className="text-3xl font-black text-amber-700">
                 {answers.filter(Boolean).length}/{QUESTIONS.length}
               </p>
-              <p className="mt-1 text-[11px] text-gray-400">Benar</p>
+                <p className="mt-1 text-[11px] text-gray-500">Benar</p>
             </div>
           </div>
           <div className="mt-6 flex gap-3">
@@ -211,13 +211,13 @@ export default function WordSwitchPage() {
                 setShowFeedback(false);
                 setAnswers([]);
               }}
-              className="flex-1 rounded-xl border border-gray-200 bg-white/70 py-3 text-sm font-bold text-gray-900 transition hover:bg-white/80 hover:scale-103 active:scale-97"
+              className="flex-1 rounded-xl border-2 border-gray-200 bg-white/70 py-3 text-sm font-bold text-gray-700 transition hover:bg-white/80 hover:scale-103 active:scale-97"
             >
               Main Lagi
             </button>
             <button
               onClick={() => router.push("/games")}
-              className="flex-1 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 py-3 text-sm font-bold text-gray-900 transition hover:scale-103 active:scale-97"
+              className="flex-1 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 py-3 text-sm font-black text-white shadow-lg transition hover:scale-103 active:scale-97"
             >
               ke Arcade →
             </button>
@@ -237,14 +237,14 @@ export default function WordSwitchPage() {
           ✕
         </button>
         <div className="text-center">
-          <p className="text-[10px] font-black uppercase tracking-widest text-amber-300/40">
-            Word Switch
+          <p className="text-[10px] font-black uppercase tracking-widest text-amber-700/60">
+            🔤 Word Switch
           </p>
           <p className="text-sm font-bold text-gray-900">
             {currentQ + 1} / {QUESTIONS.length}
           </p>
         </div>
-        <div className="rounded-lg bg-white/70 border border-gray-200 px-3 py-1.5 text-xs font-bold text-amber-400">
+        <div className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-1.5 text-xs font-bold text-amber-700">
           {xp} XP
         </div>
       </div>
@@ -252,8 +252,8 @@ export default function WordSwitchPage() {
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-6">
         <div key={currentQ} className="animate-slide-in-left w-full max-w-lg">
           <div className="rounded-2xl border border-gray-200 bg-white/70 p-6 backdrop-blur-md">
-            <p className="text-xs font-bold uppercase tracking-wider text-amber-400/60">
-              Ganti kata yang ditandai
+            <p className="text-xs font-bold uppercase tracking-wider text-amber-700/60">
+              🔄 Ganti kata yang ditandai
             </p>
             <p className="mt-3 text-lg font-semibold text-gray-800 leading-relaxed">
               {highlightSentence(q.sentence, q.highlightedWord)}

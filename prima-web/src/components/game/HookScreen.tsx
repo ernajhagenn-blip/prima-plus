@@ -2,10 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
-import SceneErrorBoundary from "./SceneErrorBoundary";
-
-const HookScene = dynamic(() => import("./HookScene"), { ssr: false });
 
 const LINES = [
   { who: "RAGA", text: "Eh, tadi aku dengerin obrolan kita.", color: "#FF8A2A" },
@@ -29,10 +25,6 @@ export default function HookScreen() {
           background: "linear-gradient(180deg, #4FC3F7 0%, #81D4FA 30%, #B3E5FC 60%, #E1F5FE 100%)",
         }}
       >
-        <SceneErrorBoundary label="Hook Scene">
-          <HookScene />
-        </SceneErrorBoundary>
-
         <div style={{ animation: "freezeIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both", position: "relative", zIndex: 10 }}>
           <p
             className="text-4xl font-black leading-tight sm:text-6xl"
@@ -78,9 +70,17 @@ export default function HookScreen() {
         background: "linear-gradient(180deg, #4FC3F7 0%, #81D4FA 25%, #B3E5FC 50%, #E1F5FE 75%, #C8E6C9 100%)",
       }}
     >
-      <SceneErrorBoundary label="Hook Scene">
-        <HookScene />
-      </SceneErrorBoundary>
+      {/* Floating star particles */}
+      <div className="pointer-events-none absolute inset-0" style={{ zIndex: 1 }}>
+        <div className="star-particle sp1">✦</div>
+        <div className="star-particle sp2">✧</div>
+        <div className="star-particle sp3">✦</div>
+        <div className="star-particle sp4">✧</div>
+        <div className="star-particle sp5">✦</div>
+        <div className="star-particle sp6">✧</div>
+        <div className="star-particle sp7">✦</div>
+        <div className="star-particle sp8">✧</div>
+      </div>
 
       <div className="absolute inset-0 flex flex-col justify-end p-6" style={{ zIndex: 5 }}>
         <div className="mx-auto w-full max-w-xl">
@@ -140,6 +140,27 @@ export default function HookScreen() {
         @keyframes bubbleSlide {
           0% { opacity: 0; transform: translateY(20px) scale(0.9); }
           100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .star-particle {
+          position: absolute;
+          color: #FFD54F;
+          font-size: 1.2rem;
+          opacity: 0.5;
+          text-shadow: 0 0 8px rgba(255,213,79,0.6);
+          animation: starFloat 4s ease-in-out infinite;
+        }
+        .sp1 { top: 8%; left: 12%; animation-delay: 0s; }
+        .sp2 { top: 15%; left: 75%; animation-delay: 0.5s; font-size: 0.9rem; }
+        .sp3 { top: 25%; left: 40%; animation-delay: 1s; }
+        .sp4 { top: 10%; left: 90%; animation-delay: 1.5s; font-size: 0.8rem; }
+        .sp5 { top: 35%; left: 20%; animation-delay: 2s; font-size: 1rem; }
+        .sp6 { top: 5%; left: 55%; animation-delay: 2.5s; font-size: 0.7rem; }
+        .sp7 { top: 20%; left: 30%; animation-delay: 3s; }
+        .sp8 { top: 12%; left: 65%; animation-delay: 3.5s; font-size: 0.85rem; }
+
+        @keyframes starFloat {
+          0%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
+          50% { transform: translateY(-12px) scale(1.2); opacity: 0.7; }
         }
       `}</style>
     </div>

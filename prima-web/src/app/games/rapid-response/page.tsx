@@ -93,22 +93,22 @@ export default function RapidResponsePage() {
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-fuchsia-500 to-rose-600 text-4xl shadow-lg shadow-fuchsia-500/20">
             ⚡
           </div>
-          <h1 className="mt-6 text-3xl font-black">Rapid Response</h1>
+          <h1 className="mt-6 text-3xl font-black text-gray-900">⚡ Rapid Response</h1>
           <p className="mt-3 text-sm text-gray-500">
             Uji kecepatan berpikir bahasa! Tulis kata asosiasi yang relevan dalam{" "}
-            <span className="font-bold text-fuchsia-400">{TIMER_SECONDS} detik</span>.
+            <span className="font-bold text-fuchsia-700">{TIMER_SECONDS} detik</span>.
           </p>
-          <div className="mt-6 space-y-2 text-left text-xs text-gray-400">
+          <div className="mt-6 space-y-2 text-left text-xs text-gray-500">
             <div className="flex items-start gap-2">
-              <span className="mt-0.5 text-fuchsia-400">●</span>
+              <span className="mt-0.5 text-fuchsia-600">●</span>
               <span>12 kata prompt yang muncul satu per satu</span>
             </div>
             <div className="flex items-start gap-2">
-              <span className="mt-0.5 text-fuchsia-400">●</span>
+              <span className="mt-0.5 text-fuchsia-600">●</span>
               <span>Tulis satu kata/frasa asosiasi secepat mungkin</span>
             </div>
             <div className="flex items-start gap-2">
-              <span className="mt-0.5 text-fuchsia-400">●</span>
+              <span className="mt-0.5 text-fuchsia-600">●</span>
               <span>Setiap jawaban relevan = +{XP_PER_WORD} XP</span>
             </div>
           </div>
@@ -120,7 +120,7 @@ export default function RapidResponsePage() {
           </button>
           <button
             onClick={() => router.push("/games")}
-            className="mt-3 text-xs text-gray-400 transition hover:text-gray-500"
+            className="mt-3 text-xs font-bold text-gray-500 transition hover:text-gray-700"
           >
             ← Kembali ke Arcade
           </button>
@@ -139,19 +139,19 @@ export default function RapidResponsePage() {
           <h1 className="mt-6 text-3xl font-black">Selesai!</h1>
           <p className="mt-2 text-sm text-gray-500">Rapid Response</p>
           <div className="mt-8 grid grid-cols-3 gap-3">
-            <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
-              <p className="text-3xl font-black text-fuchsia-400">{xp}</p>
-              <p className="mt-1 text-[11px] text-gray-400">XP Earned</p>
+            <div className="rounded-2xl border border-fuchsia-200 bg-fuchsia-50/70 p-4">
+              <p className="text-3xl font-black text-fuchsia-700">{xp}</p>
+              <p className="mt-1 text-[11px] text-gray-500">XP Earned</p>
             </div>
-            <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
-              <p className="text-3xl font-black text-emerald-400">{accuracy}%</p>
-              <p className="mt-1 text-[11px] text-gray-400">Akurasi</p>
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
+              <p className="text-3xl font-black text-emerald-700">{accuracy}%</p>
+              <p className="mt-1 text-[11px] text-gray-500">Akurasi</p>
             </div>
-            <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
-              <p className="text-3xl font-black text-amber-400">
+            <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
+              <p className="text-3xl font-black text-amber-700">
                 {answers.filter((a) => a.correct).length}/{WORD_PROMPTS.length}
               </p>
-              <p className="mt-1 text-[11px] text-gray-400">Relevan</p>
+                <p className="mt-1 text-[11px] text-gray-500">Relevan</p>
             </div>
           </div>
 
@@ -160,11 +160,11 @@ export default function RapidResponsePage() {
               <div
                 key={i}
                 className={`flex items-center justify-between rounded-lg px-3 py-1.5 text-xs ${
-                  a.correct ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"
+                  a.correct ? "bg-emerald-50 border border-emerald-200 text-emerald-700" : "bg-rose-50 border border-rose-200 text-rose-700"
                 }`}
               >
                 <span className="font-bold">{a.word}</span>
-                <span className="text-gray-500">→ {a.response}</span>
+                <span className="text-gray-600">→ {a.response}</span>
                 <span>{a.correct ? "✓" : "✗"}</span>
               </div>
             ))}
@@ -181,13 +181,13 @@ export default function RapidResponsePage() {
                 setAnswers([]);
                 setUserInput("");
               }}
-              className="flex-1 rounded-xl border border-gray-200 bg-white/70 py-3 text-sm font-bold text-gray-900 transition hover:bg-white/80 hover:scale-103 active:scale-97"
+              className="flex-1 rounded-xl border-2 border-gray-200 bg-white/70 py-3 text-sm font-bold text-gray-700 transition hover:bg-white/80 hover:scale-103 active:scale-97"
             >
               Main Lagi
             </button>
             <button
               onClick={() => router.push("/games")}
-              className="flex-1 rounded-xl bg-gradient-to-r from-fuchsia-500 to-rose-600 py-3 text-sm font-bold text-gray-900 transition hover:scale-103 active:scale-97"
+              className="flex-1 rounded-xl bg-gradient-to-r from-fuchsia-500 to-rose-600 py-3 text-sm font-black text-white shadow-lg transition hover:scale-103 active:scale-97"
             >
               ke Arcade →
             </button>
@@ -207,14 +207,14 @@ export default function RapidResponsePage() {
           ✕
         </button>
         <div className="text-center">
-          <p className="text-[10px] font-black uppercase tracking-widest text-fuchsia-300/40">
-            Rapid Response
+          <p className="text-[10px] font-black uppercase tracking-widest text-fuchsia-700/60">
+            ⚡ Rapid Response
           </p>
           <p className="text-sm font-bold text-gray-900">
             {currentQ + 1} / {WORD_PROMPTS.length}
           </p>
         </div>
-        <div className="rounded-lg bg-white/70 border border-gray-200 px-3 py-1.5 text-xs font-bold text-fuchsia-400">
+        <div className="rounded-lg bg-fuchsia-50 border border-fuchsia-200 px-3 py-1.5 text-xs font-bold text-fuchsia-700">
           {xp} XP
         </div>
       </div>
@@ -236,13 +236,13 @@ export default function RapidResponsePage() {
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-6">
         <div key={currentQ} className="animate-scale-in w-full max-w-md text-center">
           {/* Category badge */}
-          <span className="inline-block rounded-full bg-fuchsia-500/10 px-3 py-1 text-[11px] font-bold text-fuchsia-400">
+          <span className="inline-block rounded-full bg-fuchsia-100 px-3 py-1 text-[11px] font-bold text-fuchsia-700">
             {prompt.category}
           </span>
 
           {/* Word prompt */}
           <div className="mt-6">
-            <h2 className="text-6xl font-black text-gray-900" style={{ textShadow: "0 0 40px rgba(217,70,239,0.2)" }}>
+            <h2 className="text-6xl font-black text-gray-900" style={{ textShadow: "0 0 40px rgba(192,132,252,0.3)" }}>
               {prompt.word}
             </h2>
           </div>
@@ -251,12 +251,12 @@ export default function RapidResponsePage() {
           <div className="mt-6">
             <span
               className={`text-4xl font-black ${
-                timer <= 2 ? "text-rose-400" : timer <= 4 ? "text-amber-400" : "text-fuchsia-400"
+                timer <= 2 ? "text-rose-600" : timer <= 4 ? "text-amber-600" : "text-fuchsia-600"
               }`}
             >
               {timer}
             </span>
-            <p className="mt-1 text-xs text-gray-400">detik tersisa</p>
+            <p className="mt-1 text-xs text-gray-500">detik tersisa</p>
           </div>
 
           {/* Input */}
@@ -273,12 +273,12 @@ export default function RapidResponsePage() {
               }}
               disabled={lastResult !== null}
               placeholder="Ketik asosiasimu..."
-              className="w-full rounded-xl border-2 border-gray-200 bg-white/70 px-5 py-4 text-center text-lg font-bold text-gray-800 placeholder-gray-400 outline-none transition focus:border-fuchsia-400 focus:bg-white disabled:opacity-50"
+              className="w-full rounded-xl border-2 border-gray-200 bg-white/80 px-5 py-4 text-center text-lg font-bold text-gray-800 placeholder-gray-400 outline-none transition focus:border-fuchsia-400 focus:ring-2 focus:ring-fuchsia-200 focus:bg-white disabled:opacity-50"
             />
             <button
               onClick={() => userInput.trim().length > 0 && handleSubmit(userInput)}
               disabled={userInput.trim().length === 0 || lastResult !== null}
-              className="mt-3 w-full rounded-xl bg-gradient-to-r from-fuchsia-500 to-rose-600 py-3 text-sm font-bold text-gray-900 transition hover:scale-103 active:scale-97 disabled:opacity-30"
+              className="mt-3 w-full rounded-xl bg-gradient-to-r from-fuchsia-500 to-rose-600 py-3 text-sm font-black text-white shadow-lg transition hover:scale-103 active:scale-97 disabled:opacity-30"
             >
               KIRIM ⏎
             </button>

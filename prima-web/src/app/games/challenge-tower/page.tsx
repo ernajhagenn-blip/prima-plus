@@ -169,13 +169,13 @@ export default function ChallengeTowerPage() {
             Tower Selesai!
           </h1>
           <p className="mt-2 animate-fade-in text-lg text-gray-500">
-            Skor: <span className="font-bold text-amber-600">{totalScore}</span> / {maxScore}
+            Skor: <span className="font-bold text-amber-700">{totalScore}</span> / {maxScore}
           </p>
           <div className="mt-6 flex gap-3">
-            <button onClick={() => window.location.reload()} className="rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-orange-300/30 transition hover:shadow-orange-400/40">
-              Main Lagi
+            <button onClick={() => window.location.reload()} className="rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 px-6 py-3 text-sm font-black text-white shadow-lg shadow-orange-300/30 transition hover:shadow-orange-400/40" style={{ boxShadow: "0 4px 0 #E65100, inset 0 2px 0 rgba(255,255,255,0.3)" }}>
+              🔄 Main Lagi
             </button>
-            <Link href="/world" className="rounded-xl border border-gray-200 bg-white/70 px-6 py-3 text-sm font-bold text-gray-500 backdrop-blur-md transition hover:bg-white/90">
+            <Link href="/world" className="rounded-xl border-2 border-gray-200 bg-white/70 px-6 py-3 text-sm font-bold text-gray-600 backdrop-blur-md transition hover:bg-white/90">
               Kembali ke City
             </Link>
           </div>
@@ -198,10 +198,10 @@ export default function ChallengeTowerPage() {
             ← PRIMA CITY
           </Link>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-400">
-              Skor: <span className="font-bold text-amber-600">{score}</span>
+              <span className="text-xs text-gray-500">
+              Skor: <span className="font-bold text-amber-700">{score}</span>
             </span>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-gray-500">
               {totalAnswered}/{totalQuestions}
             </span>
           </div>
@@ -232,7 +232,7 @@ export default function ChallengeTowerPage() {
                     />
                   )}
                 </div>
-                <span className={`text-[10px] font-bold ${isActive ? "text-gray-800" : state === "completed" ? "text-gray-400" : "text-gray-300"}`}>
+                <span className={`text-[10px] font-bold ${isActive ? "text-gray-800" : state === "completed" ? "text-gray-500" : "text-gray-400"}`}>
                   {f.floor}
                 </span>
               </div>
@@ -248,8 +248,8 @@ export default function ChallengeTowerPage() {
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-white/70 text-4xl shadow-lg backdrop-blur-md border border-gray-200" style={{ boxShadow: `0 20px 60px -10px ${floor.glow}` }}>
             {floor.icon}
           </div>
-          <p className="mt-4 text-[10px] font-black uppercase tracking-[0.4em] text-gray-400">
-            Lantai {floor.floor}
+          <p className="mt-4 text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">
+            🏗️ Lantai {floor.floor}
           </p>
           <h2 className="mt-1 text-2xl font-black text-gray-900">{floor.title}</h2>
           <p className="mt-1 text-sm text-gray-500">{floor.desc}</p>
@@ -260,8 +260,8 @@ export default function ChallengeTowerPage() {
           key={`${currentFloor}-${currentQ}`}
           className="mt-8 animate-slide-in-left rounded-2xl border border-gray-200 bg-white/70 p-6 backdrop-blur-md"
         >
-          <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
-            Pertanyaan {currentQ + 1} / {floor.questions.length}
+          <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+            ❓ Pertanyaan {currentQ + 1} / {floor.questions.length}
           </p>
           <p className="mt-3 text-base font-semibold text-gray-800 leading-relaxed">{question.q}</p>
 
@@ -292,15 +292,15 @@ export default function ChallengeTowerPage() {
                   disabled={selected !== null}
                   className={`w-full rounded-xl border ${borderColor} ${bgColor} px-4 py-3 text-left text-sm font-medium ${textColor} transition-all duration-200 hover:border-gray-300 hover:bg-white disabled:cursor-not-allowed`}
                 >
-                  <span className="mr-3 inline-flex h-6 w-6 items-center justify-center rounded-md bg-gray-100 text-[11px] font-bold text-gray-500">
+                  <span className="mr-3 inline-flex h-6 w-6 items-center justify-center rounded-md bg-gray-100 text-[11px] font-bold text-gray-600">
                     {String.fromCharCode(65 + i)}
                   </span>
                   {opt}
                   {answerState !== "unanswered" && isCorrect && (
-                    <span className="ml-2 text-emerald-400">✓</span>
+                    <span className="ml-2 text-emerald-600">✓</span>
                   )}
                   {isSelected && !isCorrect && answerState !== "unanswered" && (
-                    <span className="ml-2 text-rose-400">✗</span>
+                    <span className="ml-2 text-rose-600">✗</span>
                   )}
                 </button>
               );

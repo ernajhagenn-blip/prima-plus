@@ -2,12 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
 import { KARTS, STAT_META } from "@/components/game/karts";
 import { useJourney } from "@/lib/store";
-import SceneErrorBoundary from "./SceneErrorBoundary";
-
-const KartScene = dynamic(() => import("./KartScene"), { ssr: false });
 
 function StatBar({
   label,
@@ -56,7 +52,6 @@ export default function KartSelectScreen() {
   const kartKey = useJourney((s) => s.kartKey);
   const setKart = useJourney((s) => s.setKart);
   const selected = KARTS.find((k) => k.key === kartKey) ?? KARTS[0];
-  const [hovered, setHovered] = useState<string | null>(null);
 
   return (
     <div
@@ -65,10 +60,6 @@ export default function KartSelectScreen() {
         background: "linear-gradient(180deg, #4FC3F7 0%, #81D4FA 30%, #B3E5FC 60%, #E1F5FE 100%)",
       }}
     >
-      <SceneErrorBoundary label="Kart Select">
-        <KartScene body={selected.body} accent={selected.accent} />
-      </SceneErrorBoundary>
-
       <div className="relative z-10 flex items-center justify-between px-4 pt-4 pb-2">
         <button
           onClick={() => router.back()}
@@ -135,13 +126,10 @@ export default function KartSelectScreen() {
         <div className="grid w-full max-w-lg grid-cols-4 gap-2">
           {KARTS.map((k) => {
             const active = k.key === selected.key;
-            const isHovered = k.key === hovered;
             return (
               <button
                 key={k.key}
                 onClick={() => setKart(k.key)}
-                onMouseEnter={() => setHovered(k.key)}
-                onMouseLeave={() => setHovered(null)}
                 className="relative overflow-hidden rounded-xl border-2 p-2.5 text-left transition-all duration-200"
                 style={{
                   cursor: "pointer",
@@ -151,10 +139,8 @@ export default function KartSelectScreen() {
                   borderColor: active ? k.body : "rgba(255,255,255,0.5)",
                   boxShadow: active
                     ? `0 4px 0 ${k.body}66, 0 6px 16px rgba(0,0,0,0.15), 0 0 20px ${k.body}33`
-                    : isHovered
-                    ? "0 4px 12px rgba(0,0,0,0.08)"
                     : "0 2px 6px rgba(0,0,0,0.04)",
-                  transform: active ? "translateY(-3px)" : isHovered ? "translateY(-1px)" : "none",
+                  transform: active ? "translateY(-3px)" : "none",
                 }}
               >
                 <div className="flex items-center gap-2">

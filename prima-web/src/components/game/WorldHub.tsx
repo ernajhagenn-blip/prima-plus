@@ -2,10 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
-import SceneErrorBoundary from "./SceneErrorBoundary";
-
-const WorldHubScene = dynamic(() => import("./WorldHubScene"), { ssr: false });
 
 const ZONES = [
   {
@@ -16,7 +12,6 @@ const ZONES = [
     href: "/journey/1",
     gradient: "linear-gradient(135deg, #66BB6A 0%, #43A047 100%)",
     shadow: "#2E7D32",
-    glow: "rgba(76,175,80,0.45)",
   },
   {
     id: "kart",
@@ -26,7 +21,6 @@ const ZONES = [
     href: "/select",
     gradient: "linear-gradient(135deg, #EF5350 0%, #FFA726 100%)",
     shadow: "#C62828",
-    glow: "rgba(239,83,80,0.45)",
   },
   {
     id: "tower",
@@ -36,7 +30,6 @@ const ZONES = [
     href: "/games/challenge-tower",
     gradient: "linear-gradient(135deg, #AB47BC 0%, #7E57C2 100%)",
     shadow: "#6A1B9A",
-    glow: "rgba(171,71,188,0.45)",
   },
   {
     id: "arcade",
@@ -46,7 +39,6 @@ const ZONES = [
     href: "/games",
     gradient: "linear-gradient(135deg, #42A5F5 0%, #26C6DA 100%)",
     shadow: "#1565C0",
-    glow: "rgba(66,165,245,0.45)",
   },
   {
     id: "garage",
@@ -56,7 +48,6 @@ const ZONES = [
     href: "/kart",
     gradient: "linear-gradient(135deg, #FFCA28 0%, #FFA726 100%)",
     shadow: "#F57F17",
-    glow: "rgba(255,202,40,0.45)",
   },
   {
     id: "knowledge",
@@ -66,7 +57,6 @@ const ZONES = [
     href: "/edukasi",
     gradient: "linear-gradient(135deg, #26C6DA 0%, #42A5F5 100%)",
     shadow: "#00838F",
-    glow: "rgba(38,198,218,0.45)",
   },
 ] as const;
 
@@ -125,9 +115,12 @@ export default function WorldHub({
         background: "linear-gradient(180deg, #4FC3F7 0%, #81D4FA 20%, #B3E5FC 45%, #C8E6C9 70%, #A5D6A7 85%, #81C784 100%)",
       }}
     >
-      <SceneErrorBoundary label="World Hub">
-        <WorldHubScene />
-      </SceneErrorBoundary>
+      {/* Floating CSS Clouds */}
+      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 1 }}>
+        <div className="hub-cloud hc1" />
+        <div className="hub-cloud hc2" />
+        <div className="hub-cloud hc3" />
+      </div>
 
       <div className="relative mx-auto max-w-5xl px-4 pb-10 pt-6 sm:px-6" style={{ zIndex: 10 }}>
         <header className="text-center" style={{ animation: "slideDown 0.5s ease-out both" }}>
@@ -219,6 +212,50 @@ export default function WorldHub({
         @keyframes slideDown { 0% { opacity: 0; transform: translateY(-30px); } 100% { opacity: 1; transform: translateY(0); } }
         @keyframes slideUp { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+
+        .hub-cloud {
+          position: absolute;
+          background: white;
+          border-radius: 50px;
+          opacity: 0.6;
+        }
+        .hub-cloud::before,
+        .hub-cloud::after {
+          content: "";
+          position: absolute;
+          background: white;
+          border-radius: 50%;
+        }
+        .hc1 {
+          width: 100px; height: 32px;
+          top: 6%; left: 5%;
+          animation: hubCloudDrift 20s linear infinite;
+        }
+        .hc1::before { width: 42px; height: 42px; top: -22px; left: 16px; }
+        .hc1::after { width: 58px; height: 48px; top: -24px; left: 38px; }
+
+        .hc2 {
+          width: 80px; height: 26px;
+          top: 18%; left: 65%;
+          animation: hubCloudDrift 24s linear infinite;
+          animation-delay: -6s;
+        }
+        .hc2::before { width: 34px; height: 34px; top: -18px; left: 12px; }
+        .hc2::after { width: 46px; height: 38px; top: -20px; left: 30px; }
+
+        .hc3 {
+          width: 110px; height: 36px;
+          top: 10%; left: 80%;
+          animation: hubCloudDrift 18s linear infinite;
+          animation-delay: -12s;
+        }
+        .hc3::before { width: 48px; height: 48px; top: -24px; left: 20px; }
+        .hc3::after { width: 64px; height: 52px; top: -26px; left: 44px; }
+
+        @keyframes hubCloudDrift {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(calc(-100vw - 200px)); }
+        }
       `}</style>
     </div>
   );

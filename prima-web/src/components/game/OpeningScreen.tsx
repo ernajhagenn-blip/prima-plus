@@ -1,58 +1,55 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
-import SceneErrorBoundary from "./SceneErrorBoundary";
-
-const OpeningScene = dynamic(() => import("./OpeningScene"), { ssr: false });
-
-const ZONE_ICONS = [
-  { emoji: "📖", label: "Cerita" },
-  { emoji: "🏎️", label: "Balapan" },
-  { emoji: "🏗️", label: "Tantangan" },
-  { emoji: "🎮", label: "Mini Game" },
-  { emoji: "🔧", label: "Garasi" },
-  { emoji: "📚", label: "Belajar" },
-];
 
 export default function OpeningScreen() {
   const router = useRouter();
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-    setMousePos({ x, y });
-  }, []);
+  const [pressed, setPressed] = useState(false);
 
   return (
     <div
-      ref={containerRef}
       className="fixed inset-0 overflow-hidden"
-      style={{ background: "linear-gradient(180deg, #4FC3F7 0%, #81D4FA 30%, #B3E5FC 60%, #E1F5FE 100%)" }}
-      onMouseMove={handleMouseMove}
+      style={{
+        background: "linear-gradient(180deg, #4FC3F7 0%, #81D4FA 25%, #B3E5FC 50%, #C8E6C9 75%, #81C784 100%)",
+      }}
     >
-      <SceneErrorBoundary label="Opening Scene">
-        <OpeningScene />
-      </SceneErrorBoundary>
+      {/* Floating CSS Clouds */}
+      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 1 }}>
+        <div className="cloud cloud-1" />
+        <div className="cloud cloud-2" />
+        <div className="cloud cloud-3" />
+        <div className="cloud cloud-4" />
+        <div className="cloud cloud-5" />
+      </div>
 
+      {/* CSS City Skyline */}
+      <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ zIndex: 2, height: "35%" }}>
+        <div className="building b1" />
+        <div className="building b2" />
+        <div className="building b3" />
+        <div className="building b4" />
+        <div className="building b5" />
+        <div className="building b6" />
+        <div className="building b7" />
+        <div className="building b8" />
+        <div className="building b9" />
+        <div className="building b10" />
+        <div className="building b11" />
+        <div className="building b12" />
+        {/* Road */}
+        <div className="road" />
+        {/* Grass */}
+        <div className="grass" />
+      </div>
+
+      {/* Main Content */}
       <div
         className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
-        style={{
-          zIndex: 15,
-          transform: `translate(${mousePos.x * 4}px, ${mousePos.y * 3}px)`,
-          transition: "transform 0.15s ease-out",
-        }}
+        style={{ zIndex: 10 }}
       >
         <div style={{ animation: "logoDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) both" }}>
-          <h1
-            className="logo-text"
-            style={{ transform: `translateX(${mousePos.x * -6}px) translateY(${mousePos.y * -4}px)` }}
-          >
+          <h1 className="logo-text">
             PRIMA<span className="logo-plus">+</span>
           </h1>
         </div>
@@ -61,25 +58,15 @@ export default function OpeningScreen() {
           BAHASA KITA. PILIHAN KITA.
         </p>
 
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-3" style={{ animation: "fadeUp 0.7s 0.5s ease-out both" }}>
-          {ZONE_ICONS.map((z, i) => (
-            <div
-              key={i}
-              className="flex flex-col items-center gap-1 rounded-2xl bg-white/30 px-3 py-2 backdrop-blur-sm"
-              style={{ border: "2px solid rgba(255,255,255,0.4)" }}
-            >
-              <span className="text-2xl">{z.emoji}</span>
-              <span className="text-[10px] font-bold text-white/90">{z.label}</span>
-            </div>
-          ))}
-        </div>
-
         <button
           onClick={() => router.push("/intro")}
           className="cta-btn"
           style={{ animation: "fadeUp 0.7s 0.8s ease-out both" }}
+          onMouseDown={() => setPressed(true)}
+          onMouseUp={() => setPressed(false)}
+          onMouseLeave={() => setPressed(false)}
         >
-          ▶ MULAI
+          MULAI
         </button>
 
         <p className="footer-label" style={{ animation: "fadeIn 0.8s 1.2s ease-out both" }}>
@@ -88,8 +75,9 @@ export default function OpeningScreen() {
       </div>
 
       <style>{`
+        /* ── Logo ── */
         .logo-text {
-          font-family: "Arial Black", "Impact", "Trebuchet MS", sans-serif;
+          font-family: "Righteous", "Arial Black", "Impact", sans-serif;
           font-size: clamp(5rem, 20vw, 13rem);
           font-weight: 900;
           line-height: 1;
@@ -111,7 +99,7 @@ export default function OpeningScreen() {
           background-clip: text;
         }
         .tagline-text {
-          font-family: "Arial Black", "Impact", sans-serif;
+          font-family: "Righteous", "Arial Black", "Impact", sans-serif;
           font-size: clamp(0.8rem, 2.8vw, 1.2rem);
           font-weight: 900;
           letter-spacing: 0.28em;
@@ -121,10 +109,12 @@ export default function OpeningScreen() {
           position: relative;
           z-index: 10;
         }
+
+        /* ── CTA Button ── */
         .cta-btn {
           margin-top: 2.8rem;
           padding: 1.1rem 3rem;
-          font-family: "Arial Black", "Impact", sans-serif;
+          font-family: "Righteous", "Arial Black", "Impact", sans-serif;
           font-size: clamp(1.05rem, 3.2vw, 1.4rem);
           font-weight: 900;
           letter-spacing: 0.08em;
@@ -155,7 +145,7 @@ export default function OpeningScreen() {
         .footer-label {
           position: absolute;
           bottom: 2.2rem;
-          font-family: "Arial", sans-serif;
+          font-family: "Nunito", sans-serif;
           font-size: 0.7rem;
           font-weight: 700;
           letter-spacing: 0.2em;
@@ -163,6 +153,125 @@ export default function OpeningScreen() {
           text-shadow: 0 1px 4px rgba(0,0,0,0.25);
           z-index: 10;
         }
+
+        /* ── Floating Clouds ── */
+        .cloud {
+          position: absolute;
+          background: white;
+          border-radius: 50px;
+          opacity: 0.9;
+          filter: blur(1px);
+        }
+        .cloud::before,
+        .cloud::after {
+          content: "";
+          position: absolute;
+          background: white;
+          border-radius: 50%;
+        }
+        .cloud-1 {
+          width: 120px; height: 40px;
+          top: 8%; left: 10%;
+          animation: cloudDrift1 18s linear infinite;
+        }
+        .cloud-1::before { width: 50px; height: 50px; top: -25px; left: 20px; }
+        .cloud-1::after { width: 70px; height: 60px; top: -30px; left: 45px; }
+
+        .cloud-2 {
+          width: 90px; height: 30px;
+          top: 15%; left: 55%;
+          animation: cloudDrift2 22s linear infinite;
+        }
+        .cloud-2::before { width: 40px; height: 40px; top: -20px; left: 15px; }
+        .cloud-2::after { width: 55px; height: 45px; top: -22px; left: 35px; }
+
+        .cloud-3 {
+          width: 150px; height: 45px;
+          top: 5%; left: 70%;
+          animation: cloudDrift1 25s linear infinite;
+          animation-delay: -8s;
+        }
+        .cloud-3::before { width: 60px; height: 55px; top: -28px; left: 25px; }
+        .cloud-3::after { width: 80px; height: 65px; top: -32px; left: 55px; }
+
+        .cloud-4 {
+          width: 100px; height: 35px;
+          top: 22%; left: 30%;
+          animation: cloudDrift2 20s linear infinite;
+          animation-delay: -5s;
+        }
+        .cloud-4::before { width: 45px; height: 45px; top: -22px; left: 18px; }
+        .cloud-4::after { width: 60px; height: 50px; top: -25px; left: 40px; }
+
+        .cloud-5 {
+          width: 80px; height: 28px;
+          top: 12%; left: 85%;
+          animation: cloudDrift1 16s linear infinite;
+          animation-delay: -3s;
+        }
+        .cloud-5::before { width: 35px; height: 35px; top: -18px; left: 12px; }
+        .cloud-5::after { width: 48px; height: 40px; top: -20px; left: 30px; }
+
+        @keyframes cloudDrift1 {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(calc(100vw + 200px)); }
+        }
+        @keyframes cloudDrift2 {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(calc(-100vw - 200px)); }
+        }
+
+        /* ── CSS City Skyline ── */
+        .building {
+          position: absolute;
+          bottom: 60px;
+          border-radius: 8px 8px 0 0;
+          border: 2px solid rgba(255,255,255,0.3);
+          border-bottom: none;
+        }
+        .b1  { width: 60px; height: 140px; left: 2%;   background: linear-gradient(180deg, #EF5350, #C62828); }
+        .b2  { width: 45px; height: 180px; left: 8%;   background: linear-gradient(180deg, #42A5F5, #1565C0); }
+        .b3  { width: 70px; height: 120px; left: 14%;  background: linear-gradient(180deg, #66BB6A, #2E7D32); }
+        .b4  { width: 50px; height: 200px; left: 22%;  background: linear-gradient(180deg, #FFA726, #E65100); }
+        .b5  { width: 55px; height: 160px; left: 30%;  background: linear-gradient(180deg, #AB47BC, #6A1B9A); }
+        .b6  { width: 40px; height: 220px; left: 38%;  background: linear-gradient(180deg, #26C6DA, #00838F); }
+        .b7  { width: 65px; height: 150px; left: 45%;  background: linear-gradient(180deg, #FFEE58, #F9A825); }
+        .b8  { width: 48px; height: 190px; left: 53%;  background: linear-gradient(180deg, #EC407A, #AD1457); }
+        .b9  { width: 55px; height: 130px; left: 60%;  background: linear-gradient(180deg, #5C6BC0, #283593); }
+        .b10 { width: 70px; height: 170px; left: 68%;  background: linear-gradient(180deg, #4CAF50, #1B5E20); }
+        .b11 { width: 45px; height: 210px; left: 78%;  background: linear-gradient(180deg, #FF7043, #BF360C); }
+        .b12 { width: 60px; height: 145px; left: 86%;  background: linear-gradient(180deg, #29B6F6, #0277BD); }
+
+        .road {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 24px;
+          background: linear-gradient(180deg, #607D8B, #455A64);
+          border-top: 3px solid #78909C;
+        }
+        .road::after {
+          content: "";
+          position: absolute;
+          top: 50%;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background: repeating-linear-gradient(90deg, #FFD54F 0px, #FFD54F 30px, transparent 30px, transparent 50px);
+          transform: translateY(-50%);
+        }
+        .grass {
+          position: absolute;
+          bottom: 24px;
+          left: 0;
+          right: 0;
+          height: 36px;
+          background: linear-gradient(180deg, #66BB6A, #43A047);
+          border-top: 3px solid rgba(255,255,255,0.3);
+        }
+
+        /* ── Keyframes ── */
         @keyframes logoDrop {
           0% { opacity: 0; transform: translateY(-100px) scale(0.7) rotate(-8deg); }
           100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }

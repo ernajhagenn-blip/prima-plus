@@ -103,7 +103,7 @@ function highlightError(paragraph: string, error: string) {
   return (
     <>
       {parts[0]}
-      <span className="inline-block rounded bg-rose-500/20 px-1.5 py-0.5 font-bold text-rose-400 underline decoration-rose-400/40 decoration-wavy underline-offset-4">
+      <span className="inline-block rounded bg-rose-500/20 px-1.5 py-0.5 font-bold text-rose-700 underline decoration-rose-500/40 decoration-wavy underline-offset-4">
         {error}
       </span>
       {parts[1]}
@@ -152,21 +152,21 @@ export default function LanguageDetectivePage() {
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-600 text-4xl shadow-lg shadow-emerald-500/20">
             🔍
           </div>
-          <h1 className="mt-6 text-3xl font-black">Language Detective</h1>
+          <h1 className="mt-6 text-3xl font-black text-gray-900">🔍 Language Detective</h1>
           <p className="mt-3 text-sm text-gray-500">
             Temukan kesalahan bahasa tersembunyi di setiap paragraf. Peranmu adalah detektif tata bahasa!
           </p>
-          <div className="mt-6 space-y-2 text-left text-xs text-gray-400">
+          <div className="mt-6 space-y-2 text-left text-xs text-gray-500">
             <div className="flex items-start gap-2">
-              <span className="mt-0.5 text-emerald-400">●</span>
+              <span className="mt-0.5 text-emerald-600">●</span>
               <span>10 paragraf dengan kesalahan tersembunyi</span>
             </div>
             <div className="flex items-start gap-2">
-              <span className="mt-0.5 text-emerald-400">●</span>
+              <span className="mt-0.5 text-emerald-600">●</span>
               <span>Identifikasi perbaikan yang tepat untuk setiap kesalahan</span>
             </div>
             <div className="flex items-start gap-2">
-              <span className="mt-0.5 text-emerald-400">●</span>
+              <span className="mt-0.5 text-emerald-600">●</span>
               <span>Setiap jawaban benar = +{XP_PER_CORRECT} XP</span>
             </div>
           </div>
@@ -178,7 +178,7 @@ export default function LanguageDetectivePage() {
           </button>
           <button
             onClick={() => router.push("/games")}
-            className="mt-3 text-xs text-gray-400 transition hover:text-gray-500"
+            className="mt-3 text-xs font-bold text-gray-500 transition hover:text-gray-700"
           >
             ← Kembali ke Arcade
           </button>
@@ -197,19 +197,19 @@ export default function LanguageDetectivePage() {
           <h1 className="mt-6 text-3xl font-black">Selesai!</h1>
           <p className="mt-2 text-sm text-gray-500">Language Detective</p>
           <div className="mt-8 grid grid-cols-3 gap-3">
-            <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
-              <p className="text-3xl font-black text-emerald-400">{xp}</p>
-              <p className="mt-1 text-[11px] text-gray-400">XP Earned</p>
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
+              <p className="text-3xl font-black text-emerald-700">{xp}</p>
+              <p className="mt-1 text-[11px] text-gray-500">XP Earned</p>
             </div>
-            <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
-              <p className="text-3xl font-black text-cyan-400">{accuracy}%</p>
-              <p className="mt-1 text-[11px] text-gray-400">Akurasi</p>
+            <div className="rounded-2xl border border-cyan-200 bg-cyan-50/70 p-4">
+              <p className="text-3xl font-black text-cyan-700">{accuracy}%</p>
+              <p className="mt-1 text-[11px] text-gray-500">Akurasi</p>
             </div>
-            <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
-              <p className="text-3xl font-black text-amber-400">
+            <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
+              <p className="text-3xl font-black text-amber-700">
                 {answers.filter(Boolean).length}/{QUESTIONS.length}
               </p>
-              <p className="mt-1 text-[11px] text-gray-400">Benar</p>
+                <p className="mt-1 text-[11px] text-gray-500">Benar</p>
             </div>
           </div>
           <div className="mt-6 flex gap-3">
@@ -222,13 +222,13 @@ export default function LanguageDetectivePage() {
                 setShowFeedback(false);
                 setAnswers([]);
               }}
-              className="flex-1 rounded-xl border border-gray-200 bg-white/70 py-3 text-sm font-bold text-gray-900 transition hover:bg-white/80 hover:scale-103 active:scale-97"
+              className="flex-1 rounded-xl border-2 border-gray-200 bg-white/70 py-3 text-sm font-bold text-gray-700 transition hover:bg-white/80 hover:scale-103 active:scale-97"
             >
               Main Lagi
             </button>
             <button
               onClick={() => router.push("/games")}
-              className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 py-3 text-sm font-bold text-gray-900 transition hover:scale-103 active:scale-97"
+              className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 py-3 text-sm font-black text-white shadow-lg transition hover:scale-103 active:scale-97"
             >
               ke Arcade →
             </button>
@@ -248,14 +248,14 @@ export default function LanguageDetectivePage() {
           ✕
         </button>
         <div className="text-center">
-          <p className="text-[10px] font-black uppercase tracking-widest text-emerald-300/40">
-            Language Detective
+          <p className="text-[10px] font-black uppercase tracking-widest text-emerald-700/60">
+            🔍 Language Detective
           </p>
           <p className="text-sm font-bold text-gray-900">
             {currentQ + 1} / {QUESTIONS.length}
           </p>
         </div>
-        <div className="rounded-lg bg-white/70 border border-gray-200 px-3 py-1.5 text-xs font-bold text-emerald-400">
+        <div className="rounded-lg bg-emerald-50 border border-emerald-200 px-3 py-1.5 text-xs font-bold text-emerald-700">
           {xp} XP
         </div>
       </div>
@@ -264,10 +264,10 @@ export default function LanguageDetectivePage() {
         <div key={currentQ} className="animate-slide-in-left w-full max-w-lg">
           <div className="rounded-2xl border border-gray-200 bg-white/70 p-6 backdrop-blur-md">
             <div className="flex items-center justify-between">
-              <p className="text-xs font-bold uppercase tracking-wider text-emerald-400/60">
-                Temukan kesalahan
+              <p className="text-xs font-bold uppercase tracking-wider text-emerald-700/60">
+                🔎 Temukan kesalahan
               </p>
-              <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-400">
+              <span className="rounded-md bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-700">
                 🔍 {q.errorType}
               </span>
             </div>
