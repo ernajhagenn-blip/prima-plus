@@ -484,19 +484,21 @@ export async function awardEpisodeAction(formData: FormData): Promise<void> {
 
 export async function recordGameAction(formData: FormData): Promise<void> {
   const p = await requireParticipant();
-  if (!p) return;
+  if (!p) redirect("/intro");
   const game = String(formData.get("game") ?? "");
   const score = Number(formData.get("score") ?? 0);
   const card = String(formData.get("card") ?? "");
   if (game) recordGameScoreDb(p.id, game, score);
   if (card) awardCardDb(p.id, card);
+  redirect("/world");
 }
 
 export async function defeatBossAction(formData: FormData): Promise<void> {
   const p = await requireParticipant();
-  if (!p) return;
+  if (!p) redirect("/intro");
   setBossDefeatedDb(p.id, true);
   awardCardDb(p.id, "Bahasa sebagai Jembatan");
+  redirect("/world");
 }
 
 export async function submitFinalQuiz(formData: FormData): Promise<void> {

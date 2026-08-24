@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { CHALLENGES as EXTERNAL_CHALLENGES } from "@/lib/challenges";
 
 const R = 180;
 const W = 64;
@@ -21,98 +22,7 @@ const ITEMS: Record<ItemKind, { icon: string; name: string }> = {
   star: { icon: "⭐", name: "Bintang" },
 };
 
-const CHALLENGES = [
-  {
-    q: "Kelasmu akan memasang caption pameran di media sosial sekolah. Sebagian besar anggota mengusulkan bahasa Inggris agar terlihat modern. Sebagai koordinator, keputusan apa yang paling tepat?",
-    opts: ["Mengikuti usulan mayoritas agar tidak dianggap kuno", "Menyusun caption berbahasa Indonesia yang menarik melalui permainan kata dan tipografi, lalu menjelaskan alasannya kepada anggota", "Mencampur dua bahasa sekaligus supaya aman dari dua sisi", "Menyerahkan sepenuhnya kepada pengelola akun"],
-    ans: 1,
-    tip: "Daya tarik sebuah bahasa bukan pada asal-usulnya, melainkan pada kreativitas penggunanya. Membuktikan bahwa bahasa Indonesia mampu tampil menarik adalah wujud kebanggaan berbahasa.",
-  },
-  {
-    q: "Seorang teman kerap mengejek teman lain yang berbicara bahasa Indonesia dengan ragam baku dan menyebutnya kaku. Sikap yang paling bertanggung jawab adalah...",
-    opts: ["Ikut tertawa agar tetap diterima dalam kelompok", "Berbicara kepada pengejek secara pribadi bahwa kemampuan berbahasa yang baik patut dihargai, bukan diejek", "Mengabaikannya karena itu bukan urusanmu", "Mengajak yang diejek pindah kelompok saja"],
-    ans: 1,
-    tip: "Ejekan terhadap ragam baku menurunkan kepercayaan diri berbahasa. Menegur dengan sopan secara pribadi menumbuhkan sikap positif tanpa memperbesar konflik.",
-  },
-  {
-    q: "OSIS akan menerbitkan pengumuman resmi lomba. Pilihan kalimat yang paling sesuai untuk konteks resmi adalah...",
-    opts: ["Guys, besok ada gathering lomba, jangan lupa datang!", "Diberitahukan kepada seluruh peserta, pelaksanaan lomba digelar besok pukul delapan pagi.", "Besok meeting penting, wajib hadir, tanpa alasan!", "Yang bersangkutan dimohon hadir, terima kasih banyak bestie!"],
-    ans: 1,
-    tip: "Dokumen resmi menuntut ragam formal: kata baku, struktur kalimat lengkap, dan nada sopan. Kesesuaian ragam dengan konteks adalah inti kesadaran berbahasa.",
-  },
-  {
-    q: "Dalam diskusi kelas, muncul perdebatan mengenai posisi bahasa daerah, bahasa Indonesia, dan bahasa asing. Analisis yang paling kritis adalah...",
-    opts: ["Bahasa asing paling penting karena bersifat global", "Ketiganya memiliki fungsi: bahasa daerah menunjukkan identitas, bahasa Indonesia mempersatukan, bahasa asing menjembatani dunia; persoalan muncul ketika proporsinya terbalik", "Semua bahasa bernilai sama sehingga tidak perlu diperdebatkan", "Bahasa daerah sebaiknya ditinggalkan agar lebih efisien"],
-    ans: 1,
-    tip: "Berpikir kritis berarti memahami fungsi setiap bahasa dan menjaga keseimbangannya, bukan memilih yang paling populer.",
-  },
-  {
-    q: "Video tugasmu banyak ditonton, namun ada komentar bahwa campuran bahasamu menyulitkan pemahaman. Respons yang paling dewasa adalah...",
-    opts: ["Membalas komentar dengan ejekan serupa", "Mengevaluasi kembali cara berbahasamu dan berlatih berbicara lebih konsisten agar mudah dipahami", "Menghapus semua komentar kritis", "Beralasan bahwa itu gaya khas anak muda"],
-    ans: 1,
-    tip: "Kritik penonton merupakan cermin bagi kesadaran berbahasa. Menyikapinya dengan evaluasi menunjukkan kedewasaan dalam berkomunikasi.",
-  },
-  {
-    q: "Seorang siswa baru dari daerah belum lancar berbahasa Indonesia, dan beberapa teman mulai menggosipinya. Tindakan yang paling membantu adalah...",
-    opts: ["Ikut menggosip agar tidak dicap berbeda", "Mengajaknya berbicara secara sabar dan membantunya berlatih bahasa Indonesia", "Mengabaikannya sampai beradaptasi sendiri", "Langsung melaporkan penggosip kepada guru"],
-    ans: 1,
-    tip: "Bahasa Indonesia berfungsi sebagai alat pemersatu. Membantu teman berlatih adalah pengamalan nyata dari sikap positif terhadap bahasa.",
-  },
-  {
-    q: "Sekolah mengadakan lomba video yang dinilai dari kejelasan penggunaan bahasa Indonesia. Strategi paling tepat untuk menang adalah...",
-    opts: ["Menggunakan sebanyak mungkin istilah asing agar terlihat hebat", "Menyusun naskah yang runtut dengan kata baku, artikulasi jelas, dan isi yang bermanfaat", "Mengutamakan efek visual yang meriah", "Mengundang narasumber terkenal"],
-    ans: 1,
-    tip: "Kejelasan pesan adalah inti komunikasi. Bahasa yang tertata membuat ide mudah dipahami dan dihargai penilai.",
-  },
-  {
-    q: "Akun resmi sekolah menulis keterangan acara dengan bahasa campuran yang sulit dipahami. Sebagai warga sekolah, sikap yang paling konstruktif adalah...",
-    opts: ["Membiarkannya karena yang penting informasi menyebar", "Menyampaikan usulan sopan kepada pengelola agar berbahasa Indonesia secara konsisten demi citra sekolah", "Menulis komentar yang mencela pengelola", "Meniru gaya penulisan tersebut di akun pribadi"],
-    ans: 1,
-    tip: "Media sekolah menjadi teladan berbahasa bagi seluruh warga. Menyampaikan masukan secara sopan adalah refleksi kritis yang membangun.",
-  },
-  {
-    q: "Seorang teman berpendapat bahwa ketepatan berbahasa tidak penting selama pesannya sampai. Argumen penyeimbang yang paling kuat adalah...",
-    opts: ["Pendapat itu benar sehingga tidak perlu dibantah", "Ketidaktepatan bahasa dapat mengubah makna dan menurunkan kepercayaan pembaca; ketepatan adalah bentuk penghormatan kepada lawan bicara", "Teman itu yang terlalu menganggap remeh", "Mengalihkan pembicaraan ke topik lain"],
-    ans: 1,
-    tip: "Bahasa yang tepat menjaga makna tetap utuh dan menunjukkan tanggung jawab dalam berkomunikasi.",
-  },
-  {
-    q: "Kelas merencanakan kampanye Bangga Berbahasa Indonesia. Program dengan dampak paling berkelanjutan adalah...",
-    opts: ["Pidato panjang setiap Senin pagi", "Konten kreatif mingguan karya siswa seperti cerita pendek, puisi video, dan teka-teki kata yang menghibur", "Denda bagi siapa pun yang memakai bahasa asing", "Melarang penggunaan gawai di sekolah"],
-    ans: 1,
-    tip: "Kampanye berhasil apabila menyenangkan dan melibatkan banyak orang. Konten kreatif membuat bahasa Indonesia terasa dekat dengan keseharian remaja.",
-  },
-  {
-    q: "Di grup kelas mulai muncul kata-kata kasar dan ejekan. Sebagai admin grup, langkah yang paling tepat adalah...",
-    opts: ["Membiarkan karena itu ruang bebas", "Mengundang anggota menyepakati etika berbahasa di grup lalu mengingatkan secara pribadi bila dilanggar", "Langsung mengeluarkan anggota yang melanggar", "Membalas dengan kata yang sama agar paham rasanya"],
-    ans: 1,
-    tip: "Kesepakatan yang disusun bersama menumbuhkan kesadaran norma dari dalam diri, sehingga pembiasaan berjalan lebih lestari daripada paksaan.",
-  },
-  {
-    q: "Banyak temanmu meyakini bahwa bahasa Indonesia itu kaku dan tidak menarik. Cara membantah yang paling efektif adalah...",
-    opts: ["Memarahi mereka karena dianggap tidak cinta bahasa", "Menunjukkan contoh nyata berupa lirik, novel, film, dan konten kreatif berbahasa Indonesia yang menyentuh dan berkualitas", "Mencatat nama mereka untuk dilaporkan", "Ikut berhenti menggunakan bahasa Indonesia"],
-    ans: 1,
-    tip: "Bukti nyata jauh lebih meyakinkan daripada nasihat. Pengalaman estetislah yang membuat seseorang jatuh cinta kembali pada bahasanya.",
-  },
-  {
-    q: "Sebuah kalimat pada artikel mading berbunyi: Dikarenakan adanya faktor tersebut maka nilai menjadi turun. Perbaikan yang paling tepat adalah...",
-    opts: ["Karena faktor tersebut, nilai menjadi turun.", "Disebabkan faktor tadi menurunlah nilainya.", "Nilai turunlah karena hal itu tadi.", "Dikarenakan faktor, menurun nilai."],
-    ans: 0,
-    tip: "Konjungsi yang tepat dan kalimat yang efisien membuat tulisan mudah dipahami. Kesadaran norma dimulai dari detail sekecil apa pun.",
-  },
-  {
-    q: "Teman sebangku sering menanyakan arti kata baku yang kamu gunakan. Sikap yang paling menguatkan loyalitas berbahasa adalah...",
-    opts: ["Menjelaskan dengan senang hati dan mengajaknya memperkaya kosakata bersama", "Menertawakan karena dianggap tidak tahu", "Menyuruhnya mencari sendiri di kamus", "Mengganti ujaranmu dengan bahasa gaul supaya ia paham"],
-    ans: 0,
-    tip: "Berbagi pengetahuan bahasa memperkuat lingkungan yang bangga berbahasa Indonesia. Loyalitas tumbuh dalam kebersamaan, bukan kesendirian.",
-  },
-  {
-    q: "Saat diskusi panel, seorang moderator memotong pembicaraanmu dan mengevaluasi bahasamu dengan kasar di depan umum. Sikap yang paling bermartabat adalah...",
-    opts: ["Memotong kembali pembicaraannya dengan suara lebih keras", "Menyampaikan pendapat kembali dengan tenang dan santun, lalu mengusulkan suasana diskusi yang saling menghormati", "Menyerah dan memilih diam sampai acara selesai", "Meninggalkan ruangan untuk menghindari konflik"],
-    ans: 1,
-    tip: "Keteguhan menggunakan bahasa yang santun justru pada situasi sulit merupakan bentuk loyalitas berbahasa yang paling tinggi.",
-  },
-];
+const CHALLENGES = EXTERNAL_CHALLENGES;
 
 interface AIKart {
   a: number; lat: number; baseLat: number; phase: number; v: number; baseV: number;
@@ -144,10 +54,10 @@ class AudioEngine {
       this.eGain = this.ctx.createGain();
       this.eGain.gain.value = 0;
       this.eOsc = this.ctx.createOscillator();
-      this.eOsc.type = "sawtooth";
+      this.eOsc.type = "triangle";
       this.eOsc.frequency.value = 70;
       this.eOsc2 = this.ctx.createOscillator();
-      this.eOsc2.type = "square";
+      this.eOsc2.type = "sine";
       this.eOsc2.frequency.value = 71;
       this.eOsc.connect(this.eGain);
       this.eOsc2.connect(this.eGain);
@@ -155,6 +65,44 @@ class AudioEngine {
       this.eOsc.start();
       this.eOsc2.start();
     } catch { }
+  }
+  musicTimer: ReturnType<typeof setInterval> | null = null;
+  startMusic() {
+    if (!this.ctx || this.musicTimer) return;
+    const chords = [
+      [523.25, 659.25, 783.99],
+      [392.0, 493.88, 587.33],
+      [440.0, 523.25, 659.25],
+      [349.23, 440.0, 523.25],
+    ];
+    const pattern = [0, 1, 2, 1];
+    let step = 0;
+    const playNote = (freq: number, dur: number, vol: number, type: OscillatorType) => {
+      if (!this.ctx || !this.master) return;
+      try {
+        const o = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+        o.type = type;
+        o.connect(g); g.connect(this.master);
+        const t = this.ctx.currentTime;
+        o.frequency.value = freq;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(vol, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        o.start(t); o.stop(t + dur + 0.05);
+      } catch { }
+    };
+    this.musicTimer = setInterval(() => {
+      const ch = chords[Math.floor(step / 4) % 4];
+      const note = ch[pattern[step % 4]];
+      playNote(note, 0.4, 0.022, "triangle");
+      if (step % 8 === 0) playNote(ch[0] / 2, 0.9, 0.03, "sine");
+      if (step % 8 === 4) playNote(ch[2] / 2, 0.9, 0.025, "sine");
+      step++;
+    }, 260);
+  }
+  stopMusic() {
+    if (this.musicTimer) { clearInterval(this.musicTimer); this.musicTimer = null; }
   }
   engine(freq: number, vol: number) {
     if (!this.ctx || !this.eOsc || !this.eOsc2 || !this.eGain) return;
@@ -187,7 +135,7 @@ const AI_COLORS = [
   ["#a855f7", "#e9d5ff"], ["#22c55e", "#bbf7d0"], ["#f97316", "#fed7aa"],
   ["#3b82f6", "#bfdbfe"], ["#e11d48", "#fecdd3"], ["#eab308", "#fef08a"], ["#14b8a6", "#99f6e4"],
 ];
-const AI_BASE = [141, 137, 134, 131, 128, 125, 122];
+const AI_BASE = [148, 146, 144, 142, 140, 137, 134];
 
 function angDiff(a: number, b: number) {
   let d = Math.abs(a - b) % (Math.PI * 2);
@@ -328,6 +276,7 @@ export default function KartRace3D({
 
   const startRace = useCallback(() => {
     S.current.audio.init();
+    S.current.audio.startMusic();
     initWorld();
     setPhase("count");
     setCdStep(3);
@@ -455,6 +404,7 @@ export default function KartRace3D({
     if (s.finished) return;
     s.finished = true;
     s.audio.engine(0, 0);
+    s.audio.stopMusic();
     const bonus = [120, 90, 70, 60, 50, 45, 40, 35][Math.min(position - 1, 7)] ?? 30;
     const total = s.coins * 15 + s.quizScore + bonus;
     setResult({ score: total, correct: s.correct, position, coins: s.coins });
@@ -784,6 +734,75 @@ export default function KartRace3D({
       });
     }
 
+    for (let i = 0; i < 26; i++) {
+      const ta = (i / 26) * Math.PI * 2 + 0.12;
+      const tx = Math.cos(ta) * (RO + 42), ty = Math.sin(ta) * (RO + 42);
+      const p = proj(tx, ty, 0);
+      if (!p) continue;
+      const depth = Math.hypot(tx - camx, ty - camy);
+      const big = i % 3 === 0;
+      bills.push({
+        depth, draw: () => {
+          const s = (big ? 16 : 11) * p.sc;
+          if (s < 2) return;
+          ctx.fillStyle = "#6b4423";
+          ctx.fillRect(p.x - s * 0.12, p.y - s * 0.9, s * 0.24, s * 0.9);
+          ctx.fillStyle = big ? "#2e8b47" : "#3aa35a";
+          ctx.beginPath();
+          ctx.arc(p.x, p.y - s * 1.25, s * 0.62, 0, Math.PI * 2);
+          ctx.arc(p.x - s * 0.4, p.y - s * 0.85, s * 0.45, 0, Math.PI * 2);
+          ctx.arc(p.x + s * 0.4, p.y - s * 0.85, s * 0.45, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = "rgba(255,255,255,0.14)";
+          ctx.beginPath();
+          ctx.arc(p.x - s * 0.18, p.y - s * 1.45, s * 0.26, 0, Math.PI * 2);
+          ctx.fill();
+        },
+      });
+    }
+
+    {
+      const ga = Math.PI / 2;
+      const pilL = proj(Math.cos(ga) * (RI - 14), Math.sin(ga) * (RI - 14), 0);
+      const pilR = proj(Math.cos(ga) * (RO + 14), Math.sin(ga) * (RO + 14), 0);
+      if (pilL && pilR) {
+        const depth = Math.hypot(Math.cos(ga) * R - camx, Math.sin(ga) * R - camy);
+        bills.push({
+          depth, draw: () => {
+            const pw = Math.max(3, 4 * pilL.sc);
+            const ph = 34 * pilL.sc;
+            ctx.fillStyle = "#c8ccd8";
+            ctx.fillRect(pilL.x - pw / 2, pilL.y - ph, pw, ph);
+            ctx.fillRect(pilR.x - pw / 2, pilR.y - ph, pw, ph);
+            ctx.fillStyle = "#e11d48";
+            ctx.fillRect(pilL.x - pw / 2, pilL.y - ph, pw, ph * 0.12);
+            ctx.fillRect(pilR.x - pw / 2, pilR.y - ph, pw, ph * 0.12);
+            const bw = Math.hypot(pilR.x - pilL.x, pilR.y - pilL.y);
+            const ang = Math.atan2(pilR.y - pilL.y, pilR.x - pilL.x);
+            ctx.save();
+            ctx.translate(pilL.x, pilL.y - ph);
+            ctx.rotate(ang);
+            const bh = Math.max(6, 10 * pilL.sc);
+            ctx.fillStyle = "#1c1f2b";
+            ctx.fillRect(0, -bh, bw, bh);
+            const cells = 10;
+            for (let i = 0; i < cells; i++) {
+              ctx.fillStyle = i % 2 === 0 ? "#ffffff" : "#1c1f2b";
+              ctx.fillRect((bw / cells) * i, -bh, bw / cells, bh * 0.32);
+            }
+            if (bw > 90) {
+              ctx.font = `900 ${bh * 0.55}px "Righteous", "Arial Black", sans-serif`;
+              ctx.fillStyle = "#FFD34D";
+              ctx.textAlign = "center";
+              ctx.textBaseline = "middle";
+              ctx.fillText("PRIMA KART", bw / 2, -bh * 0.62);
+            }
+            ctx.restore();
+          },
+        });
+      }
+    }
+
     bills.sort((a, b) => b.depth - a.depth);
     for (const b of bills) b.draw();
 
@@ -905,12 +924,12 @@ export default function KartRace3D({
           s.drifting = false;
           s.charge = 0;
         } else {
-          if (gas) s.v = Math.min(cap, s.v + (boosting ? 340 : 150) * dt);
+          if (gas) s.v = Math.min(cap, s.v + (boosting ? 360 : 170) * dt);
           else s.v -= s.v * 0.9 * dt;
-          if (brake) s.v = Math.max(0, s.v - 240 * dt);
+          if (brake) s.v = Math.max(0, s.v - 300 * dt);
 
           const canSteer = 0.3 + 0.7 * Math.min(s.v / MAXBASE, 1);
-          const turnRate = 1.7 * canSteer;
+          const turnRate = 1.9 * canSteer;
 
           if (driftKey && !s.drifting && steer !== 0 && s.v > 70) {
             s.drifting = true;
@@ -1078,7 +1097,7 @@ export default function KartRace3D({
         for (const ai of s.ai) {
           if (ai.spin > 0) { ai.spin -= dt; ai.v = Math.max(0, ai.v - 200 * dt); }
           else {
-            const rubber = Math.max(0.86, Math.min(1.14, 1 + (s.prog - ai.prog) * 0.22));
+            const rubber = Math.max(0.9, Math.min(1.12, 1 + (s.prog - ai.prog) * 0.18));
             const target = ai.baseV * rubber * (ai.itemT < 60 ? 1.3 : 1);
             ai.v = Math.min(target, ai.v + 130 * dt);
             if (ai.itemT === 60) {
