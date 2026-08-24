@@ -1,65 +1,20 @@
 "use client";
 
-import { useMemo, useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import SceneErrorBoundary from "./SceneErrorBoundary";
 
 const OpeningScene = dynamic(() => import("./OpeningScene"), { ssr: false });
 
-const CHARACTERS = [
-  { name: "NARA", color: "#EF5350" },
-  { name: "RAGA", color: "#FFA726" },
-  { name: "KIRA", color: "#AB47BC" },
-  { name: "BIMO", color: "#66BB6A" },
-  { name: "ALYA", color: "#42A5F5" },
-  { name: "DAVA", color: "#FFEE58" },
-  { name: "MIRA", color: "#26C6DA" },
-  { name: "SENA", color: "#EC407A" },
+const ZONE_ICONS = [
+  { emoji: "📖", label: "Cerita" },
+  { emoji: "🏎️", label: "Balapan" },
+  { emoji: "🏗️", label: "Tantangan" },
+  { emoji: "🎮", label: "Mini Game" },
+  { emoji: "🔧", label: "Garasi" },
+  { emoji: "📚", label: "Belajar" },
 ];
-
-function CharacterRing() {
-  const radius = 100;
-  return (
-    <div className="relative mt-4 h-2 w-full" style={{ zIndex: 10 }}>
-      <div className="character-ring" style={{ position: "relative", width: 0, height: 0, margin: "0 auto" }}>
-        {CHARACTERS.map((char, i) => {
-          const angle = (i / CHARACTERS.length) * 2 * Math.PI - Math.PI / 2;
-          const x = Math.cos(angle) * radius;
-          const y = Math.sin(angle) * radius;
-          return (
-            <div
-              key={char.name}
-              title={char.name}
-              style={{
-                position: "absolute",
-                left: `${x - 16}px`,
-                top: `${y - 16}px`,
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                background: `linear-gradient(135deg, ${char.color}, ${char.color}cc)`,
-                border: "3px solid white",
-                boxShadow: `0 3px 0 ${char.color}88, 0 4px 12px rgba(0,0,0,0.25), 0 0 20px ${char.color}44`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontFamily: '"Arial Black", sans-serif',
-                fontSize: "0.65rem",
-                fontWeight: 900,
-                color: "white",
-                textShadow: "0 1px 3px rgba(0,0,0,0.4)",
-                animationDelay: `${i * 0.1}s`,
-              }}
-            >
-              {char.name[0]}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 export default function OpeningScreen() {
   const router = useRouter();
@@ -106,7 +61,18 @@ export default function OpeningScreen() {
           BAHASA KITA. PILIHAN KITA.
         </p>
 
-        <CharacterRing />
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3" style={{ animation: "fadeUp 0.7s 0.5s ease-out both" }}>
+          {ZONE_ICONS.map((z, i) => (
+            <div
+              key={i}
+              className="flex flex-col items-center gap-1 rounded-2xl bg-white/30 px-3 py-2 backdrop-blur-sm"
+              style={{ border: "2px solid rgba(255,255,255,0.4)" }}
+            >
+              <span className="text-2xl">{z.emoji}</span>
+              <span className="text-[10px] font-bold text-white/90">{z.label}</span>
+            </div>
+          ))}
+        </div>
 
         <button
           onClick={() => router.push("/intro")}
@@ -122,8 +88,6 @@ export default function OpeningScreen() {
       </div>
 
       <style>{`
-        .character-ring { animation: spinRingSlow 30s linear infinite; }
-        @keyframes spinRingSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .logo-text {
           font-family: "Arial Black", "Impact", "Trebuchet MS", sans-serif;
           font-size: clamp(5rem, 20vw, 13rem);
