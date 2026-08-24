@@ -2,13 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { recordGameAction } from "@/app/actions";
 import { useJourney } from "@/lib/store";
 import { KARTS } from "@/components/game/karts";
-import SceneErrorBoundary from "@/components/game/SceneErrorBoundary";
-
-const KartRace3D = dynamic(() => import("@/components/games/KartRace3D"), { ssr: false });
+import KartRace3D from "@/components/games/KartRace3D";
 
 export default function LanguageKartPage() {
   const [done, setDone] = useState(false);
@@ -25,17 +22,18 @@ export default function LanguageKartPage() {
         <p className="text-xs font-bold uppercase tracking-wide text-rose-300">MAIN GAME · {kart.name}</p>
         <h1 className="mt-1 text-2xl font-black">Language Kart</h1>
         <p className="mt-1 text-sm text-white/70">
-          Balapan 3D ala Mario Kart! Setir kartnya (W/A/S/D atau panah), embat bola
-          Biru (kata Bahasa Indonesia, +10), jangan nabrak bola Merah (bahasa asing, −6).
-          60 detik, kamera ngikut di belakang. Gas sebanyak mungkin!
+          Balapan 2D top-down ala Mario Kart! Setir kartnya (W/A/S/D atau panah), embat kata
+          Indonesia (+10), jangan nabrak bahasa asing (−6). 3 lap, 60 detik. Gas!
         </p>
       </div>
 
       <div className="mt-4">
         {!done ? (
-          <SceneErrorBoundary label="Language Kart">
-            <KartRace3D onComplete={(s) => { setScore(s); setDone(true); }} kartBody={kart.body} kartAccent={kart.accent} />
-          </SceneErrorBoundary>
+          <KartRace3D
+            onComplete={(s) => { setScore(s); setDone(true); }}
+            kartBody={kart.body}
+            kartAccent={kart.accent}
+          />
         ) : (
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center backdrop-blur-md">
             <p className="text-lg font-bold">Skor akhir: {score}</p>
