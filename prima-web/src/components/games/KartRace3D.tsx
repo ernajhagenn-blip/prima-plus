@@ -10,21 +10,21 @@ const GOOD_WORDS = ["makasih", "sampai jumpa", "seru", "hebat", "teman", "belaja
 const BAD_WORDS = ["hallo guys", "btw", "omg", "literally", "vibes", "slay", "bestie", "okay dah", "see you"];
 
 const CHALLENGES = [
-  { q: "Manakah yang merupakan bahasa Indonesia baku?", opts: ["Gue mau pulang dulu ya", "Saya ingin pulang terlebih dahulu", "Gw mo cabut nih", "Aye mau out dulu"], ans: 1, tip: "Bahasa baku menggunakan 'saya' bukan 'gue/gw'." },
-  { q: "Kalimat mana yang menggunakan code-mixing?", opts: ["Aku pergi ke pasar", "Aku mau hangout sama temen-temen", "Dia sedang membaca buku", "Kami belajar di perpustakaan"], ans: 1, tip: "Code-mixing = mencampur bahasa Indonesia dengan bahasa asing dalam satu kalimat." },
-  { q: "Arti kata 'loyalitas' dalam konteks berbahasa adalah...", opts: ["Kemampuan berbicara dengan lancar", "Kesetiaan dan konsistensi menggunakan bahasa Indonesia", "Jumlah kosakata yang dikuasai", "Kecepatan dalam menulis"], ans: 1, tip: "Loyalitas berbahasa = kesetiaan menggunakan bahasa Indonesia dalam kehidupan sehari-hari." },
-  { q: "Penggunaan bahasa gaul di media sosial berdampak pada...", opts: ["Meningkatkan kreativitas", "Melemahkan kemampuan bahasa baku", "Tidak ada dampak", "Memperkuat budaya asing"], ans: 1, tip: "Penggunaan bahasa gaul terus-menerus dapat melemahkan penguasaan bahasa baku." },
-  { q: "Istilah 'bahasa Indonesia yang baik dan benar' merujuk pada...", opts: ["Bahasa yang sopan dan sesuai kaidah", "Bahasa yang paling keren", "Bahasa yang digunakan anak muda", "Bahasa yang paling banyak dipakai"], ans: 0, tip: "Bahasa yang baik = sopan, benar = sesuai kaidah tata bahasa." },
-  { q: "Apa yang dimaksud dengan 'kesadaran berbahasa'?", opts: ["Mengetahui banyak bahasa asing", "Menyadari pentingnya menggunakan bahasa Indonesia dengan tepat", "Bisa berbicara dengan logat yang benar", "Menulis tanpa kesalahan ejaan"], ans: 1, tip: "Kesadaran berbahasa = kesadaran akan pentingnya penggunaan bahasa Indonesia yang tepat." },
-  { q: "Frasa 'literally' dalam kalimat 'This is literally amazing' merupakan contoh...", opts: ["Bahasa Indonesia baku", "Pemakaian bahasa asing yang tidak perlu", "Bahasa daerah", "Singkatan resmi"], ans: 1, tip: "Kata 'literally' tidak perlu dipakai dalam konteks bahasa Indonesia." },
-  { q: "Cara yang tepat untuk menyapa dalam bahasa Indonesia formal adalah...", opts: ["Hey guys!", "Halo, apa kabar?", "Yo what's up!", "Hai bestie!"], ans: 1, tip: "Sapaan formal menggunakan kata yang sopan dan baku." },
-  { q: "Bahasa Indonesia memiliki peran penting sebagai...", opts: ["Bahasa internasional utama", "Alat pemersatu bangsa", "Bahasa bisnis dunia", "Bahasa teknologi"], ans: 1, tip: "Bahasa Indonesia adalah alat pemersatu NKRI sesuai UUD 1945." },
-  { q: "Penggunaan bahasa Indonesia yang baik di sekolah dapat...", opts: ["Mengurangi kreativitas siswa", "Meningkatkan komunikasi yang efektif", "Tidak berpengaruh", "Membuat siswa ketinggalan zaman"], ans: 1, tip: "Bahasa Indonesia yang baik meningkatkan kualitas komunikasi dan pemahaman." },
-  { q: "Kata 'aise' dan 'anjay' termasuk kategori...", opts: ["Bahasa baku Indonesia", "Bahasa gaul/slang", "Bahasa daerah", "Bahasa ilmiah"], ans: 1, tip: "Kata-kata tersebut merupakan bahasa gaul yang tidak sesuai kaidah baku." },
-  { q: "Tujuan utama penggunaan bahasa Indonesia di lingkungan sekolah adalah...", opts: ["Memenuhi aturan sekolah", "Membangun budaya literasi dan komunikasi", "Agar terlihat pintar", "Karena guru mengharuskan"], ans: 1, tip: "Penggunaan bahasa Indonesia yang baik membangun budaya literasi dan komunikasi." },
-  { q: "Kalimat yang benar adalah...", opts: ["Dia telah pergi kepusat", "Dia telah pergi ke pusat", "Dia udah cabut kepusat", "Dia udah cabut ke pusat"], ans: 1, tip: "Penulisan 'ke pusat' terpisah dan menggunakan kata baku 'telah'." },
-  { q: "Apa dampak negatif jika remaja lebih sering menggunakan bahasa asing?", opts: ["Tidak ada dampak", "Kemampuan berbahasa Indonesia menurun", "Menambah wawasan", "Meningkatkan kreativitas"], ans: 1, tip: "Terlalu sering menggunakan bahasa asing menurunkan kemampuan berbahasa Indonesia." },
-  { q: "Istilah 'bahasa prokem' adalah...", opts: ["Bahasa resmi Indonesia", "Bahasa gaul remaja Jakarta", "Bahasa daerah Jawa", "Bahasa internasional"], ans: 1, tip: "Bahasa prokem adalah ragam bahasa gaul yang berkembang di kalangan remaja Jakarta." },
+  { q: "Seorang siswa menulis di chat: 'Gw lagi males banget nih, males gerak, males ngapa-ngapain.' Menurutmu, apa dampak jangka panjang kebiasaan ini terhadap kemampuan bahasanya?", opts: ["Tidak ada dampak, toh cuma di chat pribadi", "Kemampuan menulis dan berbicara bahasa baku akan melemah karena jarang berlatih", "Justru menambah variasi kosakata", "Lebih efisien karena singkat"], ans: 1, tip: "Kebiasaan menulis informal secara konsisten akan membentuk pola pikir linguistik yang sulit beralih ke bahasa baku saat dibutuhkan (di sekolah, ujian, kerja)." },
+  { q: "Di sebuah seminar, pembicara berkata: 'Jadi basically, intinya kita harus aware terhadap issue ini, karena literally everyone affected.' Apa yang salah dari komunikasi ini?", opts: ["Tidak ada yang salah, semua orang paham", "Pencampuran bahasa asing yang tidak perlu mengurangi kejelasan bagi pendengar yang tidak menguasai bahasa tersebut", "Gaya bicara ini sudah diterima secara universal", "Hanya masalah selera, bukan kualitas"], ans: 1, tip: "Dalam konteks formal/semnar, penggunaan campuran bahasa asing bisa mengalienasi pendengar yang tidak familiar dan menurunkan kredibilitas pembicara." },
+  { q: "Sebuah penelitian menunjukkan bahwa remaja yang aktif di media sosial cenderung lebih sering menggunakan bahasa gaul dibanding bahasa baku. Mengapa fenomena ini perlu diwaspadai?", opts: ["Karena media sosial itu buruk bagi remaja", "Karena batas antara bahasa gaul dan baku bisa kabur, sehingga remaja kesulitan beralih ke bahasa formal saat diperlukan", "Karena bahasa gaul lebih kreatif", "Sebenarnya tidak perlu dikhawatirkan"], ans: 1, tip: "Media sosial membentuk kebiasaan linguistik. Tanpa kesadaran, remaja bisa kehilangan kemampuan beralih ragam (code-switching) yang tepat untuk konteks berbeda." },
+  { q: "Perhatikan kalimat ini: 'Aku mau presentasi tentang impact of social media terhadap generasi muda.' Apa masalah utama dari kalimat tersebut?", opts: ["Tidak ada masalah, semua orang mengerti", "Terlalu banyak kata serapan bahasa asing yang bisa diganti dengan padanan Indonesia yang lebih tepat", "Kalimatnya terlalu pendek", "Struktur kalimatnya sudah benar"], ans: 1, tip: "'Impact' → dampak, 'social media' → media sosial, 'terhadap' sudah benar. Menggunakan padanan Indonesia menunjukkan penguasaan kosakata yang lebih kuat." },
+  { q: "Guru bahasa Indonesia meminta siswa membuat esai formal. Seorang siswa menulis dengan campuran bahasa: 'Essay ini basically membahas tentang fenomena yang literally terjadi di sekitar kita.' Penilaian yang tepat adalah...", opts: ["Sudah bagus karena kreatif", "Perlu diperbaiki karena esai formal harus menggunakan bahasa Indonesia yang konsisten tanpa campuran bahasa asing yang tidak perlu", "Tidak masalah karena pembaca masih mengerti", "Nilai penuh karena isi/esainya yang penting"], ans: 1, tip: "Esai formal mengharapkan konsistensi penggunaan bahasa. Campuran bahasa asing yang tidak perlu menunjukkan belum matangnya kesadaran berbahasa." },
+  { q: "Ibu Kota Nusantara (IKN) menggunakan bahasa Indonesia sebagai bahasa resmi. Mengapa penegasan ini penting bagi identitas bangsa?", opts: ["Hanya formalitas administratif", "Bahasa Indonesia adalah alat pemersatu yang menjamin semua warga negara bisa berkomunikasi tanpa diskriminasi", "Bahasa Inggris seharusnya dijadikan bahasa utama", "Tidak terlalu penting selama komunikasi berjalan"], ans: 1, tip: "Penggunaan bahasa Indonesia di institusi negara memperkuat fungsi bahasa sebagai alat pemersatu dan identitas nasional Indonesia." },
+  { q: "Seorang konten kreator bilang: 'Content ini gw buat buat kalian semua yang literally need this!' Dari perspektif loyalitas berbahasa, apa yang terjadi?", opts: ["Normal saja, semua orang juga bicara begitu", "Terjadi erosi kesadaran berbahasa karena penggunaan bahasa asing secara membabi buta tanpa mempertimbangkan konteks", "Ini menunjukkan kreativitas tinggi", "Bahasa berkembang, itu wajar saja"], ans: 1, tip: "Loyalitas berbahasa bukan berarti tidak boleh meminjam kata, tapi tentang kesadaran memilih ragam yang tepat sesuai konteks dan audiens." },
+  { q: "Seorang siswa berkata: 'Aku lebih nyaman pakai bahasa gaul karena bahasa baku itu kaku dan membosankan.' Bagaimana cara merespons dengan bijak?", opts: ["Setuju saja, toh bahasa baku memang kaku", "Menjelaskan bahwa bahasa baku dan bahasa gaul punya fungsi masing-masing, dan keterampilan beralih antar keduanya adalah kekuatan, bukan kelemahan", "Melarang penggunaan bahasa gaul sepenuhnya", "Tidak usah dipedulikan"], ans: 1, tip: "Pendekatan ekstrem (larang total atau biarkan saja) kurang efektif. Yang dibutuhkan adalah kesadaran untuk menggunakan ragam yang tepat di waktu yang tepat." },
+  { q: "Dalam ujian tulis, seorang siswa menulis: 'Gimana caranya biar Indonesia tetep jaya?' Padahal soal meminta jawaban formal. Apa konsekuensinya?", opts: ["Tidak ada masalah karena isi jawabannya benar", "Guru berhak mengurangi poin karena penggunaan ragam informal tidak sesuai tuntutan soal yang meminta bahasa baku", "Siswa berhak menulis dengan gaya apapun", "Soal yang harus diperbaiki, bukan jawaban siswa"], ans: 1, tip: "Kesadaran berbahasa termasuk kemampuan menyesuaikan ragam dengan konteks. Ujian formal menuntut bahasa baku, dan ini adalah keterampilan yang harus dikuasai." },
+  { q: "Sebuah iklan produk menggunakan bahasa: 'Produk kami, basically, super bagus dan literally bikin hidup kamu lebih amazing!' Apa analisis kritismu?", opts: ["Iklan yang efektif karena menggunakan bahasa anak muda", "Penggunaan bahasa asing yang berlebihan dalam iklan bisa memperkuat tren bahasa gaul dan melemahkan kesadaran berbahasa baku di masyarakat", "Iklan seperti ini sudah standar industri", "Tidak ada masalah seluai produknya laku"], ans: 1, tip: "Media massa (termasuk iklan) memiliki pengaruh besar dalam membentuk kebiasaan berbahasa. Iklan yang tidak memperhatikan kualitas bahasa ikut andil dalam degradasi kesadaran berbahasa." },
+  { q: "Kata 'literally' sering dipakai remaja Indonesia dalam percakapan sehari-hari. Apa fungsi sebenarnya kata ini dan mengapa penggunaannya di Indonesia perlu dikritisi?", opts: ["Kata ini universal dan tidak perlu dikritisi", "Literally berarti 'secara harfiah' dalam bahasa Inggris, dan penggunaannya dalam bahasa Indonesia tanpa konteks yang tepat menunjukkan minimnya kesadaran linguistik", "Kata ini sudah menjadi bagian dari bahasa Indonesia", "Hanya masalah tren yang akan hilang sendiri"], ans: 1, tip: "Literally = secara harfiah. Dipakai remaja Indonesia biasanya tanpa makna harfiah, menunjukkan pengaruh media sosial yang membentuk kebiasaan tanpa pemahaman makna." },
+  { q: "Sebuah sekolah menerapkan 'Gerakan Ngomong Bahasa Indonesia' di lingkungan sekolah. Langkah ini sejalan dengan...", opts: ["Membatasi kreativitas siswa", "Upaya membangun kesadaran berbahasa dan loyalitas terhadap bahasa Indonesia sebagai identitas bangsa", "Aturan yang tidak relevan dengan zaman digital", "Memaksa siswa berbicara formal sepanjang hari"], ans: 1, tip: "Program seperti ini membantu remaja membiasakan diri menggunakan bahasa Indonesia secara konsisten, membangun kesadaran dan loyalitas berbahasa." },
+  { q: "Amatan: Di media sosial, banyak remaja menulis caption seperti 'Day 47: Still healing, still growing, still learning.' Padahal mereka berbicara tentang kehidupan di Indonesia. Apa yang bisa disimpulkan?", opts: ["Mereka lebih berbakat menulis dalam bahasa Inggris", "Terdapat desakulturalisasi bahasa Indonesia di kalangan remaja akibat pengaruh konten luar negeri yang dominan", "Tidak ada masalah karena caption Instagram memang pakai bahasa Inggris", "Mereka sedang belajar bahasa Inggris"], ans: 1, tip: "Ketika remaja secara default memilih bahasa asing untuk mengekspresikan diri (bukan karena konteks internasional), ini menunjukkan pelemahan ikatan emosional dengan bahasa Indonesia." },
+  { q: "Perhatikan dua kalimat: (A) 'Film ini bagus banget, wajib nonton!' (B) 'Film ini sangat menarik dan layak ditonton.' Kapan masing-masing kalimat tepat digunakan?", opts: ["Kalimat A untuk semua situasi", "Kalimat B untuk situasi formal/tulisan, Kalimat A untuk percakapan santai — keduanya valid di konteksnya masing-masing", "Kalimat B lebih baik dari Kalimat A", "Kalimat A tidak boleh digunakan"], ans: 1, tip: "Kesadaran berbahasa bukan tentang melarang bahasa gaul, tapi tentang kemampuan memilih ragam yang tepat. Formal = B, informal = A. Masalah muncul ketika satu ragam mendominasi semua konteks." },
+  { q: "Menurut UUD 1945 Pasal 36, bahasa Indonesia adalah bahasa negara. Faktanya, banyak remaja lebih bangga menggunakan bahasa asing. Apa langkah konkret yang bisa dilakukan untuk memperkuat loyalitas berbahasa?", opts: ["Melarang semua penggunaan bahasa asing", "Membangun kesadaran melalui edukasi, penguatan di lingkungan sekolah, dan menunjukkan bahwa bahasa Indonesia itu kaya, indah, dan mampu mengekspresikan ide kompleks", "Biarkan saja karena tren akan berubah", "Ganti semua bahasa asing dengan bahasa Indonesia di teknologi"], ans: 1, tip: "Pendekatan represif (melarang) kurang efektif. Yang dibutuhkan adalah pendekatan positif: edukasi, paparan, dan pembuktian bahwa bahasa Indonesia memadai untuk semua kebutuhan komunikasi." },
 ];
 
 interface Token { x: number; y: number; word: string; good: boolean; taken: boolean; respawn: number; z: number; bob: number; }
@@ -89,6 +89,8 @@ export default function KartRace3D({
   const [correctCount, setCorrectCount] = useState(0);
   const [eduScore, setEduScore] = useState(0);
   const [combo, setCombo] = useState(0);
+  const [showInstructions, setShowInstructions] = useState(true);
+  const showInstructionsRef = useRef(true);
 
   const S = useRef({
     px: 0, py: 0, pa: 0, pv: 0, pz: 0,
@@ -175,18 +177,19 @@ export default function KartRace3D({
     s.quizPaused = true;
     setQuizQ(idx);
     setQuizActive(true);
-    setQuizTimer(12);
+    setQuizTimer(20);
     setQuizAnswered(false);
     setSelectedOpt(-1);
   }, []);
 
   const answerQuiz = useCallback((optIdx: number) => {
     const s = S.current;
-    if (s.quizPaused || quizAnswered) return;
+    if (quizAnswered) return;
     setQuizAnswered(true);
     setSelectedOpt(optIdx);
     const ch = CHALLENGES[s.quizIdx];
-    const correct = optIdx === ch.ans;
+    const correct = optIdx >= 0 && optIdx === ch.ans;
+    setQuizCorrect(correct);
     if (correct) {
       sfx("correct");
       s.score += 20;
@@ -194,7 +197,6 @@ export default function KartRace3D({
       s.boostTimer = 30;
       setRaceScore(s.score);
       setCorrectCount(c => c + 1);
-      setEduScore(e => e + 10);
       setCombo(s.combo);
       s.popups.push({ x: s.px, y: s.py, z: 25, text: "+20 BENAR!", color: "#22c55e", life: 60 });
     } else {
@@ -204,13 +206,18 @@ export default function KartRace3D({
       s.combo = 0;
       setRaceScore(s.score);
       setCombo(0);
-      s.popups.push({ x: s.px, y: s.py, z: 25, text: "-5 SALAH", color: "#f43f5e", life: 60 });
+      s.popups.push({ x: s.px, y: s.py, z: 25, text: optIdx < 0 ? "WAKTU HABIS!" : "-5 SALAH", color: "#f43f5e", life: 60 });
     }
-    setTimeout(() => {
-      s.quizPaused = false;
-      setQuizActive(false);
-    }, correct ? 1500 : 2500);
   }, [quizAnswered]);
+
+  const continueQuiz = useCallback(() => {
+    const s = S.current;
+    s.quizPaused = false;
+    setQuizActive(false);
+    setQuizAnswered(false);
+    setQuizCorrect(false);
+    setSelectedOpt(-1);
+  }, []);
 
   // Quiz timer
   useEffect(() => {
@@ -256,8 +263,8 @@ export default function KartRace3D({
       const dt = Math.min(now - lt, 32); lt = now;
       if (!s.started) { draw(s, now); requestAnimationFrame(loop); return; }
 
-      // PAUSED for quiz
-      if (s.quizPaused) { draw(s, now); requestAnimationFrame(loop); return; }
+      // PAUSED for quiz OR instructions
+      if (s.quizPaused || showInstructionsRef.current) { draw(s, now); requestAnimationFrame(loop); return; }
 
       const k = s.keys;
       const tc = touch.current;
@@ -701,6 +708,71 @@ export default function KartRace3D({
       onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
       <canvas ref={canvasRef} width={dims.w} height={dims.h} style={{ width: "100%", height: "100%", display: "block" }} />
 
+      {/* INSTRUCTIONS OVERLAY */}
+      {showInstructions && (
+        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(5,5,20,0.9)", backdropFilter: "blur(16px)", zIndex: 200 }}>
+          <div style={{ padding: "32px 36px", borderRadius: 24, background: "rgba(15,15,50,0.95)", border: "1px solid rgba(124,58,237,0.4)", maxWidth: 520, width: "92%", textAlign: "center", animation: "popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both" }}>
+            <p style={{ fontFamily: "'Arial Black'", fontSize: 28, fontWeight: 900, color: "white", margin: "0 0 4px" }}>🏁 Language Kart</p>
+            <p style={{ fontFamily: "Arial", fontSize: 13, color: "rgba(255,255,255,0.45)", margin: "0 0 24px" }}>Balapan + Edukasi Bahasa Indonesia</p>
+
+            <div style={{ display: "grid", gap: 12, textAlign: "left", marginBottom: 24 }}>
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "10px 14px", borderRadius: 12, background: "rgba(255,255,255,0.04)" }}>
+                <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>⌨️</span>
+                <div>
+                  <p style={{ fontFamily: "'Arial Black'", fontSize: 14, color: "#22d3ee", margin: "0 0 2px" }}>Kontrol</p>
+                  <p style={{ fontFamily: "Arial", fontSize: 12, color: "rgba(255,255,255,0.6)", margin: 0, lineHeight: 1.4 }}>
+                    <b style={{ color: "white" }}>WASD / Panah</b> = Setir kart<br/>
+                    <b style={{ color: "white" }}>Spasi</b> = Drift (belok tajam)<br/>
+                    <b style={{ color: "white" }}>HP</b> = Sentuh kiri/kanan = setir, atas = gas, bawah = rem
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "10px 14px", borderRadius: 12, background: "rgba(255,255,255,0.04)" }}>
+                <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>💎</span>
+                <div>
+                  <p style={{ fontFamily: "'Arial Black'", fontSize: 14, color: "#22d3ee", margin: "0 0 2px" }}>Kata Terapung</p>
+                  <p style={{ fontFamily: "Arial", fontSize: 12, color: "rgba(255,255,255,0.6)", margin: 0, lineHeight: 1.4 }}>
+                    <b style={{ color: "#22d3ee" }}>Biru</b> = kata Indonesia yang baik → <b style={{ color: "#22d3ee" }}>+10</b><br/>
+                    <b style={{ color: "#f43f5e" }}>Merah</b> = bahasa gaul/asing → <b style={{ color: "#f43f5e" }}>-6</b> + kart melambat
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "10px 14px", borderRadius: 12, background: "rgba(255,255,255,0.04)" }}>
+                <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>❓</span>
+                <div>
+                  <p style={{ fontFamily: "'Arial Black'", fontSize: 14, color: "#facc15", margin: "0 0 2px" }}>Tantangan Bahasa</p>
+                  <p style={{ fontFamily: "Arial", fontSize: 12, color: "rgba(255,255,255,0.6)", margin: 0, lineHeight: 1.4 }}>
+                    Lewati gerbang <b style={{ color: "#facc15" }}>?</b> = quiz muncul.<br/>
+                    Jawab benar = <b style={{ color: "#22c55e" }}>+20 poin + speed boost</b><br/>
+                    Jawab salah = <b style={{ color: "#f43f5e" }}>-5 poin + kart melambat</b>
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "10px 14px", borderRadius: 12, background: "rgba(255,255,255,0.04)" }}>
+                <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>⚠️</span>
+                <div>
+                  <p style={{ fontFamily: "'Arial Black'", fontSize: 14, color: "#f97316", margin: "0 0 2px" }}>Rintangan</p>
+                  <p style={{ fontFamily: "Arial", fontSize: 12, color: "rgba(255,255,255,0.6)", margin: 0, lineHeight: 1.4 }}>
+                    Hati-hati dengan <b style={{ color: "#f97316" }}>segi tiga oranye</b> di track!<br/>
+                    Itu rintangan bahasa gaul — nabrak = kart melambat drastis.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <p style={{ fontFamily: "Arial", fontSize: 11, color: "rgba(255,255,255,0.35)", margin: "0 0 18px" }}>🎯 Selesaikan 3 lap dalam 90 detik. Kumpulkan poin sebanyak mungkin!</p>
+
+            <button onClick={() => { setShowInstructions(false); showInstructionsRef.current = false; }}
+              style={{ padding: "16px 40px", borderRadius: 16, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "white", fontFamily: "'Arial Black'", fontSize: 18, fontWeight: 900, cursor: "pointer", letterSpacing: "0.05em", boxShadow: "0 4px 20px rgba(124,58,237,0.4)" }}>
+              MULAI BALAPAN 🏁
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* HUD */}
       <div style={{ position: "absolute", top: 10, left: 10, right: 10, display: "flex", justifyContent: "space-between", gap: 6, zIndex: 30, pointerEvents: "none", flexWrap: "wrap" }}>
         {[{ l: "SKOR", v: raceScore, c: "#22d3ee", i: "★" }, { l: "WAKTU", v: `${time}s`, c: time <= 10 ? "#ef4444" : "#f43f5e", i: "⏱" }, { l: "POS", v: `${position}/4`, c: "#a855f7", i: "🏁" }, { l: "LAP", v: `${Math.min(lap + 1, 3)}/3`, c: "#22c55e", i: "🔄" }, { l: "BENAR", v: correctCount, c: "#facc15", i: "📝" }].map(it => (
@@ -731,32 +803,32 @@ export default function KartRace3D({
       {/* QUIZ OVERLAY */}
       {quizActive && (
         <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(5,5,20,0.85)", backdropFilter: "blur(12px)", zIndex: 100 }}>
-          <div style={{ padding: "24px 28px", borderRadius: 20, background: "rgba(15,15,50,0.95)", border: "1px solid rgba(250,204,21,0.4)", maxWidth: 480, width: "90%", animation: "popIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both" }}>
+          <div style={{ padding: "28px 32px", borderRadius: 20, background: "rgba(15,15,50,0.95)", border: "1px solid rgba(250,204,21,0.4)", maxWidth: 560, width: "92%", animation: "popIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both" }}>
             {/* Timer bar */}
-            <div style={{ width: "100%", height: 4, borderRadius: 2, background: "rgba(255,255,255,0.1)", marginBottom: 16 }}>
-              <div style={{ width: `${(quizTimer / 12) * 100}%`, height: "100%", borderRadius: 2, background: quizTimer <= 3 ? "#ef4444" : "#facc15", transition: "width 1s linear" }} />
+            <div style={{ width: "100%", height: 5, borderRadius: 3, background: "rgba(255,255,255,0.1)", marginBottom: 18 }}>
+              <div style={{ width: `${(quizTimer / 20) * 100}%`, height: "100%", borderRadius: 3, background: quizTimer <= 5 ? "#ef4444" : "#facc15", transition: "width 1s linear" }} />
             </div>
 
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-              <span style={{ fontFamily: "'Arial Black'", fontSize: 10, color: "#facc15", letterSpacing: "0.1em" }}>TANTANGAN BAHASA</span>
-              <span style={{ fontFamily: "'Arial Black'", fontSize: 14, color: quizTimer <= 3 ? "#ef4444" : "#facc15" }}>{quizTimer}s</span>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <span style={{ fontFamily: "'Arial Black'", fontSize: 13, color: "#facc15", letterSpacing: "0.08em" }}>TANTANGAN BAHASA</span>
+              <span style={{ fontFamily: "'Arial Black'", fontSize: 18, color: quizTimer <= 5 ? "#ef4444" : "#facc15" }}>{quizTimer}s</span>
             </div>
 
-            <p style={{ fontFamily: "'Arial Black'", fontSize: 15, color: "white", margin: "0 0 16px", lineHeight: 1.4 }}>{ch.q}</p>
+            <p style={{ fontFamily: "'Arial Black'", fontSize: 20, color: "white", margin: "0 0 20px", lineHeight: 1.4 }}>{ch.q}</p>
 
-            <div style={{ display: "grid", gap: 8 }}>
+            <div style={{ display: "grid", gap: 10 }}>
               {ch.opts.map((opt, i) => {
                 let bg = "rgba(255,255,255,0.06)";
                 let border = "rgba(255,255,255,0.1)";
-                let txtColor = "rgba(255,255,255,0.8)";
+                let txtColor = "rgba(255,255,255,0.85)";
                 if (quizAnswered) {
                   if (i === ch.ans) { bg = "rgba(34,197,94,0.2)"; border = "#22c55e"; txtColor = "#22c55e"; }
                   else if (i === selectedOpt && i !== ch.ans) { bg = "rgba(239,68,68,0.2)"; border = "#ef4444"; txtColor = "#ef4444"; }
                 } else if (i === selectedOpt) { bg = "rgba(250,204,21,0.15)"; border = "#facc15"; }
                 return (
                   <button key={i} onClick={() => !quizAnswered && answerQuiz(i)} disabled={quizAnswered}
-                    style={{ padding: "10px 14px", borderRadius: 12, background: bg, border: `1px solid ${border}`, color: txtColor, fontFamily: "Arial", fontSize: 12, fontWeight: 600, textAlign: "left", cursor: quizAnswered ? "default" : "pointer", transition: "all 0.15s" }}>
-                    <span style={{ fontFamily: "'Arial Black'", fontSize: 10, color: "rgba(255,255,255,0.3)", marginRight: 8 }}>{String.fromCharCode(65 + i)}.</span>
+                    style={{ padding: "14px 18px", borderRadius: 12, background: bg, border: `1px solid ${border}`, color: txtColor, fontFamily: "Arial", fontSize: 15, fontWeight: 600, textAlign: "left", cursor: quizAnswered ? "default" : "pointer", transition: "all 0.15s", lineHeight: 1.3 }}>
+                    <span style={{ fontFamily: "'Arial Black'", fontSize: 13, color: "rgba(255,255,255,0.35)", marginRight: 10 }}>{String.fromCharCode(65 + i)}.</span>
                     {opt}
                   </button>
                 );
@@ -764,10 +836,17 @@ export default function KartRace3D({
             </div>
 
             {quizAnswered && (
-              <div style={{ marginTop: 12, padding: "8px 12px", borderRadius: 10, background: quizCorrect ? "rgba(34,197,94,0.1)" : "rgba(239,68,68,0.1)", border: `1px solid ${quizCorrect ? "#22c55e33" : "#ef444433"}` }}>
-                <p style={{ fontFamily: "Arial", fontSize: 11, color: quizCorrect ? "#22c55e" : "#ef4444", margin: 0, fontWeight: 700 }}>{quizCorrect ? "✓ Benar! +20 poin" : "✗ Salah! -5 poin"}</p>
-                <p style={{ fontFamily: "Arial", fontSize: 10, color: "rgba(255,255,255,0.5)", margin: "4px 0 0" }}>{ch.tip}</p>
-              </div>
+              <>
+                <div style={{ marginTop: 16, padding: "12px 16px", borderRadius: 12, background: selectedOpt >= 0 && selectedOpt === ch.ans ? "rgba(34,197,94,0.1)" : "rgba(239,68,68,0.1)", border: `1px solid ${selectedOpt >= 0 && selectedOpt === ch.ans ? "#22c55e44" : "#ef444444"}` }}>
+                  <p style={{ fontFamily: "'Arial Black'", fontSize: 14, color: selectedOpt >= 0 && selectedOpt === ch.ans ? "#22c55e" : "#ef4444", margin: 0, fontWeight: 900 }}>
+                    {selectedOpt >= 0 && selectedOpt === ch.ans ? "✓ Benar! +20 poin" : (selectedOpt < 0 ? "WAKTU HABIS!" : "✗ Salah! -5 poin")}
+                  </p>
+                  <p style={{ fontFamily: "Arial", fontSize: 13, color: "rgba(255,255,255,0.6)", margin: "6px 0 0", lineHeight: 1.4 }}>{ch.tip}</p>
+                </div>
+                <button onClick={continueQuiz} style={{ marginTop: 14, width: "100%", padding: "14px 0", borderRadius: 12, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "white", fontFamily: "'Arial Black'", fontSize: 15, fontWeight: 900, cursor: "pointer", letterSpacing: "0.05em" }}>
+                  LANJUTKAN →
+                </button>
+              </>
             )}
           </div>
         </div>
