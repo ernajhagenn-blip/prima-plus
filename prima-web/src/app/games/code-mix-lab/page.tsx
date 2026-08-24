@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 interface Question {
@@ -172,161 +172,201 @@ export default function CodeMixLabPage() {
 
   if (phase === "start") {
     return (
-      <div className="flex min-h-dvh flex-col items-center justify-center px-4">
-        <div className="animate-scale-in w-full max-w-md text-center">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-violet-500 to-purple-600 text-4xl shadow-lg shadow-violet-500/20">
-            🧪
+      <div style={{ minHeight: "100vh", width: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "1.5rem" }}>
+        <div style={{ width: "100%", maxWidth: "28rem", textAlign: "center", animation: "scaleIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both" }}>
+          {/* Animated beaker icon */}
+          <div style={{
+            width: "80px", height: "80px", borderRadius: "24px", margin: "0 auto",
+            background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
+            display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2.5rem",
+            boxShadow: "0 8px 32px rgba(139,92,246,0.4)", animation: "floatBounce 3s ease-in-out infinite",
+          }}>🧪</div>
+
+          <h1 style={{
+            fontFamily: "'Righteous', 'Arial Black', Impact, sans-serif",
+            fontSize: "clamp(1.8rem, 6vw, 2.5rem)", fontWeight: 900, color: "white",
+            margin: "20px 0 0", textShadow: "0 2px 8px rgba(0,0,0,0.3)",
+          }}>Code-Mix Lab</h1>
+
+          <p style={{
+            fontFamily: "'Nunito', sans-serif", fontSize: "0.85rem", fontWeight: 600,
+            color: "rgba(255,255,255,0.5)", margin: "8px 0 0", lineHeight: 1.6,
+          }}>Analisis fenomena code-mixing dalam percakapan sehari-hari remaja Indonesia.</p>
+
+          {/* Feature cards */}
+          <div style={{ marginTop: "24px", display: "flex", flexDirection: "column", gap: "8px" }}>
+            {[
+              { icon: "🔬", title: "10 Kasus Nyata", desc: "Pesan campuran bahasa Indonesia-Inggris dari percakapan sehari-hari" },
+              { icon: "🧩", title: "Analisis Mendalam", desc: "Identifikasi jenis code-mixing, padanan baku, dan dampak linguistik" },
+              { icon: "⚡", title: "+12 XP per Jawaban", desc: "Setiap analisis benar meningkatkan skor kesadaran bahasamu" },
+            ].map((f, i) => (
+              <div key={i} style={{
+                display: "flex", alignItems: "center", gap: "12px", padding: "12px 14px", borderRadius: "14px",
+                background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", textAlign: "left",
+              }}>
+                <div style={{
+                  width: "40px", height: "40px", borderRadius: "12px", flexShrink: 0,
+                  background: "rgba(139,92,246,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.2rem",
+                }}>{f.icon}</div>
+                <div>
+                  <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.85)", margin: 0 }}>{f.title}</p>
+                  <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.65rem", fontWeight: 600, color: "rgba(255,255,255,0.4)", margin: "2px 0 0" }}>{f.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
-          <h1 className="mt-6 text-3xl font-black text-gray-900">🧪 Code-Mix Lab</h1>
-          <p className="mt-3 text-sm text-gray-500">
-            Analisis fenomena code-mixing: campuran bahasa Indonesia dan Inggris dalam percakapan sehari-hari.
-          </p>
-          <div className="mt-6 space-y-2 text-left text-xs text-gray-500">
-            <div className="flex items-start gap-2">
-              <span className="mt-0.5 text-violet-600">●</span>
-              <span>10 pesan campuran untuk dianalisis</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="mt-0.5 text-violet-600">●</span>
-              <span>Identifikasi jenis dan bagian code-mixing</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="mt-0.5 text-violet-600">●</span>
-              <span>Setiap jawaban benar = +{XP_PER_CORRECT} XP</span>
-            </div>
-          </div>
-          <button
-            onClick={() => setPhase("play")}
-            className="mt-8 w-full rounded-2xl bg-gradient-to-r from-violet-500 to-purple-600 py-4 text-lg font-black text-white shadow-lg shadow-violet-500/20 transition hover:scale-104 active:scale-96"
-          >
-            MULAI ▶
-          </button>
-          <button
-            onClick={() => router.push("/games")}
-            className="mt-3 text-xs font-bold text-gray-500 transition hover:text-gray-700"
-          >
-            ← Kembali ke Arcade
-          </button>
+
+          <button onClick={() => setPhase("play")} style={{
+            marginTop: "24px", width: "100%", padding: "16px", borderRadius: "16px",
+            fontFamily: "'Righteous', 'Arial Black', Impact, sans-serif", fontSize: "1.1rem", fontWeight: 900,
+            color: "white", border: "none", cursor: "pointer", letterSpacing: "0.05em",
+            background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
+            boxShadow: "0 4px 0 #6d28d9, 0 6px 0 #5b21b6, 0 10px 24px rgba(139,92,246,0.4), inset 0 2px 0 rgba(255,255,255,0.2)",
+            transition: "all 0.15s",
+          }}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
+          >MULAI ▶</button>
+
+          <button onClick={() => router.push("/games")} style={{
+            marginTop: "12px", fontFamily: "'Nunito', sans-serif", fontSize: "0.7rem", fontWeight: 700,
+            color: "rgba(255,255,255,0.4)", background: "none", border: "none", cursor: "pointer",
+          }}>← Kembali ke Arcade</button>
         </div>
+        <style>{`
+          @keyframes scaleIn { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
+          @keyframes floatBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        `}</style>
       </div>
     );
   }
 
   if (phase === "result") {
     return (
-      <div className="flex min-h-dvh flex-col items-center justify-center px-4">
-        <div className="animate-scale-in w-full max-w-md text-center">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-violet-500/20 to-purple-600/20 text-4xl">
-            🏆
+      <div style={{ minHeight: "100vh", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: "1.5rem" }}>
+        <div style={{ width: "100%", maxWidth: "28rem", textAlign: "center", animation: "scaleIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both" }}>
+          <div style={{ fontSize: "4rem" }}>🏆</div>
+          <h1 style={{ fontFamily: "'Righteous', 'Arial Black', Impact, sans-serif", fontSize: "clamp(1.8rem, 6vw, 2.5rem)", fontWeight: 900, color: "white", margin: "16px 0 0" }}>Selesai!</h1>
+          <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 600, color: "rgba(255,255,255,0.5)", margin: "4px 0 0" }}>Code-Mix Lab</p>
+
+          <div style={{ marginTop: "24px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }}>
+            {[
+              { value: xp, label: "XP Earned", color: "#a855f7", bg: "rgba(168,85,247,0.1)" },
+              { value: `${accuracy}%`, label: "Akurasi", color: "#10b981", bg: "rgba(16,185,129,0.1)" },
+              { value: `${answers.filter(Boolean).length}/${QUESTIONS.length}`, label: "Benar", color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
+            ].map((s, i) => (
+              <div key={i} style={{ padding: "14px 8px", borderRadius: "14px", background: s.bg, border: `1px solid ${s.color}20` }}>
+                <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: "1.5rem", fontWeight: 900, color: s.color, margin: 0 }}>{s.value}</p>
+                <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.6rem", fontWeight: 700, color: "rgba(255,255,255,0.4)", margin: "4px 0 0" }}>{s.label}</p>
+              </div>
+            ))}
           </div>
-          <h1 className="mt-6 text-3xl font-black">Selesai!</h1>
-          <p className="mt-2 text-sm text-gray-500">Code-Mix Lab</p>
-          <div className="mt-8 grid grid-cols-3 gap-3">
-            <div className="rounded-2xl border border-violet-200 bg-violet-50/70 p-4">
-              <p className="text-3xl font-black text-violet-700">{xp}</p>
-              <p className="mt-1 text-[11px] text-gray-500">XP Earned</p>
-            </div>
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
-              <p className="text-3xl font-black text-emerald-700">{accuracy}%</p>
-              <p className="mt-1 text-[11px] text-gray-500">Akurasi</p>
-            </div>
-            <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
-              <p className="text-3xl font-black text-amber-700">
-                {answers.filter(Boolean).length}/{QUESTIONS.length}
-              </p>
-                <p className="mt-1 text-[11px] text-gray-500">Benar</p>
-            </div>
-          </div>
-          <div className="mt-6 flex gap-3">
-            <button
-              onClick={() => {
-                setPhase("play");
-                setCurrentQ(0);
-                setScore(0);
-                setSelected(null);
-                setShowFeedback(false);
-                setAnswers([]);
-              }}
-              className="flex-1 rounded-xl border-2 border-gray-200 bg-white/70 py-3 text-sm font-bold text-gray-700 transition hover:bg-white/80 hover:scale-103 active:scale-97"
-            >
-              Main Lagi
-            </button>
-            <button
-              onClick={() => router.push("/games")}
-              className="flex-1 rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 py-3 text-sm font-black text-white shadow-lg transition hover:scale-103 active:scale-97"
-            >
-              ke Arcade →
-            </button>
+
+          <div style={{ display: "flex", gap: "10px", marginTop: "24px" }}>
+            <button onClick={() => { setPhase("play"); setCurrentQ(0); setScore(0); setSelected(null); setShowFeedback(false); setAnswers([]); }} style={{
+              flex: 1, padding: "12px", borderRadius: "14px", fontFamily: "'Nunito', sans-serif", fontSize: "0.85rem", fontWeight: 800,
+              color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", cursor: "pointer",
+            }}>🔄 Main Lagi</button>
+            <button onClick={() => router.push("/games")} style={{
+              flex: 1, padding: "12px", borderRadius: "14px", fontFamily: "'Nunito', sans-serif", fontSize: "0.85rem", fontWeight: 800,
+              color: "white", border: "none", cursor: "pointer",
+              background: "linear-gradient(135deg, #8b5cf6, #a855f7)", boxShadow: "0 4px 0 #6d28d9, inset 0 1px 0 rgba(255,255,255,0.2)",
+            }}>ke Arcade →</button>
           </div>
         </div>
+        <style>{`@keyframes scaleIn { 0% { opacity: 0; transform: scale(0.7); } 100% { opacity: 1; transform: scale(1); } }`}</style>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-dvh flex-col text-gray-800">
-      <div className="flex items-center justify-between px-4 pt-4 pb-2">
-        <button
-          onClick={() => router.push("/games")}
-          className="rounded-lg bg-white/70 border border-gray-200 px-3 py-1.5 text-xs font-bold text-gray-500 transition hover:bg-white/80"
-        >
-          ✕
-        </button>
-        <div className="text-center">
-          <p className="text-[10px] font-black uppercase tracking-widest text-violet-700/60">
-            🧪 Code-Mix Lab
-          </p>
-          <p className="text-sm font-bold text-gray-900">
-            {currentQ + 1} / {QUESTIONS.length}
-          </p>
+    <div style={{ minHeight: "100vh", width: "100%", display: "flex", flexDirection: "column" }}>
+      {/* Top bar */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px" }}>
+        <button onClick={() => router.push("/games")} style={{
+          padding: "6px 12px", borderRadius: "8px", fontFamily: "'Nunito', sans-serif", fontSize: "0.7rem", fontWeight: 700,
+          color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", cursor: "pointer",
+        }}>✕</button>
+        <div style={{ textAlign: "center" }}>
+          <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.55rem", fontWeight: 800, letterSpacing: "0.1em", color: "#a855f7", textTransform: "uppercase", margin: 0 }}>🧪 Code-Mix Lab</p>
+          <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.75rem", fontWeight: 700, color: "rgba(255,255,255,0.7)", margin: "2px 0 0" }}>{currentQ + 1} / {QUESTIONS.length}</p>
         </div>
-        <div className="rounded-lg bg-violet-50 border border-violet-200 px-3 py-1.5 text-xs font-bold text-violet-700">
-          {xp} XP
-        </div>
+        <div style={{
+          padding: "6px 12px", borderRadius: "8px",
+          background: "rgba(139,92,246,0.15)", border: "1px solid rgba(139,92,246,0.2)",
+          fontFamily: "'Righteous', sans-serif", fontSize: "0.75rem", fontWeight: 900, color: "#c084fc",
+        }}>{xp} XP</div>
       </div>
 
-      <div className="flex flex-1 flex-col items-center justify-center px-4 py-6">
-        <div key={currentQ} className="animate-slide-in-left w-full max-w-lg">
-          <div className="rounded-2xl border border-gray-200 bg-white/70 p-6 backdrop-blur-md">
-            <p className="text-xs font-bold uppercase tracking-wider text-violet-700/60">
-              🔬 Pesan campuran
-            </p>
-            <div className="mt-3 rounded-xl border border-violet-200 bg-violet-50 p-4">
-              <p className="text-sm text-gray-700 leading-relaxed">&quot;{q.mixedMessage}&quot;</p>
+      {/* Question area */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 16px 24px" }}>
+        <div key={currentQ} style={{ width: "100%", maxWidth: "36rem", animation: "slideUp 0.4s ease-out both" }}>
+          {/* Mixed message card */}
+          <div style={{
+            padding: "18px", borderRadius: "18px",
+            background: "rgba(255,255,255,0.06)", backdropFilter: "blur(16px)",
+            border: "1px solid rgba(139,92,246,0.15)",
+          }}>
+            <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.6rem", fontWeight: 800, letterSpacing: "0.1em", color: "#a855f7", textTransform: "uppercase", margin: 0 }}>🔬 Pesan campuran</p>
+            <div style={{
+              marginTop: "10px", padding: "14px", borderRadius: "12px",
+              background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.12)",
+            }}>
+              <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.85rem", fontWeight: 600, color: "rgba(255,255,255,0.85)", margin: 0, lineHeight: 1.6, fontStyle: "italic" }}>&quot;{q.mixedMessage}&quot;</p>
             </div>
-            <p className="mt-4 text-sm font-semibold text-gray-800">{q.question}</p>
+            <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.85rem", fontWeight: 700, color: "rgba(255,255,255,0.9)", margin: "14px 0 0", lineHeight: 1.6 }}>{q.question}</p>
           </div>
 
-          <div className="mt-4 space-y-2">
+          {/* Options */}
+          <div style={{ marginTop: "14px", display: "flex", flexDirection: "column", gap: "8px" }}>
             {q.options.map((opt, i) => {
               const isCorrect = opt === q.correctAnswer;
               const isSelected = opt === selected;
-              let btnStyle = "border-gray-200 bg-white/70 hover:border-gray-300 hover:bg-white/90";
-              if (showFeedback && isCorrect) btnStyle = "border-emerald-400/60 bg-emerald-500/15";
-              if (showFeedback && isSelected && !isCorrect) btnStyle = "border-rose-400/60 bg-rose-500/15";
+              let border = "1px solid rgba(255,255,255,0.08)";
+              let bg = "rgba(255,255,255,0.03)";
+              let textColor = "rgba(255,255,255,0.75)";
+              if (showFeedback && isCorrect) { border = "2px solid #10b981"; bg = "rgba(16,185,129,0.12)"; textColor = "#34d399"; }
+              else if (showFeedback && isSelected && !isCorrect) { border = "2px solid #f43f5e"; bg = "rgba(244,63,94,0.12)"; textColor = "#fb7185"; }
 
               return (
-                <button
-                  key={i}
-                  onClick={() => !showFeedback && handleAnswer(opt)}
-                  disabled={showFeedback}
-                  className={`w-full rounded-xl border p-4 text-left text-sm transition-all ${btnStyle} ${!showFeedback ? "hover:scale-[1.02] active:scale-[0.98]" : ""}`}
+                <button key={i} onClick={() => !showFeedback && handleAnswer(opt)} disabled={showFeedback}
+                  style={{
+                    display: "flex", alignItems: "flex-start", gap: "10px",
+                    padding: "14px 16px", borderRadius: "14px", border, background: bg,
+                    cursor: showFeedback ? "not-allowed" : "pointer", textAlign: "left",
+                    transition: "all 0.2s", opacity: showFeedback && !isCorrect && !isSelected ? 0.5 : 1,
+                  }}
                 >
-                  <span className="mr-2 text-[11px] text-gray-400">{String.fromCharCode(65 + i)}.</span>
-                  {opt}
+                  <span style={{
+                    width: "26px", height: "26px", borderRadius: "8px", flexShrink: 0,
+                    background: showFeedback && isCorrect ? "rgba(16,185,129,0.2)" : showFeedback && isSelected && !isCorrect ? "rgba(244,63,94,0.2)" : "rgba(255,255,255,0.08)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontFamily: "'Righteous', sans-serif", fontSize: "0.7rem", fontWeight: 900, color: textColor,
+                  }}>{String.fromCharCode(65 + i)}.</span>
+                  <span style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 600, color: textColor, lineHeight: 1.6 }}>{opt}</span>
                 </button>
               );
             })}
           </div>
 
+          {/* Feedback */}
           {showFeedback && (
-            <div className="mt-4 animate-fade-in rounded-xl border border-gray-200 bg-white/70 p-4">
-              <p className="text-xs font-bold text-gray-500">Penjelasan:</p>
-              <p className="mt-1 text-sm text-gray-600">{q.explanation}</p>
+            <div style={{
+              marginTop: "14px", padding: "14px", borderRadius: "14px",
+              background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.15)",
+              animation: "fadeIn 0.3s ease-out both",
+            }}>
+              <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.65rem", fontWeight: 800, color: "#a855f7", margin: 0 }}>💡 Penjelasan:</p>
+              <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 600, color: "rgba(255,255,255,0.65)", margin: "6px 0 0", lineHeight: 1.6 }}>{q.explanation}</p>
             </div>
           )}
         </div>
       </div>
+
+      <style>{`
+        @keyframes slideUp { 0% { opacity: 0; transform: translateY(16px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+      `}</style>
     </div>
   );
 }
