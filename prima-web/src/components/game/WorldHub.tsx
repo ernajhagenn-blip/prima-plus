@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 const ZONES = [
   {
@@ -11,8 +11,9 @@ const ZONES = [
     name: "Story District",
     desc: "Jelajahi cerita dan ambil keputusan yang membentuk karaktermu.",
     href: "/journey/1",
-    gradient: "from-amber-500 via-orange-500 to-red-500",
-    glow: "rgba(251,146,60,0.35)",
+    gradient: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
+    shadow: "#15803d",
+    glow: "rgba(34,197,94,0.45)",
     status: "available" as const,
   },
   {
@@ -21,8 +22,9 @@ const ZONES = [
     name: "PRIMA Kart Arena",
     desc: "Balapan kart melalui checkpoint situasi bahasa Indonesia.",
     href: "/select",
-    gradient: "from-rose-500 via-pink-500 to-fuchsia-500",
-    glow: "rgba(244,63,94,0.35)",
+    gradient: "linear-gradient(135deg, #ef4444 0%, #f97316 100%)",
+    shadow: "#b91c1c",
+    glow: "rgba(239,68,68,0.45)",
     status: "available" as const,
   },
   {
@@ -31,8 +33,9 @@ const ZONES = [
     name: "Challenge Tower",
     desc: "Taklukkan 6 lantai tantangan bahasa untuk membuktikan kemampuanmu.",
     href: "/games/challenge-tower",
-    gradient: "from-violet-500 via-purple-500 to-indigo-500",
-    glow: "rgba(167,139,250,0.35)",
+    gradient: "linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)",
+    shadow: "#6b21a8",
+    glow: "rgba(168,85,247,0.45)",
     status: "available" as const,
   },
   {
@@ -41,8 +44,9 @@ const ZONES = [
     name: "Mini Game Arcade",
     desc: "6 mini games seru untuk melatih kesadaran berbahasa.",
     href: "/games",
-    gradient: "from-cyan-500 via-teal-500 to-emerald-500",
-    glow: "rgba(6,182,212,0.35)",
+    gradient: "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)",
+    shadow: "#1d4ed8",
+    glow: "rgba(59,130,246,0.45)",
     status: "available" as const,
   },
   {
@@ -51,8 +55,9 @@ const ZONES = [
     name: "Garage & Upgrade",
     desc: "Kustomisasi kart dan tingkatkan performa balapanmu.",
     href: "/kart",
-    gradient: "from-sky-500 via-blue-500 to-indigo-500",
-    glow: "rgba(56,189,248,0.35)",
+    gradient: "linear-gradient(135deg, #f59e0b 0%, #f97316 100%)",
+    shadow: "#b45309",
+    glow: "rgba(245,158,11,0.45)",
     status: "available" as const,
   },
   {
@@ -61,88 +66,165 @@ const ZONES = [
     name: "Knowledge Center",
     desc: "Pelajari materi kesadaran berbahasa sebelum masuk arena.",
     href: "/edukasi",
-    gradient: "from-emerald-500 via-green-500 to-lime-500",
-    glow: "rgba(16,185,129,0.35)",
+    gradient: "linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%)",
+    shadow: "#0d9488",
+    glow: "rgba(20,184,166,0.45)",
     status: "available" as const,
   },
 ] as const;
 
-const STATUS_LABEL: Record<string, { text: string; color: string; dot: string }> = {
-  available: { text: "Bisa Dimainkan", color: "text-emerald-400", dot: "bg-emerald-400" },
-  locked: { text: "Terkunci", color: "text-zinc-500", dot: "bg-zinc-500" },
-  completed: { text: "Selesai", color: "text-amber-400", dot: "bg-amber-400" },
-};
-
 const DIMENSIONS = [
-  { key: "konteks", label: "Konteks", value: 82, color: "from-cyan-400 to-blue-500" },
-  { key: "kejelasan", label: "Kejelasan", value: 76, color: "from-violet-400 to-purple-500" },
-  { key: "adaptasi", label: "Adaptasi", value: 88, color: "from-emerald-400 to-teal-500" },
-  { key: "loyalitas", label: "Loyalitas", value: 71, color: "from-rose-400 to-pink-500" },
-  { key: "kesadaran", label: "Kesadaran", value: 65, color: "from-amber-400 to-orange-500" },
+  { key: "konteks", label: "Konteks", value: 82, color: "#3b82f6" },
+  { key: "kejelasan", label: "Kejelasan", value: 76, color: "#a855f7" },
+  { key: "adaptasi", label: "Adaptasi", value: 88, color: "#22c55e" },
+  { key: "loyalitas", label: "Loyalitas", value: 71, color: "#ef4444" },
+  { key: "kesadaran", label: "Kesadaran", value: 65, color: "#f59e0b" },
 ];
 
 const container = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.07 },
+    transition: { staggerChildren: 0.08 },
   },
 };
 
 const item = {
-  hidden: { opacity: 0, y: 24, scale: 0.95 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring" as const, stiffness: 260, damping: 20 } },
+  hidden: { opacity: 0, y: 30, scale: 0.9 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring" as const, stiffness: 260, damping: 20 },
+  },
 };
 
-function PlayerCard({ name, level, stars }: { name: string; level: number; stars: number }) {
+function ZoneCard({
+  zone,
+  onClick,
+}: {
+  zone: (typeof ZONES)[number];
+  onClick: () => void;
+}) {
+  const [hovered, setHovered] = useState(false);
+
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-md">
-      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-2xl shadow-lg shadow-orange-500/20">
-        🧑‍🚀
+    <motion.button
+      variants={item}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={onClick}
+      whileHover={{ y: -8, scale: 1.03 }}
+      whileTap={{ scale: 0.97 }}
+      className="group relative overflow-hidden text-left transition-all duration-300"
+      style={{
+        borderRadius: 20,
+        background: zone.gradient,
+        border: "3px solid rgba(255,255,255,0.3)",
+        boxShadow: hovered
+          ? `0 6px 0 ${zone.shadow}, 0 10px 20px rgba(0,0,0,0.25), 0 0 30px ${zone.glow}`
+          : `0 6px 0 ${zone.shadow}, 0 10px 20px rgba(0,0,0,0.2)`,
+      }}
+    >
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-[17px] bg-gradient-to-b from-white/20 to-transparent" />
+
+      <div className="relative p-5 pb-6">
+        <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/25 text-4xl backdrop-blur-sm">
+          {zone.icon}
+        </div>
+
+        <h2 className="text-lg font-black uppercase tracking-wide text-white drop-shadow-md">
+          {zone.name}
+        </h2>
+        <p className="mt-1.5 text-[13px] leading-relaxed text-white/85">
+          {zone.desc}
+        </p>
+
+        <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/25 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white backdrop-blur-sm transition-all duration-200 group-hover:bg-white/35">
+          <span>Kunjungi</span>
+          <span className="transition-transform group-hover:translate-x-1">→</span>
+        </div>
       </div>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-bold text-white">{name || "Petualang"}</p>
-        <p className="text-[11px] text-white/50">Level {level}</p>
-      </div>
-      <div className="flex items-center gap-1 rounded-lg bg-amber-500/10 px-2.5 py-1">
-        <span className="text-sm">⭐</span>
-        <span className="text-xs font-bold text-amber-400">{stars}</span>
-      </div>
-    </div>
+    </motion.button>
   );
 }
 
-function DimensionBar({
-  label,
-  value,
-  gradient,
+function ProfileCard({
+  name,
+  level,
+  stars,
 }: {
-  label: string;
-  value: number;
-  gradient: string;
+  name: string;
+  level: number;
+  stars: number;
 }) {
   return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between">
-        <span className="text-[11px] font-medium text-white/60">{label}</span>
-        <span className="text-[11px] font-bold text-white/80">{value}%</span>
-      </div>
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${value}%` }}
-          transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
-          className={`h-full rounded-full bg-gradient-to-r ${gradient}`}
-        />
+    <div
+      className="overflow-hidden rounded-3xl text-white"
+      style={{
+        background: "linear-gradient(180deg, #f97316 0%, #ef4444 50%, #dc2626 100%)",
+        border: "3px solid rgba(255,255,255,0.35)",
+        boxShadow: "0 6px 0 #991b1b, 0 10px 20px rgba(0,0,0,0.25)",
+      }}
+    >
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent" />
+
+      <div className="relative p-5">
+        <div className="flex items-center gap-4">
+          <div
+            className="flex h-16 w-16 items-center justify-center rounded-full bg-white/25 text-4xl backdrop-blur-sm"
+            style={{ border: "3px solid rgba(255,255,255,0.4)" }}
+          >
+            🧑‍🚀
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-base font-black text-white drop-shadow-md">
+              {name || "Petualang"}
+            </p>
+            <div className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-white/25 px-3 py-0.5 text-[11px] font-bold text-white backdrop-blur-sm">
+              ⭐ Level {level}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center gap-2 rounded-xl bg-white/20 px-4 py-2.5 backdrop-blur-sm">
+          <span className="text-xl">⭐</span>
+          <span className="text-lg font-black text-white">{stars}</span>
+          <span className="text-xs font-semibold text-white/70">Bintang</span>
+        </div>
+
+        <div className="mt-4 space-y-2.5">
+          {DIMENSIONS.map((d) => (
+            <div key={d.key} className="space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold text-white/80">{d.label}</span>
+                <span className="text-[11px] font-bold text-white">{d.value}%</span>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-white/20">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${d.value}%` }}
+                  transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
+                  className="h-full rounded-full"
+                  style={{ backgroundColor: d.color }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mx-auto mt-4 h-28 w-28">
+          <RadarChart />
+        </div>
       </div>
     </div>
   );
 }
 
-function RadarChartPlaceholder() {
-  const cx = 75;
-  const cy = 75;
-  const r = 55;
+function RadarChart() {
+  const cx = 56;
+  const cy = 56;
+  const r = 42;
   const rings = [0.25, 0.5, 0.75, 1];
   const axes = DIMENSIONS.length;
   const points = DIMENSIONS.map((d, i) => {
@@ -153,7 +235,7 @@ function RadarChartPlaceholder() {
   const pathD = points.map((p, i) => `${i === 0 ? "M" : "L"}${p.x},${p.y}`).join(" ") + "Z";
 
   return (
-    <svg viewBox="0 0 150 150" className="h-full w-full">
+    <svg viewBox="0 0 112 112" className="h-full w-full">
       {rings.map((s) => (
         <polygon
           key={s}
@@ -162,7 +244,7 @@ function RadarChartPlaceholder() {
             return `${cx + r * s * Math.cos(a)},${cy + r * s * Math.sin(a)}`;
           }).join(" ")}
           fill="none"
-          stroke="rgba(255,255,255,0.08)"
+          stroke="rgba(255,255,255,0.2)"
           strokeWidth="0.8"
         />
       ))}
@@ -175,14 +257,14 @@ function RadarChartPlaceholder() {
             y1={cy}
             x2={cx + r * Math.cos(a)}
             y2={cy + r * Math.sin(a)}
-            stroke="rgba(255,255,255,0.06)"
+            stroke="rgba(255,255,255,0.15)"
             strokeWidth="0.6"
           />
         );
       })}
-      <polygon points={points.map((p) => `${p.x},${p.y}`).join(" ")} fill="rgba(56,189,248,0.15)" stroke="rgba(56,189,248,0.6)" strokeWidth="1.2" />
+      <polygon points={points.map((p) => `${p.x},${p.y}`).join(" ")} fill="rgba(255,255,255,0.2)" stroke="white" strokeWidth="1.5" />
       {points.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="#38bdf8" />
+        <circle key={i} cx={p.x} cy={p.y} r="3" fill="white" />
       ))}
     </svg>
   );
@@ -202,184 +284,152 @@ export default function WorldHub({
   playerName?: string;
 }) {
   const router = useRouter();
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const pct = total > 0 ? Math.round((episodesDone / total) * 100) : 0;
   const level = Math.floor(episodesDone / 2) + 1;
   const stars = Object.values(gameScores).reduce((a, b) => a + b, 0) + cards * 5;
 
   return (
-    <div className="relative min-h-dvh overflow-hidden bg-[#060b1e] text-white">
-      {/* City silhouette background */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute bottom-0 left-0 right-0 h-[40vh] bg-gradient-to-t from-[#0a1128]/90 to-transparent" />
+    <div
+      className="relative min-h-dvh overflow-hidden"
+      style={{
+        background: "linear-gradient(180deg, #38bdf8 0%, #7dd3fc 30%, #bae6fd 55%, #86efac 80%, #4ade80 100%)",
+      }}
+    >
+      {/* Floating clouds */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
-          className="absolute bottom-0 left-0 right-0 h-[30vh] opacity-[0.04]"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 200'%3E%3Crect x='20' y='60' width='40' height='140' rx='2' fill='white'/%3E%3Crect x='70' y='30' width='30' height='170' rx='2' fill='white'/%3E%3Crect x='110' y='80' width='50' height='120' rx='2' fill='white'/%3E%3Crect x='170' y='20' width='25' height='180' rx='2' fill='white'/%3E%3Crect x='205' y='50' width='35' height='150' rx='2' fill='white'/%3E%3Crect x='250' y='40' width='45' height='160' rx='2' fill='white'/%3E%3Crect x='310' y='70' width='30' height='130' rx='2' fill='white'/%3E%3Crect x='350' y='15' width='20' height='185' rx='2' fill='white'/%3E%3Crect x='380' y='55' width='55' height='145' rx='2' fill='white'/%3E%3Crect x='450' y='35' width='28' height='165' rx='2' fill='white'/%3E%3Crect x='490' y='65' width='42' height='135' rx='2' fill='white'/%3E%3Crect x='545' y='25' width='36' height='175' rx='2' fill='white'/%3E%3Crect x='590' y='50' width='48' height='150' rx='2' fill='white'/%3E%3Crect x='650' y='10' width='22' height='190' rx='2' fill='white'/%3E%3Crect x='685' y='45' width='40' height='155' rx='2' fill='white'/%3E%3Crect x='740' y='60' width='52' height='140' rx='2' fill='white'/%3E%3Crect x='810' y='20' width='30' height='180' rx='2' fill='white'/%3E%3Crect x='850' y='55' width='38' height='145' rx='2' fill='white'/%3E%3Crect x='900' y='35' width='26' height='165' rx='2' fill='white'/%3E%3Crect x='940' y='70' width='44' height='130' rx='2' fill='white'/%3E%3Crect x='1000' y='25' width='34' height='175' rx='2' fill='white'/%3E%3Crect x='1050' y='50' width='48' height='150' rx='2' fill='white'/%3E%3Crect x='1110' y='40' width='28' height='160' rx='2' fill='white'/%3E%3Crect x='1150' y='60' width='36' height='140' rx='2' fill='white'/%3E%3C/svg%3E\")",
-            backgroundRepeat: "repeat-x",
-            backgroundPosition: "bottom",
-            backgroundSize: "auto 100%",
-          }}
+          className="absolute top-[8%] left-[5%] h-20 w-40 rounded-full bg-white/40 blur-sm"
+          style={{ filter: "blur(8px)" }}
         />
-        {/* Ambient glow spots */}
-        <div className="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-cyan-500/5 blur-[120px]" />
-        <div className="absolute top-1/3 right-1/4 h-80 w-80 rounded-full bg-violet-500/5 blur-[100px]" />
-        <div className="absolute bottom-1/4 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-rose-500/5 blur-[100px]" />
+        <div
+          className="absolute top-[12%] left-[15%] h-14 w-28 rounded-full bg-white/30 blur-sm"
+          style={{ filter: "blur(6px)" }}
+        />
+        <div
+          className="absolute top-[5%] right-[10%] h-24 w-48 rounded-full bg-white/35 blur-sm"
+          style={{ filter: "blur(10px)" }}
+        />
+        <div
+          className="absolute top-[15%] right-[25%] h-16 w-32 rounded-full bg-white/25 blur-sm"
+          style={{ filter: "blur(7px)" }}
+        />
+        <div
+          className="absolute top-[20%] left-[50%] h-12 w-24 rounded-full bg-white/30 blur-sm"
+          style={{ filter: "blur(6px)" }}
+        />
+
+        {/* Rolling hills at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-[25vh]">
+          <svg viewBox="0 0 1440 200" preserveAspectRatio="none" className="h-full w-full">
+            <ellipse cx="360" cy="200" rx="600" ry="180" fill="#22c55e" opacity="0.5" />
+            <ellipse cx="1080" cy="200" rx="500" ry="160" fill="#16a34a" opacity="0.4" />
+            <ellipse cx="720" cy="210" rx="800" ry="150" fill="#15803d" opacity="0.3" />
+          </svg>
+        </div>
       </div>
 
       {/* Main content */}
-      <div className="relative mx-auto max-w-6xl px-4 pb-8 pt-6 sm:px-6">
+      <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6">
         {/* Header */}
         <motion.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
+          className="text-center"
         >
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400/70">
-              PRIMA+ World Hub
-            </p>
-            <h1 className="mt-1 text-3xl font-black tracking-tight text-white sm:text-4xl">
-              PRIMA<span className="text-cyan-400">CITY</span>
-            </h1>
-            <p className="mt-1 text-sm text-white/40">PILIH PETUALANGANMU.</p>
-          </div>
-          <PlayerCard name={playerName} level={level} stars={stars} />
+          <p className="text-[11px] font-black uppercase tracking-[0.5em] text-white/70">
+            PRIMA+ World Hub
+          </p>
+          <h1
+            className="mt-2 text-5xl font-black tracking-tight text-white sm:text-6xl"
+            style={{ textShadow: "0 4px 0 #1d4ed8, 0 6px 12px rgba(0,0,0,0.2)" }}
+          >
+            PRIMA CITY
+          </h1>
+          <p className="mt-1 text-sm font-semibold text-white/80">PILIH PETUALANGANMU!</p>
         </motion.header>
 
-        {/* Zone Grid */}
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="show"
-          className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {ZONES.map((zone) => {
-            const st = STATUS_LABEL[zone.status];
-            const isHovered = hoveredId === zone.id;
-            return (
-              <motion.button
-                key={zone.id}
-                variants={item}
-                onMouseEnter={() => setHoveredId(zone.id)}
-                onMouseLeave={() => setHoveredId(null)}
-                onClick={() => router.push(zone.href)}
-                whileHover={{ y: -6, scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                className="group relative overflow-hidden rounded-2xl border border-white/10 text-left transition-all duration-300"
-                style={{
-                  background: isHovered
-                    ? `linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))`
-                    : `linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01))`,
-                  boxShadow: isHovered ? `0 20px 50px -12px ${zone.glow}, 0 0 0 1px rgba(255,255,255,0.1)` : "0 4px 20px rgba(0,0,0,0.3)",
-                }}
-              >
-                {/* Glossy top edge */}
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-
-                <div className="relative p-5">
-                  <div className="flex items-start justify-between">
-                    <div
-                      className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${zone.gradient} text-2xl shadow-lg`}
-                      style={{ boxShadow: `0 8px 24px -4px ${zone.glow}` }}
-                    >
-                      {zone.icon}
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className={`h-1.5 w-1.5 rounded-full ${st.dot}`} />
-                      <span className={`text-[10px] font-semibold uppercase tracking-wide ${st.color}`}>
-                        {st.text}
-                      </span>
-                    </div>
-                  </div>
-
-                  <h2 className="mt-4 text-base font-black uppercase tracking-wide text-white">
-                    {zone.name}
-                  </h2>
-                  <p className="mt-1.5 text-[13px] leading-relaxed text-white/50">
-                    {zone.desc}
-                  </p>
-
-                  <div className="mt-4 flex items-center gap-2 text-[11px] font-semibold text-white/30 transition-colors group-hover:text-white/60">
-                    <span>Masuk Zona</span>
-                    <span className="transition-transform group-hover:translate-x-1">→</span>
-                  </div>
-                </div>
-
-                {/* Bottom accent line */}
-                <div
-                  className={`absolute bottom-0 left-0 h-0.5 w-0 bg-gradient-to-r ${zone.gradient} transition-all duration-500 group-hover:w-full`}
-                />
-              </motion.button>
-            );
-          })}
-        </motion.div>
-
-        {/* Bottom Section: Progress + Radar */}
-        <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-5">
-          {/* Overall Progress Bar */}
+        {/* Main layout: Zones + Profile */}
+        <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-4">
+          {/* Zone Grid - left side */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md lg:col-span-3"
+            variants={container}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-3 lg:grid-cols-3"
           >
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-black uppercase tracking-widest text-white/70">Progress Perjalanan</h3>
-              <span className="text-lg font-black text-cyan-400">{pct}%</span>
-            </div>
-            <div className="mt-3 h-3 w-full overflow-hidden rounded-full bg-white/10">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${pct}%` }}
-                transition={{ duration: 1.2, delay: 0.4, ease: "easeOut" }}
-                className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-500"
-              />
-            </div>
-            <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
-              <p className="text-[11px] text-white/40">
-                Episode: <span className="font-bold text-white/70">{episodesDone}/{total}</span>
-              </p>
-              <p className="text-[11px] text-white/40">
-                Kartu: <span className="font-bold text-white/70">{cards}</span>
-              </p>
-              <p className="text-[11px] text-white/40">
-                Skor Total: <span className="font-bold text-white/70">{stars}</span>
-              </p>
-            </div>
+            {ZONES.map((zone) => (
+              <ZoneCard key={zone.id} zone={zone} onClick={() => router.push(zone.href)} />
+            ))}
           </motion.div>
 
-          {/* Radar Chart + Dimensions */}
+          {/* Profile Card - right sidebar */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md lg:col-span-2"
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="lg:col-span-1"
           >
-            <h3 className="mb-3 text-xs font-black uppercase tracking-widest text-white/70">
-              Dimensi Kemampuan
-            </h3>
-            <div className="mx-auto h-32 w-32">
-              <RadarChartPlaceholder />
-            </div>
-            <div className="mt-3 space-y-2.5">
-              {DIMENSIONS.map((d) => (
-                <DimensionBar key={d.key} label={d.label} value={d.value} gradient={d.color} />
-              ))}
-            </div>
+            <ProfileCard name={playerName} level={level} stars={stars} />
           </motion.div>
         </div>
+
+        {/* Bottom Progress Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+          className="mt-8 overflow-hidden rounded-3xl"
+          style={{
+            background: "linear-gradient(135deg, #f97316 0%, #ef4444 50%, #ec4899 100%)",
+            border: "3px solid rgba(255,255,255,0.35)",
+            boxShadow: "0 6px 0 #9f1239, 0 10px 20px rgba(0,0,0,0.2)",
+          }}
+        >
+          <div className="relative p-5">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/15 to-transparent" />
+
+            <div className="relative">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-black uppercase tracking-widest text-white drop-shadow-md">
+                  🗺️ Progress Perjalanan
+                </h3>
+                <span className="text-2xl font-black text-white drop-shadow-md">{pct}%</span>
+              </div>
+
+              <div className="mt-3 h-4 w-full overflow-hidden rounded-full bg-white/25">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${pct}%` }}
+                  transition={{ duration: 1.2, delay: 0.4, ease: "easeOut" }}
+                  className="h-full rounded-full bg-white"
+                  style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}
+                />
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
+                <p className="text-xs font-semibold text-white/80">
+                  Episode: <span className="font-black text-white">{episodesDone}/{total}</span>
+                </p>
+                <p className="text-xs font-semibold text-white/80">
+                  Kartu: <span className="font-black text-white">{cards}</span>
+                </p>
+                <p className="text-xs font-semibold text-white/80">
+                  Skor Total: <span className="font-black text-white">{stars}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
 
         {/* Footer branding */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="mt-8 text-center"
+          className="mt-6 text-center"
         >
-          <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/15">
+          <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/40">
             PRIMA+ · BAHASA KITA. PILIHAN KITA.
           </p>
         </motion.div>

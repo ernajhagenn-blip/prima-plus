@@ -88,7 +88,7 @@ function DifficultyStars({ count }: { count: number }) {
         <div
           key={i}
           className={`h-1.5 w-1.5 rounded-full ${
-            i < count ? "bg-yellow-400" : "bg-white/10"
+            i < count ? "bg-yellow-400" : "bg-gray-200"
           }`}
         />
       ))}
@@ -98,12 +98,12 @@ function DifficultyStars({ count }: { count: number }) {
 
 export default function GamesPage() {
   return (
-    <div className="relative min-h-dvh overflow-hidden bg-[#060b1e] text-white">
+    <div className="relative min-h-dvh overflow-hidden text-gray-800">
       {/* Background orbs */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-1/4 left-1/5 h-80 w-80 rounded-full bg-cyan-500/[0.04] blur-[140px]" />
-        <div className="absolute bottom-1/3 right-1/4 h-72 w-72 rounded-full bg-violet-500/[0.04] blur-[120px]" />
-        <div className="absolute top-2/3 left-1/2 h-60 w-60 rounded-full bg-rose-500/[0.03] blur-[100px]" />
+        <div className="absolute top-1/4 left-1/5 h-80 w-80 rounded-full bg-cyan-300/10 blur-[140px]" />
+        <div className="absolute bottom-1/3 right-1/4 h-72 w-72 rounded-full bg-violet-300/10 blur-[120px]" />
+        <div className="absolute top-2/3 left-1/2 h-60 w-60 rounded-full bg-rose-300/10 blur-[100px]" />
       </div>
 
       <div className="relative mx-auto max-w-5xl px-4 pb-16 pt-6">
@@ -116,21 +116,21 @@ export default function GamesPage() {
           <div>
             <Link
               href="/world"
-              className="text-xs font-semibold text-cyan-300/50 transition hover:text-cyan-300/80"
+              className="text-xs font-semibold text-blue-400 transition hover:text-blue-600"
             >
               ← PRIMA CITY
             </Link>
-            <h1 className="mt-2 text-3xl font-black text-white sm:text-4xl">
+            <h1 className="mt-2 text-3xl font-black text-gray-900 sm:text-4xl">
               Mini Game{" "}
-              <span className="bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-cyan-500 to-violet-500 bg-clip-text text-transparent">
                 Arcade
               </span>
             </h1>
-            <p className="mt-1.5 text-sm text-white/35">
+            <p className="mt-1.5 text-sm text-gray-500">
               6 tantangan untuk melatih kesadaran berbahasa Indonesia.
             </p>
           </div>
-          <div className="hidden h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-cyan-500/10 to-violet-500/10 text-3xl backdrop-blur-md sm:flex">
+          <div className="hidden h-16 w-16 items-center justify-center rounded-2xl border border-gray-200 bg-white/70 text-3xl backdrop-blur-md sm:flex shadow-sm">
             🎮
           </div>
         </motion.div>
@@ -146,14 +146,10 @@ export default function GamesPage() {
             <motion.div key={game.href} variants={item}>
               <Link
                 href={game.href}
-                className="group relative block overflow-hidden rounded-2xl border border-white/[0.06] transition-all duration-300 hover:border-white/15"
-                style={{
-                  background:
-                    "linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01))",
-                }}
+                className="group relative block overflow-hidden rounded-2xl border border-gray-200 bg-white/70 backdrop-blur-md transition-all duration-300 hover:border-gray-300 hover:shadow-lg"
               >
                 {/* Glossy top edge */}
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
 
                 {/* Hover glow */}
                 <div
@@ -170,7 +166,7 @@ export default function GamesPage() {
                       {game.icon}
                     </div>
                     <div className="text-right">
-                      <span className="rounded-md bg-white/5 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white/25">
+                      <span className="rounded-md bg-gray-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-gray-400">
                         {game.zone}
                       </span>
                       <div className="mt-1.5">
@@ -179,14 +175,14 @@ export default function GamesPage() {
                     </div>
                   </div>
 
-                  <h2 className="mt-5 text-lg font-bold text-white transition-colors group-hover:text-cyan-300">
+                  <h2 className="mt-5 text-lg font-bold text-gray-800 transition-colors group-hover:text-blue-600">
                     {game.name}
                   </h2>
-                  <p className="mt-2 text-[13px] leading-relaxed text-white/35">
+                  <p className="mt-2 text-[13px] leading-relaxed text-gray-500">
                     {game.desc}
                   </p>
 
-                  <div className="mt-5 flex items-center gap-2 text-[11px] font-semibold text-white/20 transition-colors group-hover:text-cyan-400/60">
+                  <div className="mt-5 flex items-center gap-2 text-[11px] font-semibold text-gray-400 transition-colors group-hover:text-blue-500">
                     <span>Mainkan</span>
                     <span className="transition-transform group-hover:translate-x-1.5">→</span>
                   </div>
@@ -205,7 +201,7 @@ export default function GamesPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="mt-10 text-center text-[11px] text-white/15"
+          className="mt-10 text-center text-[11px] text-gray-400"
         >
           Skor dan XP tersimpan otomatis. Main bebas tanpa urutan.
         </motion.p>

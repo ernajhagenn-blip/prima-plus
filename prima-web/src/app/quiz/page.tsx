@@ -88,13 +88,13 @@ export default function QuizPage() {
   }
 
   return (
-    <main className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-[#0a0f2c] to-[#1a1147] px-6 text-white">
-      <div className="pointer-events-none absolute right-1/4 top-1/4 h-72 w-72 rounded-full bg-fuchsia-500/15 blur-3xl" />
+    <main className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden px-6 text-gray-800">
+      <div className="pointer-events-none absolute right-1/4 top-1/4 h-72 w-72 rounded-full bg-purple-300/20 blur-3xl" />
       <div className="w-full max-w-lg">
-        <p className="text-center text-xs uppercase tracking-[0.3em] text-fuchsia-300/60">
+        <p className="text-center text-xs uppercase tracking-[0.3em] text-purple-400/80">
           Final Language Challenge
         </p>
-        <p className="mt-1 text-center text-sm text-white/60">
+        <p className="mt-1 text-center text-sm text-gray-500">
           “Bukan tentang seberapa banyak kata yang kamu hafal. Tentang seberapa sadar kamu memilihnya.”
         </p>
 
@@ -104,13 +104,13 @@ export default function QuizPage() {
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -30 }}
-            className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-md"
+            className="mt-6 rounded-3xl border border-purple-200 bg-white/70 p-6 backdrop-blur-md"
           >
-            <span className="rounded-full bg-fuchsia-500/20 px-3 py-1 text-xs font-bold text-fuchsia-200">
+            <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-bold text-purple-600">
               {q.type}
             </span>
-            <p className="mt-3 text-sm text-white/80">{q.situation}</p>
-            <p className="mt-2 text-base font-bold">{q.prompt}</p>
+            <p className="mt-3 text-sm text-gray-600">{q.situation}</p>
+            <p className="mt-2 text-base font-bold text-gray-800">{q.prompt}</p>
 
             <div className="mt-4 space-y-2">
               {q.options.map((o) => {
@@ -129,10 +129,10 @@ export default function QuizPage() {
                     onClick={() => choose(o.key)}
                     className={`block w-full rounded-xl border px-4 py-3 text-left text-sm transition ${
                       state === "c"
-                        ? "border-green-400 bg-green-500/15"
+                        ? "border-green-400 bg-green-50 text-green-700"
                         : state === "w"
-                          ? "border-rose-400 bg-rose-500/15"
-                          : "border-white/10 bg-white/5 hover:border-fuchsia-300"
+                          ? "border-rose-400 bg-rose-50 text-rose-700"
+                          : "border-gray-200 bg-white/80 text-gray-700 hover:border-purple-300 hover:bg-purple-50"
                     }`}
                   >
                     {o.text}
@@ -147,7 +147,7 @@ export default function QuizPage() {
                   <input type="hidden" name="score" value={score} />
                   <button
                     type="submit"
-                    className="w-full rounded-xl bg-fuchsia-500 py-3 text-sm font-bold"
+                    className="w-full rounded-xl bg-gradient-to-r from-purple-500 to-fuchsia-500 py-3 text-sm font-bold text-white shadow-md transition hover:shadow-lg"
                   >
                     Lihat Refleksi →
                   </button>
@@ -158,7 +158,7 @@ export default function QuizPage() {
                     setIdx((i) => i + 1);
                     setPicked(null);
                   }}
-                  className="mt-4 w-full rounded-xl bg-fuchsia-500 py-3 text-sm font-bold"
+                  className="mt-4 w-full rounded-xl bg-gradient-to-r from-purple-500 to-fuchsia-500 py-3 text-sm font-bold text-white shadow-md transition hover:shadow-lg"
                 >
                   Lanjut →
                 </button>
@@ -167,7 +167,7 @@ export default function QuizPage() {
           </motion.div>
         </AnimatePresence>
 
-        <p className="mt-3 text-center text-xs text-white/40">
+        <p className="mt-3 text-center text-xs text-gray-400">
           {idx + 1}/{QUIZ.length}
         </p>
       </div>

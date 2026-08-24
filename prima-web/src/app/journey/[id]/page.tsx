@@ -26,15 +26,15 @@ export default async function JourneyPage({
   const total = EPISODES.length;
 
   return (
-    <div className="relative min-h-[100dvh] bg-gradient-to-b from-[#0a0f2c] via-[#131a47] to-[#0a0f2c] px-4 py-8 text-white">
-      <div className="pointer-events-none absolute left-1/3 top-10 h-72 w-72 rounded-full bg-violet-500/10 blur-3xl" />
+    <div className="relative min-h-[100dvh] px-4 py-8 text-gray-800">
+      <div className="pointer-events-none absolute left-1/3 top-10 h-72 w-72 rounded-full bg-violet-300/20 blur-3xl" />
 
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center justify-between">
-          <Link href="/world" className="text-xs font-semibold text-cyan-300">← PRIMA CITY</Link>
-          <span className="text-xs text-cyan-200/60">Episode {epId}/{total}</span>
+          <Link href="/world" className="text-xs font-semibold text-blue-500">← PRIMA CITY</Link>
+          <span className="text-xs text-gray-400">Episode {epId}/{total}</span>
         </div>
-        <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/10">
+        <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-gray-200">
           <div className="h-full bg-gradient-to-r from-cyan-400 to-rose-400" style={{ width: `${(epId / total) * 100}%` }} />
         </div>
 
@@ -43,8 +43,8 @@ export default async function JourneyPage({
             <KaraAvatar className="h-40 w-40" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold uppercase tracking-wide text-rose-300">{episode.subtitle}</p>
-            <h1 className="mt-1 text-xl font-black">{episode.title}</h1>
+            <p className="text-xs font-bold uppercase tracking-wide text-rose-500">{episode.subtitle}</p>
+            <h1 className="mt-1 text-xl font-black text-gray-900">{episode.title}</h1>
 
             <div className="mt-4 space-y-3">
               {episode.panels.map((panel, i) => {
@@ -58,9 +58,9 @@ export default async function JourneyPage({
                     >
                       {panel.speaker.slice(0, 3)}
                     </div>
-                    <div className={`rounded-2xl border border-white/10 bg-white/5 p-3 text-sm backdrop-blur-md ${isKara ? "ml-auto" : ""}`}>
+                    <div className={`rounded-2xl border border-gray-200 bg-white/70 p-3 text-sm backdrop-blur-md ${isKara ? "ml-auto" : ""}`}>
                       <p className="text-[10px] font-bold" style={{ color }}>{panel.speaker}</p>
-                      <p className="text-white/90">{panel.text}</p>
+                      <p className="text-gray-700">{panel.text}</p>
                     </div>
                   </div>
                 );
@@ -72,14 +72,14 @@ export default async function JourneyPage({
         {p ? (
           <EpisodeDecision episode={episode} />
         ) : (
-          <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md">
-            <p className="text-sm font-bold">Buat profil untuk menyimpan progres episode</p>
+          <div className="mt-5 rounded-2xl border border-gray-200 bg-white/70 p-5 backdrop-blur-md">
+            <p className="text-sm font-bold text-gray-800">Buat profil untuk menyimpan progres episode</p>
             <div className="mt-3"><RegisterForm /></div>
           </div>
         )}
 
         {epId > 1 && (
-          <Link href={`/journey/${epId - 1}`} className="mt-6 inline-block text-xs text-cyan-200/60">
+          <Link href={`/journey/${epId - 1}`} className="mt-6 inline-block text-xs text-gray-400">
             ← Episode sebelumnya
           </Link>
         )}

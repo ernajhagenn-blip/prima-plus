@@ -81,7 +81,7 @@ export default function KartScene({
       style={{ touchAction: "none", cursor: interactive ? "grab" : undefined }}
     >
       <Canvas shadows camera={{ position: [0, 3, 8], fov: 45 }}>
-        <GameSky top="#0a0f2c" bottom="#131a47" />
+        <GameSky top="#87CEEB" bottom="#E0F7FA" />
         <ambientLight intensity={0.7} />
         <directionalLight position={[8, 14, 6]} intensity={1.4} />
         <pointLight position={[-8, 6, 4]} intensity={50} color={config.body} />
@@ -90,7 +90,7 @@ export default function KartScene({
         <FloatingParticles count={30} color={config.trail} />
         <mesh position={[0, -1.55, 0]}>
           <cylinderGeometry args={[3, 3.4, 0.5, 32]} />
-          <meshStandardMaterial color="#1e293b" metalness={0.6} roughness={0.3} />
+          <meshStandardMaterial color="#94A3B8" metalness={0.6} roughness={0.3} />
         </mesh>
         <mesh position={[0, -1.25, 0]}>
           <cylinderGeometry args={[2.8, 2.8, 0.1, 32]} />

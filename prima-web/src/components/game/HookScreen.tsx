@@ -27,15 +27,15 @@ export default function HookScreen() {
 
   if (freeze) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black/85 px-6 text-center">
+      <div className="fixed inset-0 flex items-center justify-center bg-white/90 px-6 text-center backdrop-blur-md">
         <motion.div initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="max-w-2xl">
             <p
-              className="text-4xl font-black leading-tight text-white sm:text-6xl"
-              style={{ textShadow: "0 4px 24px rgba(34,211,238,0.6)", WebkitTextStroke: "1px #0c4a6e" }}
+              className="text-4xl font-black leading-tight text-gray-900 sm:text-6xl"
+              style={{ textShadow: "0 2px 12px rgba(59,130,246,0.3)" }}
             >
               PERNAH NGGAK KAMU BICARA KAYAK GITU?
             </p>
-            <p className="mt-4 text-sm text-white/70">
+            <p className="mt-4 text-sm text-gray-600">
               Bahasa bukan cuma soal kata. Cara kita bicara bentuk siapa kita — dan ke siapa kita lagi bicara.
               Pertanyaannya: kamu MEMILIH, atau cuma IKUT KEBIASAAN?
             </p>
@@ -43,8 +43,7 @@ export default function HookScreen() {
             whileHover={{ scale: 1.06 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => router.push("/journey/1")}
-            className="mt-8 rounded-2xl bg-gradient-to-r from-rose-500 to-yellow-400 px-10 py-4 text-lg font-black text-[#3b0764] shadow-[0_6px_0_#9a3412]"
-            style={{ WebkitTextStroke: "1px #7c2d12" }}
+            className="mt-8 rounded-2xl bg-gradient-to-r from-rose-400 to-yellow-400 px-10 py-4 text-lg font-black text-white shadow-lg shadow-orange-300/30 transition hover:shadow-orange-400/40"
           >
             ▶ MASUK KE DUNIA PRIMA
           </motion.button>
@@ -67,22 +66,22 @@ export default function HookScreen() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="rounded-2xl border border-cyan-400/30 bg-black/55 p-4 backdrop-blur-md"
+              className="rounded-2xl border border-blue-200 bg-white/70 p-4 backdrop-blur-md"
             >
-              <p className="text-xs font-black tracking-widest text-cyan-300">{line.who}</p>
-              <p className="mt-1 text-lg font-bold text-white">“{line.text}”</p>
+              <p className="text-xs font-black tracking-widest text-blue-500">{line.who}</p>
+              <p className="mt-1 text-lg font-bold text-gray-800">"{line.text}"</p>
             </motion.div>
           </AnimatePresence>
           <div className="mt-3 flex justify-between">
             <button
               onClick={() => (i === 0 ? setFreeze(true) : setI((v) => v - 1))}
-              className="rounded-xl bg-white/10 px-5 py-2 text-sm font-bold text-white"
+              className="rounded-xl bg-gray-200/80 px-5 py-2 text-sm font-bold text-gray-600"
             >
               {i === 0 ? "Lewati ▶" : "←"}
             </button>
             <button
               onClick={() => (i === LINES.length - 1 ? setFreeze(true) : setI((v) => v + 1))}
-              className="rounded-xl bg-gradient-to-r from-rose-500 to-yellow-400 px-6 py-2 text-sm font-black text-[#3b0764]"
+              className="rounded-xl bg-gradient-to-r from-rose-400 to-yellow-400 px-6 py-2 text-sm font-black text-white shadow-md"
             >
               Lanjut →
             </button>

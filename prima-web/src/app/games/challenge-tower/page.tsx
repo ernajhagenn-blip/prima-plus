@@ -158,25 +158,25 @@ export default function ChallengeTowerPage() {
 
   if (gameComplete) {
     return (
-      <div className="relative min-h-dvh overflow-hidden bg-[#060b1e] text-white">
+      <div className="relative min-h-dvh overflow-hidden text-gray-800">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute top-1/4 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-amber-500/10 blur-[150px]" />
+          <div className="absolute top-1/4 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-amber-300/15 blur-[150px]" />
         </div>
         <div className="relative mx-auto flex max-w-lg flex-col items-center justify-center px-4 py-16 text-center">
           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200, damping: 15 }} className="text-7xl">
             🏆
           </motion.div>
-          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mt-6 text-3xl font-black">
+          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mt-6 text-3xl font-black text-gray-900">
             Tower Selesai!
           </motion.h1>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="mt-2 text-lg text-white/60">
-            Skor: <span className="font-bold text-amber-400">{totalScore}</span> / {maxScore}
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="mt-2 text-lg text-gray-500">
+            Skor: <span className="font-bold text-amber-600">{totalScore}</span> / {maxScore}
           </motion.p>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="mt-6 flex gap-3">
-            <button onClick={() => window.location.reload()} className="rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-orange-500/20 transition hover:shadow-orange-500/40">
+            <button onClick={() => window.location.reload()} className="rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-orange-300/30 transition hover:shadow-orange-400/40">
               Main Lagi
             </button>
-            <Link href="/world" className="rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-white/70 backdrop-blur-md transition hover:bg-white/10">
+            <Link href="/world" className="rounded-xl border border-gray-200 bg-white/70 px-6 py-3 text-sm font-bold text-gray-500 backdrop-blur-md transition hover:bg-white/90">
               Kembali ke City
             </Link>
           </motion.div>
@@ -186,23 +186,23 @@ export default function ChallengeTowerPage() {
   }
 
   return (
-    <div className="relative min-h-dvh overflow-hidden bg-[#060b1e] text-white">
+    <div className="relative min-h-dvh overflow-hidden text-gray-800">
       {/* Background glow */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-1/4 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-violet-500/8 blur-[150px]" />
+        <div className="absolute top-1/4 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-violet-300/15 blur-[150px]" />
       </div>
 
       <div className="relative mx-auto max-w-2xl px-4 pb-8 pt-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <Link href="/world" className="text-xs font-semibold text-cyan-300/70">
+          <Link href="/world" className="text-xs font-semibold text-blue-500">
             ← PRIMA CITY
           </Link>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-white/40">
-              Skor: <span className="font-bold text-amber-400">{score}</span>
+            <span className="text-xs text-gray-400">
+              Skor: <span className="font-bold text-amber-600">{score}</span>
             </span>
-            <span className="text-xs text-white/40">
+            <span className="text-xs text-gray-400">
               {totalAnswered}/{totalQuestions}
             </span>
           </div>
@@ -217,7 +217,7 @@ export default function ChallengeTowerPage() {
               <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
                 <div
                   className={`relative h-2 w-full overflow-hidden rounded-full transition-all duration-500 ${
-                    state === "completed" ? "bg-white/30" : isActive ? "bg-white/20" : "bg-white/5"
+                    state === "completed" ? "bg-gray-300" : isActive ? "bg-gray-200" : "bg-gray-100"
                   }`}
                 >
                   {state === "completed" && (
@@ -235,7 +235,7 @@ export default function ChallengeTowerPage() {
                     />
                   )}
                 </div>
-                <span className={`text-[10px] font-bold ${isActive ? "text-white" : state === "completed" ? "text-white/50" : "text-white/20"}`}>
+                <span className={`text-[10px] font-bold ${isActive ? "text-gray-800" : state === "completed" ? "text-gray-400" : "text-gray-300"}`}>
                   {f.floor}
                 </span>
               </div>
@@ -250,14 +250,14 @@ export default function ChallengeTowerPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mt-8 text-center"
         >
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-white/10 to-white/5 text-4xl shadow-2xl backdrop-blur-md" style={{ boxShadow: `0 20px 60px -10px ${floor.glow}` }}>
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-white/70 text-4xl shadow-lg backdrop-blur-md border border-gray-200" style={{ boxShadow: `0 20px 60px -10px ${floor.glow}` }}>
             {floor.icon}
           </div>
-          <p className="mt-4 text-[10px] font-black uppercase tracking-[0.4em] text-white/30">
+          <p className="mt-4 text-[10px] font-black uppercase tracking-[0.4em] text-gray-400">
             Lantai {floor.floor}
           </p>
-          <h2 className="mt-1 text-2xl font-black text-white">{floor.title}</h2>
-          <p className="mt-1 text-sm text-white/40">{floor.desc}</p>
+          <h2 className="mt-1 text-2xl font-black text-gray-900">{floor.title}</h2>
+          <p className="mt-1 text-sm text-gray-500">{floor.desc}</p>
         </motion.div>
 
         {/* Question */}
@@ -268,20 +268,20 @@ export default function ChallengeTowerPage() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -30 }}
             transition={{ duration: 0.3 }}
-            className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md"
+            className="mt-8 rounded-2xl border border-gray-200 bg-white/70 p-6 backdrop-blur-md"
           >
-            <p className="text-[10px] font-bold uppercase tracking-wide text-white/40">
+            <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
               Pertanyaan {currentQ + 1} / {floor.questions.length}
             </p>
-            <p className="mt-3 text-base font-semibold text-white leading-relaxed">{question.q}</p>
+            <p className="mt-3 text-base font-semibold text-gray-800 leading-relaxed">{question.q}</p>
 
             <div className="mt-5 space-y-2.5">
               {question.options.map((opt, i) => {
                 const isSelected = selected === i;
                 const isCorrect = i === question.answer;
-                let borderColor = "border-white/10";
-                let bgColor = "bg-white/[0.03]";
-                let textColor = "text-white/80";
+                let borderColor = "border-gray-200";
+                let bgColor = "bg-white/80";
+                let textColor = "text-gray-700";
 
                 if (answerState !== "unanswered") {
                   if (isCorrect) {
@@ -300,9 +300,9 @@ export default function ChallengeTowerPage() {
                     key={i}
                     onClick={() => handleAnswer(i)}
                     disabled={selected !== null}
-                    className={`w-full rounded-xl border ${borderColor} ${bgColor} px-4 py-3 text-left text-sm font-medium ${textColor} transition-all duration-200 hover:border-white/20 hover:bg-white/[0.06] disabled:cursor-not-allowed`}
+                    className={`w-full rounded-xl border ${borderColor} ${bgColor} px-4 py-3 text-left text-sm font-medium ${textColor} transition-all duration-200 hover:border-gray-300 hover:bg-white disabled:cursor-not-allowed`}
                   >
-                    <span className="mr-3 inline-flex h-6 w-6 items-center justify-center rounded-md bg-white/10 text-[11px] font-bold text-white/50">
+                    <span className="mr-3 inline-flex h-6 w-6 items-center justify-center rounded-md bg-gray-100 text-[11px] font-bold text-gray-500">
                       {String.fromCharCode(65 + i)}
                     </span>
                     {opt}
@@ -326,10 +326,10 @@ export default function ChallengeTowerPage() {
               key={i}
               className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm transition-all ${
                 floorStates[i] === "completed"
-                  ? `bg-gradient-to-br ${f.gradient} shadow-lg`
+                  ? `bg-gradient-to-br ${f.gradient} shadow-lg text-white`
                   : i === currentFloor
-                  ? "border border-white/20 bg-white/10"
-                  : "border border-white/5 bg-white/[0.02]"
+                  ? "border border-gray-300 bg-white/70 text-gray-700"
+                  : "border border-gray-200 bg-white/50 text-gray-400"
               }`}
               style={
                 floorStates[i] === "completed"
