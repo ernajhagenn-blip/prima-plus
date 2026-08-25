@@ -1,11 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
 import { recordGameAction } from "@/app/actions";
 import { useJourney } from "@/lib/store";
 import { KARTS } from "@/components/game/karts";
-import KartRace3D from "@/components/games/KartRace3D";
+import KartRace3DWeb from "@/components/games/KartRace3DWeb";
 
 function posLabel(n: number) {
   if (n === 1) return "1 (Juara)";
@@ -64,7 +64,7 @@ export default function LanguageKartPage() {
 
   return (
     <main style={{ width: "100vw", height: "100vh", margin: 0, padding: 0, overflow: "hidden", background: "#0b0d22" }}>
-      <KartRace3D
+      <KartRace3DWeb
         onComplete={(score, correct, position) => {
           setFinalScore(score);
           setFinalCorrect(correct);
