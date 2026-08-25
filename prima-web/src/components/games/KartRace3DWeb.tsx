@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { SCENARIOS as CHALLENGES } from "@/lib/challengeScenarios";
 import { validateAll } from "@/lib/challengeValidator";
 
@@ -261,9 +262,10 @@ export default function KartRace3DWeb({
     boxMeshes: THREE.Group[];
     gateMeshes: THREE.Mesh[];
     sparks: { m: THREE.Mesh; life: number; vy: number }[];
+    glbKarts: THREE.Group[];
     spawnSpark?: (x: number, z: number, color: string) => void;
     ready: boolean;
-  }>({ aiMeshes: [], coinMeshes: [], boxMeshes: [], gateMeshes: [], sparks: [], ready: false });
+  }>({ aiMeshes: [], coinMeshes: [], boxMeshes: [], gateMeshes: [], sparks: [], glbKarts: [], ready: false });
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -416,6 +418,42 @@ export default function KartRace3DWeb({
       ak.scale.setScalar(1.05);
       scene.add(ak); T.current.aiMeshes.push(ak);
     }
+    const gltfLoader = new GLTFLoader();
+    const kartFiles = ["kart-oobi", "kart-oodi", "kart-ooli", "kart-oopi", "kart-oozi"];
+    const glbModels: Record<string, THREE.Group> = {};
+    let glbDone = 0;
+    const buildSlots = () => {
+      const slots: THREE.Group[] = [];
+      for (let s = 0; s < 8; s++) {
+        const src = glbModels[kartFiles[s % 5]];
+        if (!src) return;
+        const g = new THREE.Group();
+        const clone = src.clone(true);
+        g.add(clone);
+        scene.add(g);
+        slots.push(g);
+      }
+      T.current.glbKarts = slots;
+    };
+    kartFiles.forEach((f) => {
+      gltfLoader.load(`/models/karts/${f}.glb`, (gltf) => {
+        const model = gltf.scene;
+        const box = new THREE.Box3().setFromObject(model);
+        const size = new THREE.Vector3();
+        box.getSize(size);
+        model.scale.setScalar(20 / Math.max(size.x, size.z, 0.001));
+        const wrap = new THREE.Group();
+        wrap.add(model);
+        const box2 = new THREE.Box3().setFromObject(wrap);
+        const ctr = new THREE.Vector3();
+        box2.getCenter(ctr);
+        model.position.set(-ctr.x, -box2.min.y, -ctr.z);
+        glbModels[f] = wrap;
+        glbDone++;
+        if (glbDone === kartFiles.length) buildSlots();
+      }, undefined, () => { glbDone++; if (glbDone === kartFiles.length) buildSlots(); });
+    });
+
     const sparkGeo = new THREE.SphereGeometry(1.2, 6, 6);
     const sparks: { m: THREE.Mesh; life: number; vy: number }[] = [];
     for (let i = 0; i < 40; i++) {
@@ -890,6 +928,19 @@ export default function KartRace3DWeb({
         sp.vy -= 40 * dt;
         (sp.m.material as THREE.MeshBasicMaterial).opacity = sp.life * 0.9;
       });
+
+      if (t3.glbKarts.length === 8) {
+        const procs: (THREE.Group | undefined)[] = [t3.player, ...t3.aiMeshes];
+        procs.forEach((proc, i) => {
+          const g = t3.glbKarts[i];
+          if (!g || !proc) return;
+          proc.visible = false;
+          g.visible = true;
+          g.position.copy(proc.position);
+          g.rotation.y = proc.rotation.y;
+          g.rotation.z = proc.rotation.z;
+        });
+      }
 
       // Camera: spring chase + FOV boost + roll
       const dirX = Math.cos(s.h), dirZ = Math.sin(s.h);
