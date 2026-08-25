@@ -1,4 +1,4 @@
-export interface ChallengeOption {
+﻿export interface ChallengeOption {
   text: string;
   hasil: string;
   fb: string;
@@ -135,15 +135,15 @@ export const CHALLENGES: Challenge[] = [
     id: "balasguru",
     chapter: 2,
     domain: "NORM",
-    type: "DIGITAL COMMUNICATION",
-    level: 3,
-    q: "Bu pembina mengirim broadcast di grup: 'Anak-anak, laporan kegiatan dikumpulkan besok jam 12 siang ya.' Tiga balasan ini muncul di grup. Mana yang paling tepat sebagai balasanmu?",
+    type: "LANGUAGE DILEMMA",
+    level: 5,
+    q: "Seorang teman berkata enteng: Ya kalau bahasa Indonesia pelan-pelan hilang juga nggak apa-apa. Bahasa itu cuma alat komunikasi, tinggal ganti yang lain. Kalimat itu terdengar masuk akal, tapi ada yang mengganjal. Penolakan yang paling kuat terhadap pikiran itu adalah...",
     opts: [
-      { text: "Siap bu, siap dikejar deadline-nya 💪", hasil: "Hangat, tapi ada yang terlewat.", fb: "Nadanya hangat dan wajar di grup kelas. Tapi balasan ini tidak mengonfirmasi hal yang paling penting: kamu benar-benar paham tenggatnya. Guru yang membaca mungkin bertanya-tanya — 'dia paham jam 12, atau cuma ikut senang?'", quality: "ok" },
-      { text: "Baik Bu, laporan kegiatan kami kumpulkan besok sebelum jam 12. Terima kasih pengingatnya.", hasil: "Pendek, jelas, dan mengonfirmasi.", fb: "Balasan ini bekerja dengan baik karena tiga hal: mengonfirmasi tugas, mengulang tenggat (sebuah cara halus memastikan tidak ada salah paham), dan tetap hangat dengan ucapan terima kasih. Tidak perlu kaku — perhatikan tidak ada kata formal berlebihan di sini. Kesadaran norma itu tentang kesesuaian, bukan kekakuan.", quality: "best" },
-      { text: "Noted bu 🙏", hasil: "Cepat, tapi tipis.", fb: "'Noted' efisien dan lazim di chat kerja. Tapi sebagai balasan kepada guru untuk sebuah tenggat, dia tidak mengonfirmasi pemahamanmu — hanya menandai pesan sudah dibaca. Efisiensi bagus untukmu, kurang menghibur untuk yang membaca.", quality: "poor" },
+      { text: "Salah pikir, karena bahasa Indonesia adalah bahasa resmi negara sehingga wajib dipakai semua orang.", hasil: "Kamu bertahan pada aturan.", fb: "Benar secara hukum, tetapi aturan saja jarang membuat orang merasakan pentingnya sesuatu. Orang bisa patuh tanpa peduli, dan loyalitas yang didasarkan pada kewajiban semata rapuh ketika tidak ada yang mengawasi. Ada alasan yang lebih dalam untuk menjaga bahasa ini.", quality: "poor" },
+      { text: "Bahasa menyimpan cara kita memaknai dunia: ungkapan, humor, dan pengalaman generasi. Kehilangannya berarti kehilangan salah satu cara mengenal diri sendiri, dan itu sebabnya layak dijaga, meski bahasa lain tetap dipakai sehari-hari.", hasil: "Kamu menemukan alasan yang paling dalam.", fb: "Ini inti dari loyalitas berbahasa: bukan soal menolak bahasa lain, melainkan menyadari bahwa bahasa Indonesia membawa hal-hal yang tidak bisa digantikan, seperti lelucon yang hanya lucu dalam bahasa itu atau kata yang rasa tidak punya padanan persis. Orang yang sadar itu akan menjaga bahasanya tanpa merasa dipaksa.", quality: "best" },
+      { text: "Tergantung. Kalau dia memang merasa bahasa Inggris lebih berguna untuk hidupnya, itu pilihan dan haknya.", hasil: "Kamu memilih menghormati semua pilihan.", fb: "Menghormati pilihan orang memang penting, tetapi ada yang tidak tepat di sini: temanmu tidak sedang memilih bahasa, ia sedang meremehkan nilai sebuah bahasa. Dua hal itu berbeda. Menghormati hak berbahasa tidak sama dengan membiarkan anggapan bahwa kehilangan bahasa adalah hal yang sepele.", quality: "poor" },
     ],
-    reflect: "Kalau broadcast yang sama dikirim ketua panitia (temanmu sendiri), apakah balasanmu berubah? Mana bagian yang berubah, dan kenapa?",
+    reflect: "Kapan terakhir kali bahasa Indonesia membuatmu merasa pulang, misalnya lewat sebuah lagu, ungkapan, atau lelucon yang hanya jalan dalam bahasa itu?",
     ans: 1,
   },
   {

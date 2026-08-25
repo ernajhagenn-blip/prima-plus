@@ -158,7 +158,7 @@ export default function ChatPage() {
   const pick = (i: number) => { if (chosen === null) setChosen(i); };
 
   return (
-    <main style={{ width: "100vw", minHeight: "100vh", margin: 0, background: "radial-gradient(ellipse at 50% -10%, #22104a 0%, #0b0d22 55%)", padding: "clamp(14px,3vmin,40px) clamp(12px,3vmin,32px)", display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <main style={{ width: "100vw", minHeight: "100vh", margin: 0, background: "linear-gradient(180deg, #6ec6ff 0%, #9fe0b8 100%)", padding: "clamp(14px,3vmin,40px) clamp(12px,3vmin,32px)", display: "flex", flexDirection: "column", alignItems: "center" }}>
       {!allChatDone ? (
         <div style={{ width: "100%", maxWidth: 660, display: "flex", flexDirection: "column", minHeight: "80vh" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, gap: 10 }}>
@@ -170,7 +170,7 @@ export default function ChatPage() {
             </p>
           </div>
 
-          <h1 style={{ fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: "clamp(19px,3.4vmin,27px)", color: "white", margin: "0 0 18px", textShadow: "0 2px 12px rgba(236,72,153,0.4)" }}>
+          <h1 style={{ fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: "clamp(19px,3.4vmin,27px)", color: "#0e2a45", margin: "0 0 18px", textShadow: "0 2px 0 rgba(255,255,255,0.7)" }}>
             {s.title}
           </h1>
 
@@ -182,21 +182,21 @@ export default function ChatPage() {
                   <div style={{ width: 32, height: 32, borderRadius: "50%", flexShrink: 0, background: left ? "linear-gradient(135deg,#64748b,#94a3b8)" : "linear-gradient(135deg,#7c3aed,#ec4899)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Righteous',sans-serif", fontSize: 12, color: "white", fontWeight: 700 }}>
                     {left ? m.from.slice(0, 2).toUpperCase() : "AKU"}
                   </div>
-                  <div style={{ background: left ? "rgba(255,255,255,0.09)" : "linear-gradient(135deg,rgba(124,58,237,0.35),rgba(236,72,153,0.3))", borderRadius: left ? "4px 18px 18px 18px" : "18px 4px 18px 18px", padding: "10px 14px", border: "1px solid rgba(255,255,255,0.13)" }}>
+                  <div style={{ background: left ? "rgba(255,255,255,0.97)" : "linear-gradient(135deg,#8b5cf6,#ec4899)", borderRadius: left ? "4px 18px 18px 18px" : "18px 4px 18px 18px", padding: "10px 14px", border: "1px solid rgba(255,255,255,0.6)", boxShadow: "0 2px 8px rgba(20,40,70,0.12)" }}>
                     <p style={{ fontFamily: "'Righteous',sans-serif", fontSize: 9.5, color: "rgba(255,255,255,0.42)", margin: "0 0 3px" }}>{left ? m.from : ""}</p>
-                    <p style={{ fontFamily: "Arial,sans-serif", fontSize: 14, color: "rgba(255,255,255,0.93)", margin: 0, lineHeight: 1.5 }}>{m.text}</p>
+                    <p style={{ fontFamily: "Arial,sans-serif", fontSize: 14, color: left ? "#1c2430" : "white", margin: 0, lineHeight: 1.5 }}>{m.text}</p>
                   </div>
                 </div>
               );
             })}
           </div>
 
-            <div style={{ background: "rgba(250,204,21,0.08)", borderRadius: 16, padding: "13px 17px", border: "1px solid rgba(250,204,21,0.35)", marginBottom: 14, animation: "bubbleIn 0.4s 0.5s ease both" }}>
+            <div style={{ background: "rgba(255,255,255,0.94)", borderRadius: 16, padding: "13px 17px", border: "2px solid #facc15", boxShadow: "0 3px 12px rgba(20,40,70,0.15)", marginBottom: 14, animation: "bubbleIn 0.4s 0.5s ease both" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, flexWrap: "wrap", gap: 6 }}>
                 <span style={{ fontFamily: "'Righteous',sans-serif", fontSize: 10, color: "#facc15", letterSpacing: "0.12em" }}>KEPUTUSAN</span>
                 <span style={{ fontFamily: "'Righteous',sans-serif", fontSize: 9, letterSpacing: "0.1em", color: "#0b0d22", background: "#facc15", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>{s.domain}</span>
               </div>
-              <p style={{ fontFamily: "Arial,sans-serif", fontSize: 14.5, color: "white", margin: 0, lineHeight: 1.5, fontWeight: 600 }}>{s.ask}</p>
+              <p style={{ fontFamily: "Arial,sans-serif", fontSize: 14.5, color: "#16324a", margin: 0, lineHeight: 1.5, fontWeight: 600 }}>{s.ask}</p>
             </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 9, marginTop: "auto" }}>

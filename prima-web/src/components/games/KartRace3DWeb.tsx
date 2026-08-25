@@ -433,6 +433,23 @@ export default function KartRace3DWeb({
         scene.add(g);
         slots.push(g);
       }
+      const tints = [0xef4444, 0xa855f7, 0x22c55e, 0x3b82f6, 0xf97316, 0xeab308, 0x14b8a6, 0xec4899];
+      slots.forEach((g, i) => {
+        g.traverse((o) => {
+          const mesh = o as THREE.Mesh;
+          if (mesh.isMesh && mesh.material) {
+            const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+            mesh.material = mats.map((m) => {
+              const mm = (m as THREE.MeshStandardMaterial).clone();
+              if (i > 0 && mm.color && mm.color.getHSL({ h: 0, s: 0, l: 0 }).l > 0.25) {
+                const hsl = mm.color.getHSL({ h: 0, s: 0, l: 0 });
+                mm.color.setHSL(((hsl.h + tints[i] / 360) % 1), Math.max(hsl.s, 0.75), hsl.l);
+              }
+              return mm;
+            });
+          }
+        });
+      });
       T.current.glbKarts = slots;
     };
     kartFiles.forEach((f) => {
