@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import FunBackground from "@/components/FunBackground";
 
 interface Msg { from: string; side: "l" | "r"; text: string; }
 interface Choice { text: string; fb: string; tone: "good" | "mid" | "bad"; }
@@ -158,7 +159,8 @@ export default function ChatPage() {
   const pick = (i: number) => { if (chosen === null) setChosen(i); };
 
   return (
-    <main style={{ width: "100vw", minHeight: "100vh", margin: 0, background: "linear-gradient(180deg, #6ec6ff 0%, #9fe0b8 100%)", padding: "clamp(14px,3vmin,40px) clamp(12px,3vmin,32px)", display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <main style={{ width: "100vw", minHeight: "100vh", margin: 0, position: "relative", zIndex: 1, background: "linear-gradient(180deg, #6ec6ff 0%, #9fe0b8 100%)", padding: "clamp(14px,3vmin,40px) clamp(12px,3vmin,32px)", display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <FunBackground variant="bright" />
       {!allChatDone ? (
         <div style={{ width: "100%", maxWidth: 660, display: "flex", flexDirection: "column", minHeight: "80vh" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, gap: 10 }}>

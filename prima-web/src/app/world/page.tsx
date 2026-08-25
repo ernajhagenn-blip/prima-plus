@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import FunBackground from "@/components/FunBackground";
 
 interface Loc {
   id: string;
@@ -27,7 +28,9 @@ export default function WorldPage() {
   const router = useRouter();
 
   return (
-    <main style={{ width: "100vw", minHeight: "100vh", margin: 0, background: "radial-gradient(ellipse at 50% 120%, #4c1d95 0%, #1e1b4b 45%, #0b0d22 80%)", padding: "clamp(16px,3vmin,36px)", display: "flex", flexDirection: "column", alignItems: "center", overflowX: "hidden" }}>
+    <>
+    <FunBackground variant="night" />
+    <main style={{ width: "100vw", minHeight: "100vh", margin: 0, position: "relative", zIndex: 1, background: "radial-gradient(ellipse at 50% 120%, rgba(76,29,149,0.55) 0%, rgba(30,27,75,0.5) 45%, rgba(11,13,34,0.6) 80%)", padding: "clamp(16px,3vmin,36px)", display: "flex", flexDirection: "column", alignItems: "center", overflowX: "hidden" }}>
       <p style={{ fontFamily: "'Righteous',sans-serif", fontSize: "clamp(11px,2vmin,13px)", letterSpacing: "0.3em", color: "#a78bfa", margin: "0 0 4px", textAlign: "center" }}>
         SELAMAT DATANG DI
       </p>
@@ -53,9 +56,10 @@ export default function WorldPage() {
                 padding: "20px 14px 16px",
                 cursor: "pointer",
                 textAlign: "center",
-                transform: active ? "translateY(-10px) scale(1.05)" : "translateY(0) scale(1)",
+                transform: active ? "translateY(-14px) translateZ(50px) rotateX(0deg) scale(1.07)" : "translateY(6px) translateZ(0px) rotateX(14deg) scale(1)",
                 boxShadow: active ? `0 14px 44px ${loc.glow}` : "0 6px 20px rgba(0,0,0,0.35)",
                 transition: "all 0.3s cubic-bezier(0.34,1.56,0.64,1)",
+                transformStyle: "preserve-3d",
                 animation: `riseIn 0.5s ${i * 0.09}s ease both`,
                 position: "relative",
                 overflow: "hidden",
@@ -64,7 +68,7 @@ export default function WorldPage() {
               <div style={{
                 fontSize: "clamp(34px,6.5vmin,48px)", marginBottom: 8,
                 filter: active ? "drop-shadow(0 4px 10px rgba(0,0,0,0.4))" : "grayscale(0.3)",
-                transform: active ? "scale(1.15)" : "scale(1)", transition: "all 0.3s",
+                transform: active ? "scale(1.15) translateZ(34px)" : "scale(1) translateZ(18px)", transition: "all 0.3s",
               }}>
                 {loc.icon}
               </div>
@@ -102,5 +106,6 @@ export default function WorldPage() {
 
       <style>{`@keyframes riseIn { 0% { opacity: 0; transform: translateY(24px); } 100% { opacity: 1; transform: translateY(0); } }`}</style>
     </main>
+    </>
   );
 }

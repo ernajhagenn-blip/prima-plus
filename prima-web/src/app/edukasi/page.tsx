@@ -1,6 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
+import FunBackground from "@/components/FunBackground";
 
 const T = {
   judul: "🌐 Ruang Edukasi PRIMA+: Dinamika Bahasa dan Identitas Digital",
@@ -24,7 +25,8 @@ export default function EdukasiPage() {
   const router = useRouter();
 
   return (
-    <main style={{ width: "100vw", minHeight: "100vh", margin: 0, background: "radial-gradient(ellipse at 50% -10%, #1d3a5f 0%, #0b0d22 60%)", padding: "clamp(16px,4vmin,48px)", display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <main style={{ width: "100vw", minHeight: "100vh", margin: 0, position: "relative", zIndex: 1, background: "radial-gradient(ellipse at 50% -10%, rgba(29,58,95,0.55) 0%, rgba(11,13,34,0.6) 60%)", padding: "clamp(16px,4vmin,48px)", display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <FunBackground variant="night" />
       <p style={{ fontFamily: "'Righteous',sans-serif", fontSize: 12, letterSpacing: "0.25em", color: "#38bdf8", margin: "0 0 10px", textAlign: "center" }}>
         MEMAHAMI KONSEPNYA
       </p>

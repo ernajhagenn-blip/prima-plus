@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import FunBackground from "@/components/FunBackground";
 import { STORY_DATA } from "@/lib/storyData";
 
 interface ChatLine { from: string; text: string; foreign?: string[]; }
@@ -39,7 +40,8 @@ export default function StoryPage() {
   const last = idx === STORY_DATA.length - 1;
 
   return (
-    <main style={{ width: "100vw", minHeight: "100vh", margin: 0, background: "radial-gradient(ellipse at 50% -20%, #2a1655 0%, #0b0d22 55%)", padding: "clamp(16px,4vmin,48px)", display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <main style={{ width: "100vw", minHeight: "100vh", margin: 0, position: "relative", zIndex: 1, background: "radial-gradient(ellipse at 50% -20%, rgba(42,22,85,0.55) 0%, rgba(11,13,34,0.6) 55%)", padding: "clamp(16px,4vmin,48px)", display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <FunBackground variant="night" />
       <div style={{ width: "100%", maxWidth: 720, display: "flex", gap: 6, marginBottom: 26 }}>
         {STORY_DATA.map((_, i) => (
           <div key={i} style={{ flex: 1, height: 5, borderRadius: 3, background: i <= idx ? "linear-gradient(90deg,#7c3aed,#ec4899)" : "rgba(255,255,255,0.1)", transition: "background 0.4s" }} />
