@@ -222,7 +222,7 @@ export default function CinematicOpening() {
       <div style={{
         position: "absolute", left: 0, right: 0, top: "46%", textAlign: "center", zIndex: 10,
         opacity: ready ? 1 : 0, transform: ready ? "translateY(0)" : "translateY(18px)",
-        transition: "opacity 0.8s ease, transform 0.8s ease", pointerEvents: ready ? "auto" : "none", padding: "0 20px",
+        transition: "opacity 0.8s ease, transform 0.8s ease", pointerEvents: "auto", padding: "0 20px",
       }}>
         <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: "clamp(13px, 2.4vmin, 18px)", color: "rgba(255,255,255,0.85)", textShadow: "0 2px 10px rgba(0,0,0,0.6)", margin: "0 0 6px", fontStyle: "italic" }}>
           Berakar pada Aksara, Setia pada Nusantara.
@@ -248,10 +248,13 @@ export default function CinematicOpening() {
       </div>
 
       {!ready && (
-        <div style={{ position: "absolute", bottom: 18, left: 0, right: 0, textAlign: "center", zIndex: 5 }}>
-          <span style={{ fontFamily: "'Righteous', sans-serif", fontSize: 12, color: "rgba(255,255,255,0.4)", letterSpacing: "0.2em" }}>
-            MEMUAT DUNIA PRIMA+...
-          </span>
+        <div style={{ position: "absolute", inset: 0, zIndex: 15, display: "flex", alignItems: "flex-end", justifyContent: "center", paddingBottom: 60 }}>
+          <button
+            onClick={() => { leaveRef.current = performance.now(); setLeaving(true); setTimeout(() => router.push("/intro"), 550); }}
+            style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'Righteous', sans-serif", fontSize: 13, color: "rgba(255,255,255,0.55)", letterSpacing: "0.2em" }}
+          >
+            LEWATI ▸
+          </button>
         </div>
       )}
     </div>
