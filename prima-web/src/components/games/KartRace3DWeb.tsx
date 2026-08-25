@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import * as THREE from "three";
-import { CHALLENGES, CHAPTERS } from "@/lib/challenges";
+import { SCENARIOS as CHALLENGES } from "@/lib/challengeScenarios";
+import { validateAll } from "@/lib/challengeValidator";
 
 const R = 180;
 const W = 64;
@@ -153,7 +154,7 @@ function buildKart(body: string, accent: string, suit: string): THREE.Group {
   const sL = new THREE.Mesh(new THREE.BoxGeometry(1.5, 5, 1.5), mDark);
   sL.position.set(-6, 12.5, -11); g.add(sL);
   const sR = sL.clone(); sR.position.x = 6; g.add(sR);
-  const wGeo = new THREE.CylinderGeometry(4.6, 4.6, 5, 14);
+  const wGeo = new THREE.CylinderGeometry(4.6, 4.6, 5, 20);
   wGeo.rotateZ(Math.PI / 2);
   [[-10.5, 8], [10.5, 8], [-10.5, -9], [10.5, -9]].forEach(([wx, wz]) => {
     const w = new THREE.Mesh(wGeo, mDark);
@@ -161,9 +162,9 @@ function buildKart(body: string, accent: string, suit: string): THREE.Group {
   });
   const torso = new THREE.Mesh(new THREE.BoxGeometry(9, 8, 7), new THREE.MeshStandardMaterial({ color: new THREE.Color(suit), roughness: 0.5 }));
   torso.position.set(0, 14.5, -2); g.add(torso);
-  const head = new THREE.Mesh(new THREE.SphereGeometry(6.4, 18, 14), mSkin);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(6.4, 24, 18), mSkin);
   head.position.set(0, 23, -2); g.add(head);
-  const helmet = new THREE.Mesh(new THREE.SphereGeometry(7.4, 18, 12, 0, Math.PI * 2, 0, Math.PI * 0.55), new THREE.MeshStandardMaterial({ color: new THREE.Color(body), roughness: 0.35 }));
+  const helmet = new THREE.Mesh(new THREE.SphereGeometry(7.4, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.55), new THREE.MeshStandardMaterial({ color: new THREE.Color(body), roughness: 0.35 }));
   helmet.position.set(0, 23.5, -2); g.add(helmet);
   const visor = new THREE.Mesh(new THREE.BoxGeometry(8.5, 3.6, 2), new THREE.MeshStandardMaterial({ color: 0x1c1f2b, roughness: 0.2, metalness: 0.4 }));
   visor.position.set(0, 22.5, 3.6); g.add(visor);
@@ -212,6 +213,11 @@ export default function KartRace3DWeb({
   const [quizScore, setQuizScore] = useState(0);
   const [result, setResult] = useState({ score: 0, correct: 0, position: 8, coins: 0 });
   const [popupMsg, setPopupMsg] = useState<{ text: string; color: string; key: number } | null>(null);
+
+  useEffect(() => {
+    const issues = validateAll();
+    if (issues.length > 0) console.warn("[PRIMA+] Validasi tantangan:", issues);
+  }, []);
 
   const isTouch = useMemo(() => typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0), []);
 
@@ -328,22 +334,17 @@ export default function KartRace3DWeb({
     const banner = new THREE.Mesh(new THREE.BoxGeometry(W + 56, 9, 3), new THREE.MeshStandardMaterial({ map: makeTextTex("PRIMA KART", "#1c1f2b", "#FFD34D"), roughness: 0.6 }));
     banner.position.set(0, 34, R); scene.add(banner);
 
-    const qTex = (() => {
-      const cv = document.createElement("canvas"); cv.width = 128; cv.height = 128;
-      const x = cv.getContext("2d")!;
-      x.font = "900 92px Arial Black, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
-      x.fillStyle = "white"; x.fillText("?", 64, 70);
-      return new THREE.CanvasTexture(cv);
-    })();
-    const boxGeo = new THREE.BoxGeometry(9, 9, 9);
-    const boxMat = new THREE.MeshStandardMaterial({ color: 0xa78bfa, transparent: true, opacity: 0.72, roughness: 0.25 });
+    const crystalGeo = new THREE.IcosahedronGeometry(5.2, 0);
+    const crystalMat = new THREE.MeshStandardMaterial({ color: 0xa78bfa, emissive: 0x7c3aed, emissiveIntensity: 0.55, roughness: 0.15, metalness: 0.35, flatShading: true });
+    const haloMat = new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.28, side: THREE.DoubleSide });
     for (let i = 0; i < 8; i++) {
       const a = 0.35 + i * 0.785;
       const grp = new THREE.Group();
-      grp.add(new THREE.Mesh(boxGeo, boxMat));
-      grp.add(new THREE.LineSegments(new THREE.EdgesGeometry(boxGeo), new THREE.LineBasicMaterial({ color: 0xffffff })));
-      const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: qTex, transparent: true, depthTest: false }));
-      spr.scale.setScalar(6); grp.add(spr);
+      const crystal = new THREE.Mesh(crystalGeo, crystalMat);
+      grp.add(crystal);
+      const halo = new THREE.Mesh(new THREE.RingGeometry(6.4, 7.4, 24), haloMat);
+      halo.rotation.x = -Math.PI / 2;
+      grp.add(halo);
       grp.position.set(Math.cos(a) * R, 9, Math.sin(a) * R);
       scene.add(grp);
       T.current.boxMeshes.push(grp);
@@ -542,7 +543,8 @@ export default function KartRace3DWeb({
       s.quizScore = Math.max(0, s.quizScore - 5); setQuizScore(s.quizScore);
       addPopup("WAKTU HABIS", "#f43f5e"); sfxEvent("wrong"); return;
     }
-    const q = c.opts[opt]?.quality ?? "poor";
+    const eff = c.choices[opt]?.consequence.gameEffect ?? "slowdown";
+    const q = eff === "boost" ? "best" : eff === "neutral" ? "ok" : "poor";
     if (q === "best") {
       s.correct += 1; s.quizScore += 25; s.boost = Math.max(s.boost, 60);
       setCorrectCount(s.correct); setQuizScore(s.quizScore);
@@ -571,7 +573,7 @@ export default function KartRace3DWeb({
   useEffect(() => {
     if (!quizOpen) return;
     const h = (e: KeyboardEvent) => {
-      if (["1", "2", "3"].includes(e.key) && !quizAnswered && CHALLENGES[quizIdx].opts[parseInt(e.key) - 1]) { e.preventDefault(); answerQuiz(parseInt(e.key) - 1); }
+      if (["1", "2", "3"].includes(e.key) && !quizAnswered && CHALLENGES[quizIdx].choices[parseInt(e.key) - 1]) { e.preventDefault(); answerQuiz(parseInt(e.key) - 1); }
       else if ((e.key === "Enter" || e.key === " ") && quizAnswered) { e.preventDefault(); continueQuiz(); }
     };
     window.addEventListener("keydown", h);
@@ -875,6 +877,9 @@ export default function KartRace3DWeb({
       const targetLook = new THREE.Vector3(px + dirX * 14, 4, pz + dirZ * 14);
       const lerpK = 1 - Math.exp(-dt * 8);
       s.camPos.lerp(targetPos, lerpK);
+      const toCam = new THREE.Vector3(s.camPos.x - px, 0, s.camPos.z - pz);
+      const camDist = toCam.length();
+      if (camDist < CAMD * 0.55) { toCam.multiplyScalar((CAMD * 0.55) / Math.max(camDist, 0.001)); s.camPos.x = px + toCam.x; s.camPos.z = pz + toCam.z; }
       s.camLook.lerp(targetLook, lerpK);
       t3.camera.position.copy(s.camPos);
       t3.camera.up.set(Math.sin(-s.steerVis * 0.05) * 0.3, 1, 0).normalize();
@@ -1067,23 +1072,23 @@ export default function KartRace3DWeb({
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                 <span style={{ fontFamily: "'Righteous', sans-serif", fontSize: 13, color: "#facc15", letterSpacing: "0.06em" }}>GERBANG TANTANGAN</span>
-                <span style={{ fontFamily: "'Righteous', sans-serif", fontSize: 9, letterSpacing: "0.12em", color: "#0b0d22", background: "#facc15", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>{ch.domain}</span>
+                <span style={{ fontFamily: "'Righteous', sans-serif", fontSize: 9, letterSpacing: "0.12em", color: "#0b0d22", background: "#facc15", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>{ch.domain.replace(/-/g, " ").toUpperCase()}</span>
               </div>
               <span style={{ fontFamily: "'Righteous', sans-serif", fontSize: 18, color: quizTimer <= 6 ? "#ef4444" : "#facc15" }}>{quizTimer}s</span>
             </div>
-            <p style={{ fontFamily: "'Righteous', 'Arial Black', sans-serif", fontSize: "clamp(15px,2.8vmin,19px)", color: "white", margin: "0 0 18px", lineHeight: 1.45 }}>{ch.q}</p>
+            <p style={{ fontFamily: "'Righteous', 'Arial Black', sans-serif", fontSize: "clamp(15px,2.8vmin,19px)", color: "white", margin: "0 0 18px", lineHeight: 1.45 }}>{ch.context}</p>
             <div style={{ display: "grid", gap: 9 }}>
-              {ch.opts.map((opt, i) => {
+              {ch.choices.map((opt, i) => {
                 let bg = "rgba(255,255,255,0.06)";
                 let border = "rgba(255,255,255,0.12)";
                 let txt = "rgba(255,255,255,0.88)";
                 if (quizAnswered) {
-                  const selQ = quizSelected >= 0 ? ch.opts[quizSelected]?.quality : null;
+                  const selQ = quizSelected >= 0 ? ch.choices[quizSelected]?.consequence.gameEffect : null;
                   if (i === quizSelected) {
-                    if (selQ === "best") { bg = "rgba(34,197,94,0.18)"; border = "#22c55e"; txt = "#4ade80"; }
-                    else if (selQ === "ok") { bg = "rgba(250,204,21,0.14)"; border = "#facc15"; txt = "#fde047"; }
+                    if (selQ === "boost") { bg = "rgba(34,197,94,0.18)"; border = "#22c55e"; txt = "#4ade80"; }
+                    else if (selQ === "neutral") { bg = "rgba(250,204,21,0.14)"; border = "#facc15"; txt = "#fde047"; }
                     else { bg = "rgba(239,68,68,0.16)"; border = "#ef4444"; txt = "#f87171"; }
-                  } else if (opt.quality === "best") { bg = "rgba(34,197,94,0.1)"; border = "rgba(34,197,94,0.5)"; txt = "#86efac"; }
+                  } else if (opt.consequence.gameEffect === "boost") { bg = "rgba(34,197,94,0.1)"; border = "rgba(34,197,94,0.5)"; txt = "#86efac"; }
                 }
                 return (
                   <button key={i} onClick={() => !quizAnswered && answerQuiz(i)} disabled={quizAnswered}
@@ -1098,13 +1103,19 @@ export default function KartRace3DWeb({
               <>
                 <div style={{ marginTop: 15, padding: "13px 16px", borderRadius: 12, background: "rgba(124,58,237,0.1)", border: "1px solid rgba(168,85,247,0.4)" }}>
                   <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 10, letterSpacing: "0.14em", color: "#c084fc", margin: "0 0 5px" }}>HASIL</p>
-                  <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 13.5, color: "white", margin: "0 0 8px", lineHeight: 1.45 }}>{ch.opts[quizSelected]?.hasil}</p>
+                  <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 13.5, color: "white", margin: "0 0 8px", lineHeight: 1.45 }}>
+                    {ch.choices[quizSelected]?.consequence.gameEffect === "boost"
+                      ? "Keputusanmu bekerja dengan baik di konteks ini."
+                      : ch.choices[quizSelected]?.consequence.gameEffect === "neutral"
+                        ? "Pesan sampai — dengan satu hal yang layak dicermati."
+                        : "Terkirim, tapi efeknya berbeda dari yang mungkin kamu niatkan."}
+                  </p>
                   <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 10, letterSpacing: "0.14em", color: "#c084fc", margin: "0 0 5px" }}>MENGAPA BEGITU</p>
-                  <p style={{ fontFamily: "Arial, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.75)", margin: 0, lineHeight: 1.6 }}>{ch.opts[quizSelected]?.fb}</p>
+                  <p style={{ fontFamily: "Arial, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.75)", margin: 0, lineHeight: 1.6 }}>{ch.choices[quizSelected]?.consequence.feedback}</p>
                 </div>
                 <div style={{ marginTop: 10, padding: "12px 16px", borderRadius: 12, background: "rgba(250,204,21,0.07)", border: "1px dashed rgba(250,204,21,0.45)" }}>
                   <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 10, letterSpacing: "0.14em", color: "#facc15", margin: "0 0 5px" }}>COBA PIKIR LAGI</p>
-                  <p style={{ fontFamily: "Arial, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.8)", margin: 0, lineHeight: 1.55, fontStyle: "italic" }}>{ch.reflect}</p>
+                  <p style={{ fontFamily: "Arial, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.8)", margin: 0, lineHeight: 1.55, fontStyle: "italic" }}>{ch.reflectiveQuestion}</p>
                 </div>
                 <button onClick={continueQuiz} style={{ marginTop: 14, width: "100%", padding: "14px 0", borderRadius: 12, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "white", fontFamily: "'Righteous', sans-serif", fontSize: 16, fontWeight: 900, cursor: "pointer", letterSpacing: "0.04em" }}>
                   LANJUTKAN BALAPAN (Enter)

@@ -80,7 +80,7 @@ export const CHALLENGES: Challenge[] = [
     q: "Temanmu berkata: 'Presentasi pakai istilah Inggris lebih profesional. Kalau full bahasa Indonesia malah kelihatan biasa.' Kamu melihat dua versi kalimat: (A) 'Berikut hasil evaluasi program yang telah kami lakukan.' (B) 'Berikut hasil evaluation program yang telah kami lakukan.' Apa pertimbangan yang paling kuat sebelum memilih?",
     opts: [
       { text: "Pilih B, karena istilah Inggris memang terdengar lebih profesional.", hasil: "Kamu mengikuti asumsi temanmu.", fb: "Coba uji asumsinya: apa yang membuat 'evaluation' lebih profesional dari 'evaluasi' yang berarti sama persis? Profesionalitas terasa dari kejelasan, struktur, dan kepercayaan diri penyampaian — bukan dari asal kata. Justru penyisipan yang tidak perlu bisa mengurangi kesan rapi.", quality: "poor" },
-      { text: "Pilih A, karena semua bahasa asing harus dihindari dalam presentasi.", hasil: "Kamu memilih kebalikannya secara mutlak.", fb: "Kebalikan dari asumsi yang salah bukan otomatis benar. Ada istilah yang memang lebih lazim dalam bahasa asing atau belum punya padanan mapan. Melarang mutlak sama kaku dengan memakai mutlak — keduanya menutup ruang pertimbangan.", quality: "poor" },
+      { text: "Pilih A, karena semua bahasa asing harus dihindari dalam presentasi.", hasil: "Kamu memilih kebalikannya secara mutlak.",     fb: "Kebalikan dari asumsi yang keliru bukan otomatis menjadi benar. Ada istilah yang memang lebih lazim dalam bahasa asing atau belum punya padanan mapan. Melarang mutlak sama kaku dengan memakai mutlak — keduanya menutup ruang pertimbangan.", quality: "poor" },
       { text: "Pertimbangkan audiens, tujuan presentasi, dan apakah istilah asing itu memang diperlukan atau hanya menambah kesan.", hasil: "Kamu menolak kedua jebakan sekaligus.", fb: "Ini pertimbangan yang paling kuat: profesional bukan ditentukan oleh banyaknya istilah Inggris, melainkan oleh pesan yang jelas dan sesuai audiens. 'Evaluasi' dan 'evaluation' sama-sama benar secara makna — yang membedakan hanyalah kesengajaan pilihannya. Pilihan yang sadar selalu terlihat lebih rapi daripada pilihan yang ikut arus.", quality: "best" },
     ],
     reflect: "Pernahkah kamu menyisipkan kata asing dalam presentasi — dan bisa kah kamu jelaskan alasan fungsinya kalau ditanya?",
@@ -158,7 +158,7 @@ export const CHALLENGES: Challenge[] = [
       { text: "Tulis versi yang lebih tertata — 'Seru! Siswa-siswi menutup kegiatan dengan makan bersama dan menonton film' — tanpa kehilangan kehangatannya.", hasil: "Kamu menyesuaikan tanpa menjadi kaku.", fb: "Ini titik temu yang tepat: akun resmi menuntut kejelasan dan kesopanan, tapi tidak harus dingin. Perhatikan versimu masih memakai kata 'seru' — hangat dan manusiawi. Kesadaran norma bukan soal memilih kata paling formal, tapi kata yang paling sesuai untuk siapa yang membaca dan siapa yang berbicara.", quality: "best" },
       { text: "Tulis sangat formal dan panjang agar terlihat resmi dan dihormati.", hasil: "Formalitas berlebihan justru mengunci pembaca.", fb: "Niatnya benar, tapi hasilnya bisa berbalik: unggahan yang terlalu birokratis jarang dibaca sampai selesai, apalagi dibagikan ulang. Akun sekolah yang baik justru bisa tampil ramah — yang penting akurat, sopan, dan jelas. Formalitas maksimal bukan tujuan; kesesuaian maksimal yang jadi tujuan.", quality: "poor" },
     ],
-    reflect: "Akun siapa lagi yang kamu kelola atau ikuti yang punya 'suara' berbeda untuk konteks berbeda? Coba identifikasi perbedaannya.",
+    reflect: "Akun siapa lagi yang kamu kelola atau ikuti yang punya suara berbeda untuk konteks berbeda? Apa saja yang berubah?",
     ans: 1,
   },
   {
@@ -248,7 +248,7 @@ export const CHALLENGES: Challenge[] = [
       { text: "Saat memilih antara dua kata untuk hal yang sama — dan bertanya mana yang lebih jujur untuk perasaanku.", hasil: "Kesadaranmu tinggal di pemilihan kata.", fb: "Ini level yang halus: sadar pada skala kata. Orang yang terbiasa bertanya 'mana yang lebih jujur' sedang melatih selera bahasanya setiap hari. Itu fondasi dari gaya pribadi — dan gaya pribadi adalah tanda penutur yang dewasa.", quality: "ok" },
       { text: "Justru saat menyadari aku MENGETIK tanpa mikir — lalu berhenti, dan bertanya kenapa kata ini yang keluar.", hasil: "Kesadaranmu justru lahir dari kebiasaan.", fb: "Momen 'tunggu, kenapa aku nulis gini?' adalah momen paling berharga dari semuanya — karena dia terjadi tepat di wilayah kebiasaan, tempat kesadaran paling jarang masuk. Kalau kamu bisa menangkap momen itu lebih sering, kamu tidak sedang melawan bahasa campur atau membelanya: kamu cuma kembali jadi orang yang memilih.", quality: "ok" },
     ],
-    reflect: "Ini bukan akhir — ini awal kebiasaan baru. Selama seminggu ke depan, tangkap satu momen 'kenapa aku nulis gini?' setiap hari. Lihat apa yang kamu temukan tentang dirimu sendiri.",
+    reflect: "Selama seminggu ke depan, tangkap satu momen 'kenapa aku nulis gini?' setiap hari — momen seperti apa yang paling sering kamu temukan?",
     ans: -1,
   },
 ];
