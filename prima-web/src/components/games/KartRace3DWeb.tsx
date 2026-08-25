@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { SCENARIOS as CHALLENGES } from "@/lib/challengeScenarios";
 import { validateAll } from "@/lib/challengeValidator";
 
@@ -145,10 +146,12 @@ function buildKart(body: string, accent: string, suit: string): THREE.Group {
   const mDark = new THREE.MeshStandardMaterial({ color: 0x14161f, roughness: 0.7 });
   const mSkin = new THREE.MeshStandardMaterial({ color: 0xf1c9a5, roughness: 0.6 });
 
-  const chassis = new THREE.Mesh(new THREE.BoxGeometry(13, 7, 24), mBody);
+  const chassis = new THREE.Mesh(new RoundedBoxGeometry(13, 7, 24, 3, 2.4), mBody);
   chassis.position.y = 8; g.add(chassis);
-  const nose = new THREE.Mesh(new THREE.BoxGeometry(9, 4.5, 6), mAcc);
-  nose.position.set(0, 7.5, 13); g.add(nose);
+  const noseGeo = new THREE.CylinderGeometry(2.8, 4.4, 7, 18);
+  noseGeo.rotateX(Math.PI / 2);
+  const nose = new THREE.Mesh(noseGeo, mAcc);
+  nose.position.set(0, 7.5, 14.5); g.add(nose);
   const spoiler = new THREE.Mesh(new THREE.BoxGeometry(16, 1.6, 5), mAcc);
   spoiler.position.set(0, 16, -11); g.add(spoiler);
   const sL = new THREE.Mesh(new THREE.BoxGeometry(1.5, 5, 1.5), mDark);
@@ -160,10 +163,10 @@ function buildKart(body: string, accent: string, suit: string): THREE.Group {
     const w = new THREE.Mesh(wGeo, mDark);
     w.position.set(wx, 4.6, wz); g.add(w);
   });
-  const torso = new THREE.Mesh(new THREE.BoxGeometry(9, 8, 7), new THREE.MeshStandardMaterial({ color: new THREE.Color(suit), roughness: 0.5 }));
+  const torso = new THREE.Mesh(new THREE.CapsuleGeometry(4.6, 4.5, 6, 16), new THREE.MeshStandardMaterial({ color: new THREE.Color(suit), roughness: 0.5 }));
   torso.position.set(0, 14.5, -2); g.add(torso);
   const head = new THREE.Mesh(new THREE.SphereGeometry(6.4, 24, 18), mSkin);
-  head.position.set(0, 23, -2); g.add(head);
+  head.position.set(0, 23, -2); head.scale.set(1, 1.06, 1); g.add(head);
   const helmet = new THREE.Mesh(new THREE.SphereGeometry(7.4, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.55), new THREE.MeshStandardMaterial({ color: new THREE.Color(body), roughness: 0.35 }));
   helmet.position.set(0, 23.5, -2); g.add(helmet);
   const visor = new THREE.Mesh(new THREE.BoxGeometry(8.5, 3.6, 2), new THREE.MeshStandardMaterial({ color: 0x1c1f2b, roughness: 0.2, metalness: 0.4 }));
@@ -333,6 +336,28 @@ export default function KartRace3DWeb({
     const p2 = new THREE.Mesh(pillarGeo, pillarM); p2.position.set(RO + 14, 18, R); scene.add(p2);
     const banner = new THREE.Mesh(new THREE.BoxGeometry(W + 56, 9, 3), new THREE.MeshStandardMaterial({ map: makeTextTex("PRIMA KART", "#1c1f2b", "#FFD34D"), roughness: 0.6 }));
     banner.position.set(0, 34, R); scene.add(banner);
+
+    const flagCols = [0xef4444, 0xfacc15, 0x3b82f6, 0x22c55e, 0xec4899];
+    const flagGeo = new THREE.PlaneGeometry(3.2, 4);
+    const poleGeo = new THREE.CylinderGeometry(0.7, 0.7, 26, 8);
+    const poleMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.5 });
+    for (let loc = 0; loc < 6; loc++) {
+      const baseA = loc * (Math.PI / 3) + 0.5;
+      const r = RO + 30;
+      const pA = new THREE.Vector3(Math.cos(baseA) * r, 13, Math.sin(baseA) * r);
+      const pB = new THREE.Vector3(Math.cos(baseA + 0.16) * r, 13, Math.sin(baseA + 0.16) * r);
+      const pole1 = new THREE.Mesh(poleGeo, poleMat); pole1.position.copy(pA); scene.add(pole1);
+      const pole2 = new THREE.Mesh(poleGeo, poleMat); pole2.position.copy(pB); scene.add(pole2);
+      for (let f = 0; f < 9; f++) {
+        const t = (f + 0.5) / 9;
+        const sag = Math.sin(t * Math.PI) * 4;
+        const flag = new THREE.Mesh(flagGeo, new THREE.MeshStandardMaterial({ color: flagCols[(f + loc) % 5], roughness: 0.6, side: THREE.DoubleSide }));
+        flag.position.lerpVectors(pA, pB, t);
+        flag.position.y -= sag;
+        flag.rotation.y = baseA + Math.PI / 2;
+        scene.add(flag);
+      }
+    }
 
     const crystalGeo = new THREE.IcosahedronGeometry(5.2, 0);
     const crystalMat = new THREE.MeshStandardMaterial({ color: 0xa78bfa, emissive: 0x7c3aed, emissiveIntensity: 0.55, roughness: 0.15, metalness: 0.35, flatShading: true });
