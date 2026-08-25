@@ -357,16 +357,27 @@ export default function KartRace3D({
     setQuizAnswered(true);
     setQuizSelected(opt);
     const c = CHALLENGES[quizIdx];
-    const ok = opt >= 0 && opt === c.ans;
-    if (ok) {
-      s.correct += 1; s.quizScore += 25; s.boost = Math.max(s.boost, 45);
+    if (opt < 0) {
+      s.quizScore = Math.max(0, s.quizScore - 5);
+      setQuizScore(s.quizScore);
+      addPopup(s.x, s.y, "WAKTU HABIS", "#f43f5e");
+      sfxEvent("wrong");
+      return;
+    }
+    const q = c.opts[opt]?.quality ?? "poor";
+    if (q === "best") {
+      s.correct += 1; s.quizScore += 25; s.boost = Math.max(s.boost, 60);
       setCorrectCount(s.correct); setQuizScore(s.quizScore);
-      addPopup(s.x, s.y, "+25", "#22c55e");
+      addPopup(s.x, s.y, `${c.domain} ✓`, "#22c55e");
+      sfxEvent("correct");
+    } else if (q === "ok") {
+      s.quizScore += 10; s.boost = Math.max(s.boost, 30);
+      setQuizScore(s.quizScore);
+      addPopup(s.x, s.y, `${c.domain} +`, "#facc15");
       sfxEvent("correct");
     } else {
-      s.quizScore = Math.max(0, s.quizScore - 10);
-      setQuizScore(s.quizScore);
-      addPopup(s.x, s.y, "-10", "#f43f5e");
+      s.v *= 0.75;
+      addPopup(s.x, s.y, `${c.domain} ✗`, "#f43f5e");
       sfxEvent("wrong");
     }
   }, [quizAnswered, quizIdx, addPopup, sfxEvent]);
@@ -1349,35 +1360,46 @@ export default function KartRace3D({
               <div style={{ width: `${(quizTimer / 25) * 100}%`, height: "100%", borderRadius: 3, background: quizTimer <= 6 ? "#ef4444" : "#facc15", transition: "width 1s linear" }} />
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-              <span style={{ fontFamily: "'Righteous', sans-serif", fontSize: 13, color: "#facc15", letterSpacing: "0.06em" }}>GERBANG TANTANGAN</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontFamily: "'Righteous', sans-serif", fontSize: 13, color: "#facc15", letterSpacing: "0.06em" }}>GERBANG TANTANGAN</span>
+                <span style={{ fontFamily: "'Righteous', sans-serif", fontSize: 9, letterSpacing: "0.12em", color: "#0b0d22", background: "#facc15", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>{ch.domain}</span>
+              </div>
               <span style={{ fontFamily: "'Righteous', sans-serif", fontSize: 18, color: quizTimer <= 6 ? "#ef4444" : "#facc15" }}>{quizTimer}s</span>
             </div>
-            <p style={{ fontFamily: "'Righteous', 'Arial Black', sans-serif", fontSize: "clamp(16px,3vmin,20px)", color: "white", margin: "0 0 18px", lineHeight: 1.45 }}>{ch.q}</p>
+            <p style={{ fontFamily: "'Righteous', 'Arial Black', sans-serif", fontSize: "clamp(15px,2.8vmin,19px)", color: "white", margin: "0 0 18px", lineHeight: 1.45 }}>{ch.q}</p>
             <div style={{ display: "grid", gap: 9 }}>
               {ch.opts.map((opt, i) => {
                 let bg = "rgba(255,255,255,0.06)";
                 let border = "rgba(255,255,255,0.12)";
                 let txt = "rgba(255,255,255,0.88)";
                 if (quizAnswered) {
-                  if (i === ch.ans) { bg = "rgba(34,197,94,0.18)"; border = "#22c55e"; txt = "#4ade80"; }
-                  else if (i === quizSelected && i !== ch.ans) { bg = "rgba(239,68,68,0.18)"; border = "#ef4444"; txt = "#f87171"; }
+                  const selQ = quizSelected >= 0 ? ch.opts[quizSelected]?.quality : null;
+                  if (i === quizSelected) {
+                    if (selQ === "best") { bg = "rgba(34,197,94,0.18)"; border = "#22c55e"; txt = "#4ade80"; }
+                    else if (selQ === "ok") { bg = "rgba(250,204,21,0.14)"; border = "#facc15"; txt = "#fde047"; }
+                    else { bg = "rgba(239,68,68,0.16)"; border = "#ef4444"; txt = "#f87171"; }
+                  } else if (opt.quality === "best") { bg = "rgba(34,197,94,0.1)"; border = "rgba(34,197,94,0.5)"; txt = "#86efac"; }
                 }
                 return (
                   <button key={i} onClick={() => !quizAnswered && answerQuiz(i)} disabled={quizAnswered}
                     style={{ padding: "13px 16px", borderRadius: 12, background: bg, border: `1.5px solid ${border}`, color: txt, fontFamily: "Arial, sans-serif", fontSize: "clamp(13px,2.4vmin,15px)", fontWeight: 600, textAlign: "left", cursor: quizAnswered ? "default" : "pointer", lineHeight: 1.4 }}>
                     <span style={{ fontFamily: "'Righteous', sans-serif", color: "rgba(255,255,255,0.35)", marginRight: 10 }}>{String.fromCharCode(65 + i)}.</span>
-                    {opt}
+                    {opt.text}
                   </button>
                 );
               })}
             </div>
-            {quizAnswered && (
+            {quizAnswered && quizSelected >= 0 && (
               <>
-                <div style={{ marginTop: 15, padding: "12px 15px", borderRadius: 12, background: quizSelected === ch.ans ? "rgba(34,197,94,0.1)" : "rgba(239,68,68,0.1)", border: `1px solid ${quizSelected === ch.ans ? "#22c55e55" : "#ef444455"}` }}>
-                  <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 14, color: quizSelected === ch.ans ? "#4ade80" : "#f87171", margin: 0 }}>
-                    {quizSelected === ch.ans ? "Tepat! +25 poin" : quizSelected < 0 ? "Waktu habis. -10 poin" : "Belum tepat. -10 poin"}
-                  </p>
-                  <p style={{ fontFamily: "Arial, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.65)", margin: "6px 0 0", lineHeight: 1.5 }}>{ch.tip}</p>
+                <div style={{ marginTop: 15, padding: "13px 16px", borderRadius: 12, background: "rgba(124,58,237,0.1)", border: "1px solid rgba(168,85,247,0.4)" }}>
+                  <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 10, letterSpacing: "0.14em", color: "#c084fc", margin: "0 0 5px" }}>HASIL</p>
+                  <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 13.5, color: "white", margin: "0 0 8px", lineHeight: 1.45 }}>{ch.opts[quizSelected]?.hasil}</p>
+                  <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 10, letterSpacing: "0.14em", color: "#c084fc", margin: "0 0 5px" }}>MENGAPA BEGITU</p>
+                  <p style={{ fontFamily: "Arial, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.75)", margin: 0, lineHeight: 1.6 }}>{ch.opts[quizSelected]?.fb}</p>
+                </div>
+                <div style={{ marginTop: 10, padding: "12px 16px", borderRadius: 12, background: "rgba(250,204,21,0.07)", border: "1px dashed rgba(250,204,21,0.45)" }}>
+                  <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 10, letterSpacing: "0.14em", color: "#facc15", margin: "0 0 5px" }}>COBA PIKIR LAGI</p>
+                  <p style={{ fontFamily: "Arial, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.8)", margin: 0, lineHeight: 1.55, fontStyle: "italic" }}>{ch.reflect}</p>
                 </div>
                 <button onClick={continueQuiz} style={{ marginTop: 14, width: "100%", padding: "14px 0", borderRadius: 12, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "white", fontFamily: "'Righteous', sans-serif", fontSize: 16, fontWeight: 900, cursor: "pointer", letterSpacing: "0.04em" }}>
                   LANJUTKAN BALAPAN (Enter)

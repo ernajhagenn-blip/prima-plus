@@ -234,39 +234,42 @@ export default function SelectScreen() {
             </p>
           </div>
 
-          <div style={{ flex: "1 1 300px", minWidth: 280, maxWidth: 400, display: "flex", flexDirection: "column", justifyContent: "center", gap: 12 }}>
-            {CHARACTERS.map((c, i) => {
-              const active = i === charIdx;
-              return (
-                <button
-                  key={c.key}
-                  onClick={() => setCharIdx(i)}
-                  style={{
-                    display: "flex", alignItems: "center", gap: 14, textAlign: "left",
-                    padding: "12px 16px", borderRadius: 18,
-                    background: active ? "rgba(255,255,255,0.14)" : "rgba(255,255,255,0.05)",
-                    border: active ? `3px solid ${c.helmet}` : "2px solid rgba(255,255,255,0.12)",
-                    cursor: "pointer",
-                    boxShadow: active ? `0 8px 28px ${c.helmet}66` : "none",
-                    transform: active ? "scale(1.02)" : "scale(1)",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  <div style={{ width: 64, flexShrink: 0 }}>
-                    <CharacterPortrait ch={c} />
-                  </div>
-                  <div>
-                    <p style={{ fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: "clamp(14px,2.4vmin,17px)", color: "white", margin: 0, textShadow: "0 2px 4px rgba(0,0,0,0.9)" }}>
-                      {c.name}
-                    </p>
-                    <p style={{ fontFamily: "Arial,sans-serif", fontSize: "clamp(11px,1.9vmin,12.5px)", color: active ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.5)", margin: "2px 0 0", lineHeight: 1.35, textShadow: "0 1px 3px rgba(0,0,0,0.9)" }}>
-                      {c.title}
-                    </p>
-                  </div>
-                  {active && <span style={{ marginLeft: "auto", color: c.helmet, fontSize: 20 }}>▶</span>}
-                </button>
-              );
-            })}
+          <div style={{ flex: "1 1 300px", minWidth: 280, maxWidth: 440, display: "flex", flexDirection: "column", justifyContent: "center", gap: 14 }}>
+            <p style={{ fontFamily: "'Righteous',sans-serif", fontSize: 11, letterSpacing: "0.22em", color: "rgba(255,255,255,0.45)", margin: 0, textAlign: "center" }}>
+              PILIH PEMBALAP
+            </p>
+            <div style={{ display: "flex", justifyContent: "center", gap: "clamp(8px,1.8vmin,16px)", flexWrap: "wrap" }}>
+              {CHARACTERS.map((c, i) => {
+                const active = i === charIdx;
+                return (
+                  <button
+                    key={c.key}
+                    onClick={() => setCharIdx(i)}
+                    style={{
+                      width: "clamp(76px,13vmin,96px)",
+                      aspectRatio: "1",
+                      borderRadius: "50%",
+                      padding: 0,
+                      overflow: "hidden",
+                      cursor: "pointer",
+                      background: active ? `radial-gradient(circle at 50% 35%, ${c.helmet}66, rgba(10,12,30,0.9))` : "rgba(255,255,255,0.05)",
+                      border: active ? `4px solid ${c.helmet}` : "3px solid rgba(255,255,255,0.15)",
+                      boxShadow: active ? `0 0 26px ${c.helmet}88, 0 8px 20px rgba(0,0,0,0.4)` : "0 4px 12px rgba(0,0,0,0.3)",
+                      transform: active ? "scale(1.1)" : "scale(1)",
+                      transition: "all 0.25s cubic-bezier(0.34,1.56,0.64,1)",
+                      position: "relative",
+                    }}
+                  >
+                    <div style={{ width: "100%", height: "100%", transform: "translateY(8%) scale(1.4)", pointerEvents: "none" }}>
+                      <CharacterPortrait ch={c} />
+                    </div>
+                    <span style={{ position: "absolute", bottom: 3, left: 0, right: 0, fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: "clamp(9px,1.6vmin,11px)", color: "white", textShadow: "0 2px 4px rgba(0,0,0,0.95), 0 0 8px rgba(0,0,0,0.8)", letterSpacing: "0.04em" }}>
+                      {c.name.toUpperCase()}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}

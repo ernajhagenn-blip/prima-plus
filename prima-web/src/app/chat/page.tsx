@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -9,9 +9,11 @@ interface Scenario {
   id: string;
   place: string;
   title: string;
+  domain: string;
   msgs: Msg[];
   ask: string;
   choices: Choice[];
+  reflect: string;
 }
 
 const SCENARIOS: Scenario[] = [
@@ -19,6 +21,7 @@ const SCENARIOS: Scenario[] = [
     id: "grup",
     place: "Grup WhatsApp Kelas · 23:40",
     title: "Pesan untuk Dua Jenis Pembaca",
+    domain: "CONTEXT AWARENESS",
     msgs: [
       { from: "Bu Guru", side: "l", text: "Selamat malam anak-anak, besok jangan lupa bawa surat izin study tour ya." },
       { from: "Bu Guru", side: "l", text: "Ibu juga ikut di grup ini, kalau ada yang mau ditanyakan silakan." },
@@ -26,6 +29,7 @@ const SCENARIOS: Scenario[] = [
       { from: "Kamu", side: "r", text: "(Kamu punya usulan jadwal rapat OSIS. Grup ini isinya teman sekelas — tapi Bu Guru baru saja ikut membaca. Momen ini menentukan...)" },
     ],
     ask: "Tiga cara ini sama-sama ' sopan'. Tapi mana yang paling tepat untuk grup yang pembacanya campur?",
+    reflect: "Kalau pesan yang sama kamu kirim ke grup sahabatmu saja, tanpa guru, apakah pilihanmu masih sama? Kenapa?",
     choices: [
       {
         text: "Bu, izin menambahkan agenda ya. Besok setelah jam terakhir kami ingin mengusulkan jadwal rapat OSIS. Mohon arahan dan izinnya 🙏",
@@ -48,11 +52,13 @@ const SCENARIOS: Scenario[] = [
     id: "caption",
     place: "Instagram · Unggahan Kegiatan Sekolah",
     title: "Caption untuk Publik",
+    domain: "CODE-MIXING AWARENESS",
     msgs: [
       { from: "Kamu", side: "r", text: "(Baru pulang dari bakti sosial di panti asuhan. Fotonya bagus-bagus, mau diunggah...)" },
       { from: "Kamu", side: "r", text: "(Pengikutmu: teman sekolah, adik kelas, beberapa guru, dan akun sekolah yang suka membagikan ulang.)" },
     ],
     ask: "Semua caption ini 'kamu banget'. Mana yang paling pantas untuk audiens campur seperti ini?",
+    reflect: "Apakah kamu memilih kata itu karena memang dibutuhkan — atau karena terdengar lebih keren?",
     choices: [
       {
         text: "Hari ini kami berbagi waktu di Panti Asuhan Harapan. Terima kasih sudah menyambut kami dengan hangat — cerita mereka lebih berharga daripada fotonya.",
@@ -75,12 +81,14 @@ const SCENARIOS: Scenario[] = [
     id: "presentasi",
     place: "Kelas · Jam Pelajaran Ke-7",
     title: "Tiga Puluh Detik Persiapan",
+    domain: "NORM VS CONTEXT",
     msgs: [
       { from: "Bu Guru", side: "l", text: "Kelompok Raka, hasil pengamatan kalian menarik. Raka, jelaskan di depan sekarang." },
       { from: "Bu Guru", side: "l", text: "Oh iya, Kepala Sekolah sedang berkunjung. Silakan, Raka." },
       { from: "Kamu", side: "r", text: "(Tiga puluh detik lagi giliranmu. Biasanya kamu menjelaskan ke teman dengan santai — dan sekarang kepala sekolah duduk di barisan kedua...)" },
     ],
     ask: "Kalimat pembuka mana yang akan kamu pilih dalam tiga puluh detik ini?",
+    reflect: "Kalau kepala sekolah tidak hadir dan hanya Bu Guru yang mendengar, apakah pilihanmu akan tetap sama?",
     choices: [
       {
         text: "Terima kasih, Bu. Berdasarkan pengamatan kami selama tiga hari, tanaman di dekat jendela tumbuh lebih cepat. Dugaan kami, cahaya memengaruhi pertumbuhannya.",
@@ -103,12 +111,14 @@ const SCENARIOS: Scenario[] = [
     id: "adik",
     place: "Kantin · Istirahat",
     title: "Adik Kelas yang Sedang Rendah Diri",
+    domain: "LANGUAGE ATTITUDE",
     msgs: [
       { from: "Adik Kelas", side: "l", text: "Kak, aku tuh ngerasa aneh kalau nulis caption pakai bahasa Indonesia yang beneran." },
       { from: "Adik Kelas", side: "l", text: "Kayak... norak gitu. Temen-temenku semua pakai bahasa campur, keliatan lebih keren." },
       { from: "Kamu", side: "r", text: "(Kamu ingat data yang pernah kamu baca: penerimaan tinggi, pemahaman rendah. Tapi adikmu tidak sedang bertanya data — dia sedang cerita soal rasa percaya dirinya.)" },
     ],
     ask: "Respons mana yang benar-benar membantu dia — bukan cuma terdengar bijak?",
+    reflect: "Bahasa yang sedang tren tidak otomatis lebih bernilai. Menurutmu, apa yang sebenarnya membuat sebuah bahasa terasa 'lebih bernilai'?",
     choices: [
       {
         text: "Boleh banget pakai bahasa campur, itu gaya kalian. Tapi coba sesekali tulis sesuatu yang benar-benar kamu rasakan pakai bahasa Indonesia penuh — lalu bandingkan sendiri mana yang terasa lebih 'kamu'. Jangan biarkan tren yang memilih untukmu.",
@@ -181,10 +191,13 @@ export default function ChatPage() {
             })}
           </div>
 
-          <div style={{ background: "rgba(250,204,21,0.08)", borderRadius: 16, padding: "13px 17px", border: "1px solid rgba(250,204,21,0.35)", marginBottom: 14, animation: "bubbleIn 0.4s 0.5s ease both" }}>
-            <p style={{ fontFamily: "'Righteous',sans-serif", fontSize: 10, color: "#facc15", letterSpacing: "0.12em", margin: "0 0 5px" }}>KEPUTUSAN</p>
-            <p style={{ fontFamily: "Arial,sans-serif", fontSize: 14.5, color: "white", margin: 0, lineHeight: 1.5, fontWeight: 600 }}>{s.ask}</p>
-          </div>
+            <div style={{ background: "rgba(250,204,21,0.08)", borderRadius: 16, padding: "13px 17px", border: "1px solid rgba(250,204,21,0.35)", marginBottom: 14, animation: "bubbleIn 0.4s 0.5s ease both" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, flexWrap: "wrap", gap: 6 }}>
+                <span style={{ fontFamily: "'Righteous',sans-serif", fontSize: 10, color: "#facc15", letterSpacing: "0.12em" }}>KEPUTUSAN</span>
+                <span style={{ fontFamily: "'Righteous',sans-serif", fontSize: 9, letterSpacing: "0.1em", color: "#0b0d22", background: "#facc15", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>{s.domain}</span>
+              </div>
+              <p style={{ fontFamily: "Arial,sans-serif", fontSize: 14.5, color: "white", margin: 0, lineHeight: 1.5, fontWeight: 600 }}>{s.ask}</p>
+            </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 9, marginTop: "auto" }}>
             {s.choices.map((c, i) => {
@@ -205,8 +218,16 @@ export default function ChatPage() {
                   </button>
                   {showFb && isSel && (
                     <div style={{ marginTop: 8, padding: "13px 16px", borderRadius: 14, background: "rgba(124,58,237,0.12)", border: "1px solid rgba(168,85,247,0.4)", animation: "bubbleIn 0.3s ease both" }}>
-                      <p style={{ fontFamily: "'Righteous',sans-serif", fontSize: 10, letterSpacing: "0.14em", color: "#c084fc", margin: "0 0 6px" }}>MENGAPA BEGITU</p>
-                      <p style={{ fontFamily: "Arial,sans-serif", fontSize: 13.5, color: "rgba(255,255,255,0.85)", margin: 0, lineHeight: 1.65 }}>{c.fb}</p>
+                      <p style={{ fontFamily: "'Righteous',sans-serif", fontSize: 10, letterSpacing: "0.14em", color: "#c084fc", margin: "0 0 5px" }}>HASIL</p>
+                      <p style={{ fontFamily: "Arial,sans-serif", fontSize: 13.5, color: "rgba(255,255,255,0.9)", margin: "0 0 10px", lineHeight: 1.5, fontStyle: "italic" }}>
+                        {c.tone === "good" ? "Pilihanmu bekerja dengan baik di konteks ini." : c.tone === "mid" ? "Pesan terkirim — dengan satu hal yang layak kamu perhatikan." : "Pesan terkirim, tapi efeknya berbeda dari yang mungkin kamu niatkan."}
+                      </p>
+                      <p style={{ fontFamily: "'Righteous',sans-serif", fontSize: 10, letterSpacing: "0.14em", color: "#c084fc", margin: "0 0 5px" }}>MENGAPA BEGITU</p>
+                      <p style={{ fontFamily: "Arial,sans-serif", fontSize: 13.5, color: "rgba(255,255,255,0.85)", margin: "0 0 12px", lineHeight: 1.65 }}>{c.fb}</p>
+                      <div style={{ padding: "10px 13px", borderRadius: 10, background: "rgba(250,204,21,0.07)", border: "1px dashed rgba(250,204,21,0.45)" }}>
+                        <p style={{ fontFamily: "'Righteous',sans-serif", fontSize: 10, letterSpacing: "0.14em", color: "#facc15", margin: "0 0 4px" }}>COBA PIKIR LAGI</p>
+                        <p style={{ fontFamily: "Arial,sans-serif", fontSize: 13, color: "rgba(255,255,255,0.8)", margin: 0, lineHeight: 1.55, fontStyle: "italic" }}>{s.reflect}</p>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -219,7 +240,7 @@ export default function ChatPage() {
               onClick={() => { setChosen(null); setStage(stage + 1); }}
               style={{ marginTop: 14, padding: "14px 0", borderRadius: 14, background: "linear-gradient(135deg,#7c3aed,#ec4899)", border: "none", color: "white", fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: 15, fontWeight: 900, cursor: "pointer", animation: "bubbleIn 0.3s ease both" }}
             >
-              {stage === SCENARIOS.length - 1 ? "Refleksi Diri →" : "Percakapan Berikutnya →"}
+              {stage === SCENARIOS.length - 1 ? "Refleksi Diri →" : "SITUASI BERIKUTNYA →"}
             </button>
           )}
         </div>
