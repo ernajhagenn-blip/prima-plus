@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useJourney } from "@/lib/store";
 import { KARTS, STAT_META } from "@/components/game/karts";
 import SelectScene from "@/components/game/SelectScene";
+import { gameAudio } from "@/lib/gameAudio";
 
 export interface CharacterDef {
   key: string;
@@ -248,7 +249,7 @@ export default function SelectScreen() {
                 return (
                   <button
                     key={c.key}
-                    onClick={() => setCharIdx(i)}
+                    onClick={() => { gameAudio.sfx("hover"); setCharIdx(i); }}
                     style={{
                       width: "clamp(76px,13vmin,96px)",
                       aspectRatio: "1",
@@ -311,7 +312,7 @@ export default function SelectScreen() {
               return (
                 <button
                   key={k.key}
-                  onClick={() => { setKartIdx(i); setKart(k.key); }}
+                  onClick={() => { gameAudio.sfx("select"); setKartIdx(i); setKart(k.key); }}
                   style={{
                     display: "flex", alignItems: "center", gap: 14, textAlign: "left",
                     padding: "13px 16px", borderRadius: 18,
@@ -351,7 +352,7 @@ export default function SelectScreen() {
           </Link>
         )}
         <button
-          onClick={() => { if (step === 1) setStep(2); else router.push("/games/language-kart"); }}
+          onClick={() => { gameAudio.sfx("click"); if (step === 1) setStep(2); else router.push("/games/language-kart"); }}
           style={{ flex: 1, padding: "14px 0", borderRadius: 14, background: step === 1 ? "linear-gradient(135deg,#7c3aed,#a855f7)" : "linear-gradient(135deg,#16a34a,#4ade80)", border: "2px solid rgba(255,255,255,0.5)", color: "white", fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: "clamp(15px,2.8vmin,18px)", fontWeight: 900, cursor: "pointer", boxShadow: step === 1 ? "0 8px 26px rgba(168,85,247,0.45)" : "0 8px 26px rgba(34,197,94,0.45)", letterSpacing: "0.04em" }}
         >
           {step === 1 ? "LANJUT PILIH KART ▶" : "GAS KE LINTASAN ▶"}

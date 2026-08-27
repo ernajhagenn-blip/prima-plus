@@ -77,6 +77,7 @@ export default function ChatPage() {
   const pick = (i: number) => {
     if (chosen !== null) return;
     setChosen(i);
+    gameAudio.sfx("dialog");
     const tone = s.choices[i]?.tone;
     gameAudio.sfx(tone === "good" ? "correct" : tone === "bad" ? "wrong" : "click");
   };
@@ -217,7 +218,7 @@ export default function ChatPage() {
           {/* Next Button */}
           {chosen !== null && (
             <button
-              onClick={() => { setChosen(null); setStage(stage + 1); }}
+              onClick={() => { gameAudio.sfx("page"); setChosen(null); setStage(stage + 1); }}
               style={{ marginTop: 16, padding: "16px 0", borderRadius: 14, background: "linear-gradient(135deg,#7c3aed,#ec4899)", border: "none", color: "white", fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: 16, fontWeight: 900, cursor: "pointer", animation: "bubbleIn 0.3s ease both", boxShadow: "0 4px 20px rgba(124,58,237,0.4)" }}
             >
               {stage === SCENARIOS.length - 1 ? "Refleksi Diri ?" : "SELANJUTNYA →"}

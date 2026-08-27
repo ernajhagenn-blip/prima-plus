@@ -92,12 +92,12 @@ export default function StoryPage() {
 
       <div style={{ display: "flex", gap: 10, width: "100%", maxWidth: 620, marginTop: "auto", paddingBottom: 8 }}>
         {idx > 0 && (
-          <button onClick={() => { setIdx(idx - 1); setOpenSource(false); }} style={{ flex: "0 0 130px", padding: "14px 0", borderRadius: 14, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", color: "white", fontFamily: "'Righteous',sans-serif", fontSize: 14, cursor: "pointer" }}>
+          <button onClick={() => { gameAudio.sfx("page"); setIdx(idx - 1); setOpenSource(false); }} style={{ flex: "0 0 130px", padding: "14px 0", borderRadius: 14, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", color: "white", fontFamily: "'Righteous',sans-serif", fontSize: 14, cursor: "pointer" }}>
             ? Sebelumnya
           </button>
         )}
         <button
-          onClick={() => { if (last) { router.push("/edukasi"); } else { setIdx(idx + 1); setOpenSource(false); } }}
+          onClick={() => { gameAudio.sfx("transition"); if (last) { router.push("/edukasi"); } else { setIdx(idx + 1); setOpenSource(false); } }}
           style={{ flex: 1, padding: "14px 0", borderRadius: 14, background: "linear-gradient(135deg,#7c3aed,#ec4899)", border: "none", color: "white", fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: 15, fontWeight: 900, cursor: "pointer", boxShadow: "0 6px 20px rgba(168,85,247,0.4)" }}
         >
           {last ? "Lanjut ke Ruang Edukasi ?" : "Data Berikutnya ?"}

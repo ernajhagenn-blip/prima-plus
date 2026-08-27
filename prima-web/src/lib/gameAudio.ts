@@ -1,6 +1,6 @@
 "use client";
 
-export type MusicStyle = "arcade" | "puzzle" | "action" | "mystery" | "chill";
+export type MusicStyle = "arcade" | "puzzle" | "action" | "mystery" | "chill" | "victory" | "tense" | "happy";
 
 interface Preset {
   tempo: number;
@@ -36,6 +36,21 @@ const PRESETS: Record<MusicStyle, Preset> = {
     tempo: 380, wave: "sine", bassWave: "triangle", vol: 0.032,
     chords: [[349.23, 440, 523.25], [329.63, 392, 493.88], [293.66, 369.99, 440], [261.63, 329.63, 392]],
     melody: [0, 2, 1, 0, 2, 1, 0, 1],
+  },
+  victory: {
+    tempo: 180, wave: "square", bassWave: "triangle", vol: 0.03,
+    chords: [[523.25, 659.25, 783.99], [587.33, 739.99, 880], [523.25, 659.25, 783.99], [659.25, 783.99, 987.77]],
+    melody: [0, 1, 2, 0, 2, 1, 0, 2],
+  },
+  tense: {
+    tempo: 140, wave: "sawtooth", bassWave: "square", vol: 0.02,
+    chords: [[220, 277.18, 329.63], [233.08, 293.66, 349.23], [220, 277.18, 329.63], [207.65, 261.63, 311.13]],
+    melody: [0, 2, 1, 0, 1, 2, 0, 1],
+  },
+  happy: {
+    tempo: 200, wave: "triangle", bassWave: "sine", vol: 0.035,
+    chords: [[392, 493.88, 587.33], [440, 554.37, 659.25], [523.25, 659.25, 783.99], [440, 554.37, 659.25]],
+    melody: [0, 2, 0, 1, 2, 0, 1, 2],
   },
 };
 
@@ -109,7 +124,7 @@ class GameAudio {
     this.step = 0;
   }
 
-  sfx(name: "click" | "correct" | "wrong" | "tick" | "win" | "lose" | "whoosh" | "coin") {
+  sfx(name: "click" | "correct" | "wrong" | "tick" | "win" | "lose" | "whoosh" | "coin" | "hover" | "select" | "typing" | "page" | "notification" | "error" | "success" | "levelup" | "powerup" | "jump" | "reveal" | "transition" | "dialog") {
     this.ensure();
     this.resume();
     if (!this.ctx || !this.master) return;
@@ -136,6 +151,19 @@ class GameAudio {
       case "win": [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => beep(f, f, 0.16, "triangle", 0.16, i * 0.11)); break;
       case "lose": beep(330, 165, 0.5, "sawtooth", 0.12); break;
       case "whoosh": beep(900, 180, 0.18, "sine", 0.1); break;
+      case "hover": beep(1200, 1400, 0.04, "sine", 0.05); break;
+      case "select": beep(800, 1200, 0.08, "triangle", 0.1); break;
+      case "typing": beep(600 + Math.random() * 200, 500 + Math.random() * 200, 0.03, "square", 0.04); break;
+      case "page": beep(500, 800, 0.12, "sine", 0.08); beep(700, 900, 0.1, "sine", 0.06, 0.06); break;
+      case "notification": beep(880, 1320, 0.1, "triangle", 0.12); beep(1100, 1500, 0.14, "triangle", 0.1, 0.1); break;
+      case "error": beep(300, 150, 0.15, "square", 0.14); beep(250, 100, 0.2, "square", 0.12, 0.12); break;
+      case "success": [523, 659, 784, 1047].forEach((f, i) => beep(f, f, 0.12, "triangle", 0.12, i * 0.08)); break;
+      case "levelup": [440, 554, 659, 880].forEach((f, i) => beep(f, f * 1.02, 0.14, "square", 0.13, i * 0.07)); break;
+      case "powerup": beep(400, 1200, 0.3, "sawtooth", 0.15); beep(800, 1600, 0.2, "triangle", 0.12, 0.15); break;
+      case "jump": beep(300, 800, 0.15, "sine", 0.1); break;
+      case "reveal": beep(400, 600, 0.08, "sine", 0.06); beep(600, 900, 0.1, "sine", 0.08, 0.08); beep(900, 1200, 0.15, "triangle", 0.1, 0.16); break;
+      case "transition": beep(500, 300, 0.15, "sine", 0.08); beep(300, 600, 0.18, "sine", 0.06, 0.1); break;
+      case "dialog": beep(800, 600, 0.05, "triangle", 0.06); break;
     }
   }
 }

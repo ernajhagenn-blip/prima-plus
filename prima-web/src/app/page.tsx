@@ -400,7 +400,7 @@ export default function CinematicOpening() {
     };
   }, []);
 
-  const go = () => router.push("/intro");
+  const go = () => { gameAudio.sfx("click"); gameAudio.sfx("whoosh"); router.push("/intro"); };
 
   return (
     <div style={{ width: "100vw", height: "100vh", position: "relative", overflow: "hidden", background: "#5db8ff" }}>

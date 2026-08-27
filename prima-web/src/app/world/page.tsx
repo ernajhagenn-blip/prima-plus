@@ -90,7 +90,7 @@ export default function WorldPage() {
           return (
             <button
               key={loc.id}
-              onClick={() => setSel(loc)}
+              onClick={() => { gameAudio.sfx("select"); setSel(loc); }}
               style={{
                 flex: "1 1 200px", maxWidth: 260,
                 background: "white",
@@ -161,7 +161,7 @@ export default function WorldPage() {
               {sel.desc}
             </p>
             <button
-              onClick={() => { router.push(sel.href); }}
+              onClick={() => { gameAudio.sfx("click"); router.push(sel.href); }}
               style={{
                 width: "100%", padding: "16px 0", borderRadius: 18,
                 background: sel.gradient, border: `5px solid ${NAVY}`,

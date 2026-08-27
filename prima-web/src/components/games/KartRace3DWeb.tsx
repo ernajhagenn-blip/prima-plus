@@ -109,7 +109,7 @@ class AudioEngine {
   setMuted(m: boolean) { if (this.master && this.ctx) this.master.gain.setTargetAtTime(m ? 0 : 0.5, this.ctx.currentTime, 0.02); }
 }
 
-const AI_COLORS = ["#a855f7", "#22c55e", "#f97316", "#3b82f6", "#e11d48", "#eab308", "#14b8a6"];
+const AI_COLORS = ["#a855f7", "#22c55e", "#f97316"];
 const AI_BASE = [148, 146, 144, 142, 140, 137, 134];
 
 function angDiff(a: number, b: number) {
@@ -490,11 +490,10 @@ export default function KartRace3DWeb({
     }
     T.current.flames = flames;
 
-    const AI_NAMES = ["Raga", "Kira", "Bimo", "Alya", "Dava", "Mira", "Senä"];
-    for (let i = 0; i < 7; i++) {
+    const AI_NAMES = ["Raga", "Kira", "Bimo"];
+    for (let i = 0; i < 3; i++) {
       const ak = buildKart(AI_COLORS[i], "#f8fafc", AI_COLORS[i], AI_NAMES[i]);
       ak.scale.setScalar(0.65);
-      ak.scale.setScalar(1.05);
       scene.add(ak); T.current.aiMeshes.push(ak);
     }
     const gltfLoader = new GLTFLoader();

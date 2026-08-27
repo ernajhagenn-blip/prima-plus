@@ -84,7 +84,7 @@ export default function EdukasiPage() {
       </div>
 
       <button
-        onClick={() => router.push("/chat")}
+        onClick={() => { gameAudio.sfx("transition"); router.push("/chat"); }}
         style={{ marginTop: 28, marginBottom: 10, padding: "15px 44px", borderRadius: 999, background: "linear-gradient(135deg,#0ea5e9,#22d3ee)", border: "none", color: "#06283d", fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: 16, fontWeight: 900, cursor: "pointer", boxShadow: "0 6px 24px rgba(34,211,238,0.4)" }}
       >
         Lihat dalam Kehidupan Sehari-hari ?
