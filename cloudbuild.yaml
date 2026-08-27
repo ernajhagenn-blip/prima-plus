@@ -1,0 +1,5 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-f", "prima-web/Dockerfile", "-t", "gcr.io/docucraft-ai-mgwp9/prima-plus", "."]
+images:
+  - "gcr.io/docucraft-ai-mgwp9/prima-plus"
