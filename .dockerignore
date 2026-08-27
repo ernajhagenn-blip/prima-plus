@@ -1,0 +1,13 @@
+.git
+_aktif
+_archive
+outputs
+prima_media
+__pycache__
+*.docx
+*.pdf
+*.md
+node_modules
+.next
+prima-web/.next
+prima-web/node_modules
