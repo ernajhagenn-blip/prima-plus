@@ -35,13 +35,14 @@ import { PARTICIPANT_COOKIE, ADMIN_COOKIE } from "@/lib/constants";
 import { LIKERT_OPTIONS } from "@/lib/data";
 import { pageForStage } from "@/lib/flow";
 import { isAdminAuthed } from "@/lib/session";
+import { logRegistration, logPretest, logGame, logPosttest, logRespons } from "@/lib/googleSheets";
 
 async function requireParticipant() {
   const cookieStore = await cookies();
   const id = Number(cookieStore.get(PARTICIPANT_COOKIE)?.value ?? 0);
   const p = id > 0 ? getParticipant(id) : undefined;
   if (!p) return null;
-  return p as { id: number; name: string; kelas: string; stage: Stage };
+  return p as { id: number; code: string; name: string; kelas: string; stage: Stage };
 }
 
 function scoreValue(answer: string | null): number {
@@ -105,6 +106,13 @@ export async function startJourney(prevState: unknown, formData: FormData) {
     maxAge: 60 * 60 * 24 * 14,
   });
 
+  logRegistration({
+    code,
+    name,
+    kelas,
+    timestamp: new Date().toISOString(),
+  });
+
   redirect("/story");
 }
 
@@ -147,6 +155,15 @@ export async function submitPretest(prevState: unknown, formData: FormData) {
       total,
       p.id,
     );
+  });
+
+  logPretest({
+    code: p.code,
+    name: p.name,
+    kelas: p.kelas,
+    total: answers.reduce((s, a) => s + a.score, 0),
+    answers,
+    timestamp: new Date().toISOString(),
   });
 
   redirect("/edukasi");
@@ -201,6 +218,20 @@ export async function submitGame(formData: FormData) {
     ).run(score, max, reflection, p.id);
   });
 
+  logGame({
+    code: p.code,
+    name: p.name,
+    kelas: p.kelas,
+    score,
+    max,
+    answers: rows.map((r) => ({
+      scenario_id: r.scenario_id,
+      chosen: r.chosen || "",
+      correct: r.is_correct === 1,
+    })),
+    timestamp: new Date().toISOString(),
+  });
+
   redirect("/posttest");
 }
 
@@ -244,6 +275,15 @@ export async function submitPosttest(prevState: unknown, formData: FormData) {
     ).run(total, p.id);
   });
 
+  logPosttest({
+    code: p.code,
+    name: p.name,
+    kelas: p.kelas,
+    total: answers.reduce((s, a) => s + a.score, 0),
+    answers,
+    timestamp: new Date().toISOString(),
+  });
+
   redirect("/respons");
 }
 
@@ -279,6 +319,18 @@ export async function submitRespons(prevState: unknown, formData: FormData) {
       insert.run(p.id, a.item_id, a.answer, a.score);
     }
     db.prepare("UPDATE participants SET stage = 'done' WHERE id = ?").run(p.id);
+  });
+
+  logRespons({
+    code: p.code,
+    name: p.name,
+    kelas: p.kelas,
+    answers: answers.map((a) => ({
+      item_id: a.item_id,
+      dimension: "",
+      answer: a.answer,
+    })),
+    timestamp: new Date().toISOString(),
   });
 
   redirect("/selesai");
