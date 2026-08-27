@@ -83,11 +83,8 @@ export default function GameShell({ children }: { children: React.ReactNode }) {
       <style>{`
         @keyframes cloudDrift { 0% { transform: translateX(-30vw); } 100% { transform: translateX(130vw); } }
         @keyframes shellDrive {
-          0% { transform: translateX(-15vw) scaleX(1); }
-          49% { transform: translateX(108vw) scaleX(1); }
-          50% { transform: translateX(108vw) scaleX(-1); }
-          99% { transform: translateX(-15vw) scaleX(-1); }
-          100% { transform: translateX(-15vw) scaleX(1); }
+          0% { transform: translateX(-15vw); }
+          100% { transform: translateX(108vw); }
         }
         @keyframes shellBob { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-22px) rotate(5deg); } }
       `}</style>
