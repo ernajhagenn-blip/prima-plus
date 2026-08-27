@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import GameShell from "@/components/GameShell";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -29,11 +30,7 @@ export default function RootLayout({
     <html lang="id" className="h-full antialiased">
       <body className="min-h-full">
         <GameShell>{children}</GameShell>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}`,
-          }}
-        />
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
