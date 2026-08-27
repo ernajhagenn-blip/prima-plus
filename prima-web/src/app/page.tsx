@@ -407,22 +407,22 @@ export default function CinematicOpening() {
       <div ref={mountRef} style={{ position: "absolute", inset: 0 }} />
 
       <div style={{
-        position: "absolute", top: "6%", left: 0, right: 0, textAlign: "center", zIndex: 10,
+        position: "absolute", top: "4%", left: 0, right: 0, textAlign: "center", zIndex: 10,
         animation: "titleFloat 3.4s ease-in-out infinite", pointerEvents: "none",
       }}>
-        <div style={{ display: "inline-block", marginBottom: -4 }}>
-          <div style={{ width: "min(66vw, 470px)", height: 14, borderRadius: 4, background: "repeating-conic-gradient(#1c1f2b 0% 25%, #ffffff 0% 50%) 0 0 / 14px 14px", border: "3px solid #1c1f2b", boxShadow: "0 4px 0 rgba(0,0,0,0.25)" }} />
+        <div style={{ display: "inline-block", marginBottom: -2 }}>
+          <div style={{ width: "min(56vw, 420px)", height: 10, borderRadius: 4, background: "repeating-conic-gradient(#1c1f2b 0% 25%, #ffffff 0% 50%) 0 0 / 12px 12px", border: "2px solid #1c1f2b", boxShadow: "0 3px 0 rgba(0,0,0,0.25)" }} />
         </div>
         <div style={{ position: "relative", display: "block", lineHeight: 1 }}>
           <h1 aria-hidden style={{
-            fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: "clamp(54px, 13.5vmin, 136px)", margin: 0, lineHeight: 1.05,
-            position: "absolute", inset: 0, color: "#241505", WebkitTextStroke: "7px #241505",
+            fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: "clamp(42px, 12vmin, 130px)", margin: 0, lineHeight: 1.05,
+            position: "absolute", inset: 0, color: "#241505", WebkitTextStroke: "clamp(4px,1.2vmin,7px) #241505",
             textShadow: "0 5px 0 #8a6205, 0 10px 0 #6b4a04, 0 15px 0 #4d3503, 0 22px 34px rgba(20,10,0,0.55)",
           }}>
             PRIMA+
           </h1>
           <h1 style={{
-            fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: "clamp(54px, 13.5vmin, 136px)", margin: 0, lineHeight: 1.05,
+            fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: "clamp(42px, 12vmin, 130px)", margin: 0, lineHeight: 1.05,
             position: "relative", color: "transparent",
             background: "linear-gradient(180deg, #ffffff 0%, #fff3b8 30%, #ffd34d 55%, #ffb824 78%, #ff9d00 100%)",
             WebkitBackgroundClip: "text", backgroundClip: "text",
@@ -430,40 +430,40 @@ export default function CinematicOpening() {
             PRIMA+
           </h1>
         </div>
-        <div style={{ display: "inline-block", marginTop: 10, background: "linear-gradient(180deg,#2a2e3d,#1c1f2b)", color: "#FFD34D", fontFamily: "'Righteous',sans-serif", fontSize: "clamp(12px,2.2vmin,16px)", letterSpacing: "0.3em", padding: "7px 26px", borderRadius: 999, border: "3px solid #FFD34D", boxShadow: "0 5px 0 rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.15)" }}>
+        <div style={{ display: "inline-block", marginTop: 8, background: "linear-gradient(180deg,#2a2e3d,#1c1f2b)", color: "#FFD34D", fontFamily: "'Righteous',sans-serif", fontSize: "clamp(10px,2vmin,15px)", letterSpacing: "0.3em", padding: "clamp(4px,1vmin,7px) clamp(16px,4vw,26px)", borderRadius: 999, border: "2px solid #FFD34D", boxShadow: "0 4px 0 rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.15)" }}>
           ✦ PRIMA CIRCUIT ✦
         </div>
       </div>
 
       <div style={{
-        position: "absolute", left: 0, right: 0, bottom: "9%", textAlign: "center", zIndex: 10,
+        position: "absolute", left: 0, right: 0, bottom: 0, textAlign: "center", zIndex: 10,
         opacity: ready ? 1 : 0, transform: ready ? "translateY(0) scale(1)" : "translateY(26px) scale(0.94)",
-        transition: "opacity 0.7s ease, transform 0.7s cubic-bezier(0.34,1.56,0.64,1)", padding: "0 20px",
+        transition: "opacity 0.7s ease, transform 0.7s cubic-bezier(0.34,1.56,0.64,1)", padding: "0 14px",
       }}>
         <div style={{
           display: "inline-block", background: "rgba(22,16,48,0.72)", backdropFilter: "blur(10px)",
-          borderRadius: 26, padding: "20px 34px 26px", border: "3px solid rgba(255,255,255,0.25)",
-          boxShadow: "0 14px 0 rgba(12,8,32,0.45), 0 26px 50px rgba(10,8,30,0.4)",
+          borderRadius: 20, padding: "clamp(12px,3vw,20px) clamp(14px,4vw,34px) clamp(14px,3vw,22px)", border: "2px solid rgba(255,255,255,0.2)",
+          boxShadow: "0 10px 0 rgba(12,8,32,0.4), 0 20px 40px rgba(10,8,30,0.35)", maxWidth: "92vw",
         }}>
-          <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: "clamp(20px, 4vmin, 28px)", color: "#ffffff", margin: "0 0 10px", fontStyle: "italic", textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}>
+          <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: "clamp(14px, 3.2vmin, 24px)", color: "#ffffff", margin: "0 0 6px", fontStyle: "italic", textShadow: "0 2px 8px rgba(0,0,0,0.6)", lineHeight: 1.3 }}>
             Berakar pada Aksara, Setia pada Nusantara.
           </p>
-          <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: "clamp(22px, 4.5vmin, 32px)", color: "#FFD34D", margin: "0 0 28px", fontWeight: 700, textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}>
+          <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: "clamp(15px, 3.6vmin, 28px)", color: "#FFD34D", margin: "0 0 18px", fontWeight: 700, textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}>
             Bahasa Kita, Identitas Kita!
           </p>
           <button
             onClick={go}
             style={{
-              padding: "28px 96px", borderRadius: 999, border: "4px solid rgba(255,255,255,0.9)",
+              padding: "clamp(12px,2.5vmin,18px) clamp(28px,8vw,60px)", borderRadius: 999, border: "3px solid rgba(255,255,255,0.9)",
               background: "linear-gradient(180deg, #a855f7 0%, #7c3aed 55%, #6d28d9 100%)",
               color: "white", fontFamily: "'Righteous', 'Arial Black', sans-serif",
-              fontSize: "clamp(24px, 5vmin, 36px)", fontWeight: 900, letterSpacing: "0.06em",
+              fontSize: "clamp(16px, 3.5vmin, 26px)", fontWeight: 900, letterSpacing: "0.06em",
               cursor: "pointer",
-              boxShadow: "0 10px 0 #4c1d95, 0 20px 40px rgba(124,58,237,0.5), inset 0 2px 0 rgba(255,255,255,0.45)",
+              boxShadow: "0 8px 0 #4c1d95, 0 16px 30px rgba(124,58,237,0.5), inset 0 2px 0 rgba(255,255,255,0.45)",
               transition: "transform 0.1s ease, box-shadow 0.1s ease",
             }}
-            onPointerDown={(e) => { e.currentTarget.style.transform = "translateY(6px)"; e.currentTarget.style.boxShadow = "0 2px 0 #4c1d95, 0 6px 14px rgba(124,58,237,0.5)"; }}
-            onPointerUp={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 0 #4c1d95, 0 20px 40px rgba(124,58,237,0.5), inset 0 2px 0 rgba(255,255,255,0.45)"; }}
+            onPointerDown={(e) => { e.currentTarget.style.transform = "translateY(4px)"; e.currentTarget.style.boxShadow = "0 2px 0 #4c1d95, 0 6px 14px rgba(124,58,237,0.5)"; }}
+            onPointerUp={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 8px 0 #4c1d95, 0 16px 30px rgba(124,58,237,0.5), inset 0 2px 0 rgba(255,255,255,0.45)"; }}
           >
             MULAI PETUALANGAN ▶
           </button>

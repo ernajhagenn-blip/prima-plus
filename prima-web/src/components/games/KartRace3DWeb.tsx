@@ -1325,25 +1325,35 @@ export default function KartRace3DWeb({
               })}
             </div>
 
-            {/* Feedback */}
-            {quizAnswered && quizSelected >= 0 && (
+            {/* Feedback + Continue */}
+            {quizAnswered && (
               <>
                 <div style={{ marginTop: 15, padding: "13px 16px", borderRadius: 12, background: "rgba(124,58,237,0.1)", border: "1px solid rgba(168,85,247,0.4)" }}>
                   <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 10, letterSpacing: "0.14em", color: "#c084fc", margin: "0 0 5px" }}>HASIL</p>
-                  <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 13.5, color: "white", margin: "0 0 8px", lineHeight: 1.45 }}>
-                    {ch.choices[quizSelected]?.consequence.gameEffect === "boost"
-                      ? "Keputusanmu bekerja dengan baik di konteks ini."
-                      : ch.choices[quizSelected]?.consequence.gameEffect === "neutral"
-                        ? "Pesan sampai — dengan satu hal yang layak dicermati."
-                        : "Terkirim, tapi efeknya berbeda dari yang mungkin kamu niatkan."}
-                  </p>
-                  <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 10, letterSpacing: "0.14em", color: "#c084fc", margin: "0 0 5px" }}>MENGAPA BEGITU</p>
-                  <p style={{ fontFamily: "Arial, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.75)", margin: 0, lineHeight: 1.6 }}>{ch.choices[quizSelected]?.consequence.feedback}</p>
+                  {quizSelected >= 0 ? (
+                    <>
+                      <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 13.5, color: "white", margin: "0 0 8px", lineHeight: 1.45 }}>
+                        {ch.choices[quizSelected]?.consequence.gameEffect === "boost"
+                          ? "Keputusanmu bekerja dengan baik di konteks ini."
+                          : ch.choices[quizSelected]?.consequence.gameEffect === "neutral"
+                            ? "Pesan sampai — dengan satu hal yang layak dicermati."
+                            : "Terkirim, tapi efeknya berbeda dari yang mungkin kamu niatkan."}
+                      </p>
+                      <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 10, letterSpacing: "0.14em", color: "#c084fc", margin: "0 0 5px" }}>MENGAPA BEGITU</p>
+                      <p style={{ fontFamily: "Arial, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.75)", margin: 0, lineHeight: 1.6 }}>{ch.choices[quizSelected]?.consequence.feedback}</p>
+                    </>
+                  ) : (
+                    <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 13.5, color: "#fca5a5", margin: 0, lineHeight: 1.45 }}>
+                      Waktu habis — tantangan terlewat. Pertanyaan ini tetap penting untuk dipikirkan.
+                    </p>
+                  )}
                 </div>
-                <div style={{ marginTop: 10, padding: "12px 16px", borderRadius: 12, background: "rgba(250,204,21,0.07)", border: "1px dashed rgba(250,204,21,0.45)" }}>
-                  <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 10, letterSpacing: "0.14em", color: "#facc15", margin: "0 0 5px" }}>COBA PIKIR LAGI</p>
-                  <p style={{ fontFamily: "Arial, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.8)", margin: 0, lineHeight: 1.55, fontStyle: "italic" }}>{ch.reflectiveQuestion}</p>
-                </div>
+                {quizSelected >= 0 && (
+                  <div style={{ marginTop: 10, padding: "12px 16px", borderRadius: 12, background: "rgba(250,204,21,0.07)", border: "1px dashed rgba(250,204,21,0.45)" }}>
+                    <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 10, letterSpacing: "0.14em", color: "#facc15", margin: "0 0 5px" }}>COBA PIKIR LAGI</p>
+                    <p style={{ fontFamily: "Arial, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.8)", margin: 0, lineHeight: 1.55, fontStyle: "italic" }}>{ch.reflectiveQuestion}</p>
+                  </div>
+                )}
                 <button onClick={continueQuiz} style={{ marginTop: 14, width: "100%", padding: "14px 0", borderRadius: 12, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "white", fontFamily: "'Righteous', sans-serif", fontSize: 16, fontWeight: 900, cursor: "pointer", letterSpacing: "0.04em" }}>
                   LANJUTKAN BALAPAN (Enter)
                 </button>
