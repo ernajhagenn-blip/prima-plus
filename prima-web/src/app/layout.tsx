@@ -7,11 +7,11 @@ export const metadata: Metadata = {
   title: "PRIMA+ — Kesadaran Berbahasa Remaja",
   description: "Platform kesadaran berbahasa Indonesia untuk remaja.",
   applicationName: "PRIMA+",
-  manifest: "/manifest.webmanifest",
+  manifest: `${process.env.NEXT_PUBLIC_BASE_PATH}/manifest.webmanifest`,
   appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "PRIMA+" },
   icons: {
-    icon: [{ url: "/favicon-32.png", sizes: "32x32" }, { url: "/icon-192.png", sizes: "192x192" }],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+    icon: [{ url: `${process.env.NEXT_PUBLIC_BASE_PATH}/favicon-32.png`, sizes: "32x32" }, { url: `${process.env.NEXT_PUBLIC_BASE_PATH}/icon-192.png`, sizes: "192x192" }],
+    apple: [{ url: `${process.env.NEXT_PUBLIC_BASE_PATH}/apple-touch-icon.png`, sizes: "180x180" }],
   },
 };
 

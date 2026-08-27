@@ -536,7 +536,7 @@ export default function KartRace3DWeb({
       T.current.glbKarts = slots;
     };
     kartFiles.forEach((f) => {
-      gltfLoader.load(`/models/karts/${f}.glb`, (gltf) => {
+      gltfLoader.load(`${process.env.NEXT_PUBLIC_BASE_PATH}/models/karts/${f}.glb`, (gltf) => {
         const model = gltf.scene;
         const box = new THREE.Box3().setFromObject(model);
         const size = new THREE.Vector3();
