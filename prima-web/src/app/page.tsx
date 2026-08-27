@@ -164,7 +164,7 @@ function buildCloud(): THREE.Group {
 
 export default function CinematicOpening() {
   const mountRef = useRef<HTMLDivElement>(null);
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(true);
   const [leaving, setLeaving] = useState(false);
   const router = useRouter();
 
