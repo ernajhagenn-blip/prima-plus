@@ -10,7 +10,8 @@ import {
 } from "@/lib/data";
 import type { Scenario, ScenarioOption } from "@/lib/data";
 
-const PRIMA_ROOT = process.env.PRIMA_ROOT || "D:\\opsi2026\\prima-web";
+// Vercel serverless: only /tmp is writable. Local dev: project root.
+const PRIMA_ROOT = process.env.VERCEL ? "/tmp" : (process.env.PRIMA_ROOT || process.cwd());
 const DATA_DIR = path.join(PRIMA_ROOT, "data");
 const DB_PATH = path.join(DATA_DIR, "prima.db");
 

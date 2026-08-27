@@ -285,7 +285,8 @@ export default function KartRace3DWeb({
     if (issues.length > 0) console.warn("[PRIMA+] Validasi tantangan:", issues);
   }, []);
 
-  const isTouch = useMemo(() => typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0), []);
+  const [isTouch, setIsTouch] = useState(false);
+  useEffect(() => { setIsTouch("ontouchstart" in window || navigator.maxTouchPoints > 0); }, []);
 
   const S = useRef({
     x: 0, y: R, h: Math.PI, v: 0,
@@ -330,14 +331,18 @@ export default function KartRace3DWeb({
     ready: boolean;
   }>({ aiMeshes: [], coinMeshes: [], boxMeshes: [], gateMeshes: [], sparks: [], glbKarts: [], ready: false });
 
+  const [fatal3D, setFatal3D] = useState<string | null>(null);
+
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x6ec6ff);
-    scene.fog = new THREE.Fog(0xa8ddff, 300, 1200);
-    const camera = new THREE.PerspectiveCamera(62, mount.clientWidth / mount.clientHeight, 0.1, 2000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    let scene: THREE.Scene, camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer;
+    try {
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x6ec6ff);
+      scene.fog = new THREE.Fog(0xa8ddff, 300, 1200);
+      camera = new THREE.PerspectiveCamera(62, mount.clientWidth / mount.clientHeight, 0.1, 2000);
+      renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     mount.appendChild(renderer.domElement);
@@ -493,6 +498,10 @@ export default function KartRace3DWeb({
       scene.add(ak); T.current.aiMeshes.push(ak);
     }
     const gltfLoader = new GLTFLoader();
+    // Kenney GLBs reference external PNGs that aren't bundled.
+    // Intercept URI loads and substitute a tiny white data-URI; kart tints come from procedural mats.
+    const WHITE_PNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9ZqEX+oAAAAASUVORK5CYII=";
+    gltfLoader.manager.setURLModifier(() => WHITE_PNG);
     const kartFiles = ["kart-oobi", "kart-oodi", "kart-ooli", "kart-oopi", "kart-oozi"];
     const glbModels: Record<string, THREE.Group> = {};
     let glbDone = 0;
@@ -580,7 +589,23 @@ export default function KartRace3DWeb({
       if (mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);
       T.current.ready = false;
     };
+    } catch (err) {
+      console.error("[KartRace3D] init failed:", err);
+      setFatal3D(err instanceof Error ? err.message : String(err));
+    }
   }, [kartBody, kartAccent]);
+
+  if (fatal3D) {
+    return (
+      <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#0b0d22", color: "white", padding: 24, textAlign: "center" }}>
+        <div>
+          <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 22, color: "#FFD34D", margin: "0 0 12px" }}>Mode 3D tidak dapat dimuat</p>
+          <p style={{ fontFamily: "Arial, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.7)", margin: "0 0 18px" }}>{fatal3D}</p>
+          <button onClick={() => onComplete(0, 0, 8)} style={{ padding: "12px 24px", borderRadius: 12, background: "linear-gradient(135deg,#7c3aed,#a855f7)", border: "none", color: "white", fontFamily: "'Righteous', sans-serif", fontSize: 14, fontWeight: 900, cursor: "pointer" }}>LEWATI & KEMBALI</button>
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     const s = S.current;
