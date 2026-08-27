@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useJourney } from "@/lib/store";
 import { KARTS, STAT_META } from "@/components/game/karts";
+import SelectScene from "@/components/game/SelectScene";
 
 export interface CharacterDef {
   key: string;
@@ -209,24 +210,27 @@ export default function SelectScreen() {
   const kart = KARTS[kartIdx];
 
   return (
-    <main style={{ width: "100vw", minHeight: "100vh", margin: 0, background: "radial-gradient(ellipse at 50% -10%, #312e81 0%, #1e1b4b 40%, #0b0d22 80%)", padding: "clamp(14px,3vmin,36px) clamp(12px,3vmin,32px)", display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <p style={{ fontFamily: "'Righteous',sans-serif", fontSize: "clamp(11px,2vmin,13px)", letterSpacing: "0.3em", color: "#facc15", margin: "0 0 4px" }}>
+    <main style={{ width: "100vw", minHeight: "100vh", margin: 0, position: "relative", background: "linear-gradient(180deg, #0b0d22 0%, #1e1b4b 40%, #312e81 100%)", padding: "clamp(14px,3vmin,36px) clamp(12px,3vmin,32px)", display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <div style={{ position: "fixed", inset: 0, zIndex: 0 }}>
+        <SelectScene color="#7c3aed" accent="#a855f7" />
+      </div>
+      <p style={{ fontFamily: "'Righteous',sans-serif", fontSize: "clamp(11px,2vmin,13px)", letterSpacing: "0.3em", color: "#facc15", margin: "0 0 4px", position: "relative", zIndex: 2 }}>
         GARASI · LANGKAH {step === 1 ? "1" : "2"}/2
       </p>
-      <h1 style={{ fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: "clamp(26px,5.5vmin,44px)", color: "white", margin: "0 0 4px", textShadow: "0 3px 0 #1c1030, 0 6px 24px rgba(250,204,21,0.35)" }}>
+      <h1 style={{ fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: "clamp(26px,5.5vmin,44px)", color: "white", margin: "0 0 4px", textShadow: "0 3px 0 #1c1030, 0 6px 24px rgba(250,204,21,0.35)", position: "relative", zIndex: 2 }}>
         {step === 1 ? "PILIH KARAKTER" : "PILIH KART"}
       </h1>
 
       {step === 1 && (
-        <div style={{ width: "100%", maxWidth: 900, display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "clamp(10px,2.5vmin,28px)", marginTop: 8 }}>
+        <div style={{ width: "100%", maxWidth: 900, display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "clamp(10px,2.5vmin,28px)", marginTop: 8, position: "relative", zIndex: 2 }}>
           <div style={{ flex: "1 1 340px", minWidth: 300, maxWidth: 440 }}>
             <div style={{ background: "radial-gradient(circle at 50% 60%, rgba(255,255,255,0.09), rgba(255,255,255,0.02) 65%)", borderRadius: 24, border: `3px solid ${ch.helmet}`, padding: 8, boxShadow: `0 10px 40px ${ch.helmet}55` }}>
               <CharacterPortrait ch={ch} big />
             </div>
-            <h2 key={ch.key} style={{ fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: "clamp(26px,5vmin,40px)", color: ch.helmet === "#22c55e" ? "#4ade80" : ch.helmet === "#0ea5e9" ? "#38bdf8" : ch.helmet, textAlign: "center", margin: "14px 0 2px", textShadow: "0 3px 0 #0b0d22", animation: "kartIn 0.35s both" }}>
+            <h2 key={ch.key} style={{ fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: "clamp(26px,5vmin,40px)", color: ch.helmet === "#22c55e" ? "#4ade80" : ch.helmet === "#0ea5e9" ? "#38bdf8" : ch.helmet, textAlign: "center", margin: "22px 0 4px", textShadow: "0 3px 0 #0b0d22", animation: "kartIn 0.35s both" }}>
               {ch.name.toUpperCase()}
             </h2>
-            <p style={{ fontFamily: "'Righteous',sans-serif", fontSize: "clamp(12px,2.2vmin,15px)", color: "#facc15", textAlign: "center", margin: "0 0 8px", textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}>
+            <p style={{ fontFamily: "'Righteous',sans-serif", fontSize: "clamp(12px,2.2vmin,15px)", color: "#facc15", textAlign: "center", margin: "0 0 10px", textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}>
               {ch.title}
             </p>
             <p key={ch.key + "d"} style={{ fontFamily: "Arial,sans-serif", fontSize: "clamp(13px,2.2vmin,15px)", color: "rgba(255,255,255,0.85)", textAlign: "center", margin: "0 auto", maxWidth: 380, lineHeight: 1.55, textShadow: "0 1px 4px rgba(0,0,0,0.8)", animation: "kartIn 0.4s 0.08s both" }}>
@@ -275,12 +279,12 @@ export default function SelectScreen() {
       )}
 
       {step === 2 && (
-        <div style={{ width: "100%", maxWidth: 900, display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "clamp(10px,2.5vmin,28px)", marginTop: 8 }}>
+        <div style={{ width: "100%", maxWidth: 900, display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "clamp(10px,2.5vmin,28px)", marginTop: 8, position: "relative", zIndex: 2 }}>
           <div style={{ flex: "1 1 340px", minWidth: 300, maxWidth: 460 }}>
             <div style={{ background: "radial-gradient(circle at 50% 60%, rgba(255,255,255,0.09), rgba(255,255,255,0.02) 65%)", borderRadius: 24, border: `3px solid ${kart.body}`, padding: "10px 6px 0", boxShadow: `0 10px 40px ${kart.body}55` }}>
               <KartPreview body={kart.body} accent={kart.accent} />
             </div>
-            <h2 key={kart.key} style={{ fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: "clamp(26px,5vmin,40px)", color: kart.accent, textAlign: "center", margin: "14px 0 2px", textShadow: "0 3px 0 #0b0d22, 0 0 26px rgba(255,255,255,0.25)", animation: "kartIn 0.35s both" }}>
+            <h2 key={kart.key} style={{ fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: "clamp(26px,5vmin,40px)", color: kart.accent, textAlign: "center", margin: "22px 0 4px", textShadow: "0 3px 0 #0b0d22, 0 0 26px rgba(255,255,255,0.25)", animation: "kartIn 0.35s both" }}>
               {kart.name.toUpperCase()}
             </h2>
             <p key={kart.key + "t"} style={{ fontFamily: "Arial,sans-serif", fontSize: "clamp(13px,2.2vmin,15.5px)", color: "rgba(255,255,255,0.85)", textAlign: "center", margin: "0 auto 16px", maxWidth: 380, lineHeight: 1.55, textShadow: "0 1px 4px rgba(0,0,0,0.8)", animation: "kartIn 0.4s 0.08s both" }}>
@@ -336,7 +340,7 @@ export default function SelectScreen() {
         </div>
       )}
 
-      <div style={{ display: "flex", gap: 12, marginTop: "clamp(16px,3vmin,28px)", width: "100%", maxWidth: 520, padding: "0 8px" }}>
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px clamp(14px,3vmin,32px)", background: "linear-gradient(transparent, rgba(11,13,34,0.97) 40%)", display: "flex", gap: 12, zIndex: 50 }}>
         {step === 2 ? (
           <button onClick={() => setStep(1)} style={{ flex: "0 0 130px", display: "flex", alignItems: "center", justifyContent: "center", padding: "14px 0", borderRadius: 14, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", color: "white", fontFamily: "'Righteous',sans-serif", fontSize: 14, cursor: "pointer" }}>
             ← Karakter
@@ -354,7 +358,54 @@ export default function SelectScreen() {
         </button>
       </div>
 
-      <style>{`@keyframes kartIn { 0% { opacity: 0; transform: translateY(10px) scale(0.96); } 100% { opacity: 1; transform: translateY(0) scale(1); } }`}</style>
+      <style>{`
+        @keyframes kartIn { 0% { opacity: 0; transform: translateY(10px) scale(0.96); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes neonFloat { 0%,100% { transform: translateY(0) rotate(0deg); opacity: 0.6; } 50% { transform: translateY(-18px) rotate(3deg); opacity: 1; } }
+        @keyframes neonPulse { 0%,100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.15); } }
+        @keyframes neonSlide { 0% { transform: translateX(-100vw); } 100% { transform: translateX(100vw); } }
+      `}</style>
+      {/* Overlay animated elements */}
+      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 1, overflow: "hidden" }}>
+        {/* Floating particles */}
+        {Array.from({ length: 18 }).map((_, i) => (
+          <div key={`p${i}`} style={{
+            position: "absolute",
+            left: `${(i * 23) % 100}%`,
+            top: `${(i * 37) % 90}%`,
+            width: 4 + (i % 3) * 2,
+            height: 4 + (i % 3) * 2,
+            borderRadius: "50%",
+            background: ["#facc15", "#a78bfa", "#ec4899", "#38bdf8", "#4ade80"][i % 5],
+            boxShadow: `0 0 8px ${["#facc15", "#a78bfa", "#ec4899", "#38bdf8", "#4ade80"][i % 5]}88`,
+            animation: `neonPulse ${2 + (i % 4) * 0.6}s ${(i % 5) * 0.3}s ease-in-out infinite`,
+          }} />
+        ))}
+        {/* Neon lines */}
+        {[0, 1, 2].map((i) => (
+          <div key={`l${i}`} style={{
+            position: "absolute",
+            top: `${20 + i * 25}%`,
+            left: 0,
+            width: "100%",
+            height: 1,
+            background: `linear-gradient(90deg, transparent, ${["#a78bfa", "#ec4899", "#38bdf8"][i]}33, transparent)`,
+            animation: `neonSlide ${12 + i * 4}s ${i * 2}s linear infinite`,
+          }} />
+        ))}
+        {/* Floating icons */}
+        {["⚡", "🏎️", "🏁", "🏆", "🎯"].map((icon, i) => (
+          <div key={`icon${i}`} style={{
+            position: "absolute",
+            left: `${10 + i * 18}%`,
+            top: `${15 + (i % 3) * 25}%`,
+            fontSize: 18 + i * 2,
+            opacity: 0.25,
+            animation: `neonFloat ${5 + i * 1.5}s ${i * 0.8}s ease-in-out infinite`,
+          }}>
+            {icon}
+          </div>
+        ))}
+      </div>
     </main>
   );
 }

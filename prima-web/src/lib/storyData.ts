@@ -3,7 +3,7 @@ export interface DataPoint {
   headline: string;
   big: string;
   desc: string;
-  chat?: { from: string; text: string; foreign?: string[] }[];
+  points?: string[];
   source: {
     author: string;
     year: string;
@@ -15,79 +15,75 @@ export interface DataPoint {
 
 export const STORY_DATA: DataPoint[] = [
   {
-    id: "insertion",
-    headline: "Penyisipan Kata Mendominasi",
-    big: "63,41%",
-    desc: "Dari 41 tuturan yang mengandung alih kode dan campur kode dalam interaksi pembelajaran, campur kode penyisipan kata menjadi bentuk paling tinggi (26 tuturan), diikuti penyisipan frasa (19,51%) dan penyisipan klausa (2,43%).",
-    chat: [
-      { from: "Rani", text: "eh tugasnya nanti di {submit} ke mana?", foreign: ["submit"] },
-      { from: "Dimas", text: "ke {link} yang dikirim Bu. jangan sampe kelewat {deadline}-nya", foreign: ["link", "deadline"] },
+    id: "faktor2",
+    headline: "Faktor Pemicu Pergeseran Ragam Bahasa di Era Digital",
+    big: "Analisis Sosiolinguistik",
+    desc: "Analisis sosiolinguistik mengenai latar belakang terjadinya pergeseran pola komunikasi dan standar bahasa di masyarakat.",
+    points: [
+      "Intensitas Penggunaan Media Sosial: Ekosistem platform digital yang tinggi membentuk kebiasaan komunikasi baru serta mempercepat penyebaran ragam bahasa non-formal di kalangan pengguna muda.",
+      "Pengaruh Budaya Populer Global: Masuknya unsur budaya luar dan tren global secara konstan menggeser porsi penggunaan tata bahasa yang baku dalam percakapan sehari-hari.",
+      "Rendahnya Kesadaran Kontekstual: Kurangnya internalisasi fungsi ragam bahasa formal menyebabkan pudarnya batasan penggunaan bahasa yang baik dan benar sesuai situasi.",
     ],
     source: {
-      author: "Tim penulis Prosiding KIBAR UNINDRA",
-      year: "2025",
-      title: "Alih Kode dan Campur Kode dalam Interaksi Pembelajaran Bahasa Indonesia di SMK Al Fat-Hiyah Jakarta",
-      venue: "Prosiding Seminar Nasional KIBAR, Universitas Indraprasta PGRI",
-      link: "https://proceeding.unindra.ac.id/index.php/kibar",
+      author: "Nabilla Qorima, Ika Amelia, et al.",
+      year: "2026",
+      title: "Pergeseran Ragam Bahasa dalam Ekosistem Media Sosial: Kajian Sosiolinguistik dan Relevansinya terhadap Penguatan Bahasa Indonesia di Perguruan Tinggi",
+      venue: "Jurnal Arjuna: Publikasi Ilmu Pendidikan, Bahasa dan Matematika, Vol. 4 No. 1 (2026)",
+      link: "https://journal.aripi.or.id/index.php/Arjuna/article/view/2706",
     },
   },
   {
-    id: "genz",
-    headline: "Tiga Wajah Campur Kode Gen Z",
-    big: "Inner · Outer · Hybrid",
-    desc: "Kajian wacana TikTok menemukan tiga bentuk sekaligus: campur kode internal (dengan ragam akrab sehari-hari), eksternal (menyisipkan bahasa asing), dan hibrida (imbuhan Indonesia + kata asing). Contoh asli dari data: 'Ngedownload lagu viral di TikTok' — imbuhan 'nge-' bertemu kata 'download'.",
-    chat: [
-      { from: "@jesselyn", text: "Ide cemilan yang {next level}, yang di {level up}!", foreign: ["next level", "level up"] },
-      { from: "@androidnyel", text: "Lagi {ngedownload} lagu viral, nanti aku {kabarin} ya", foreign: ["ngedownload"] },
+    id: "kosakata",
+    headline: "Tingkat Penguasaan Kosakata Baku dan Faktor Penurunannya",
+    big: "Kosakata Baku",
+    desc: "Analisis data ilmiah mengenai penurunan penguasaan bahasa Indonesia baku beserta faktor pemicunya di lingkungan generasi muda.",
+    points: [
+      "Kategori Penguasaan Cukup: Berdasarkan kajian empiris terhadap tingkat penguasaan kosakata baku, kemampuan berbahasa formal generasi muda mayoritas berada pada kategori cukup.",
+      "Faktor Minimnya Eksposur: Rendahnya frekuensi penggunaan kata baku dalam aktivitas harian disebabkan oleh interaksi yang dominan menggunakan ragam informal.",
+      "Pengaruh Lingkungan dan Teknologi: Kebiasaan berinteraksi dengan paparan media dan gaya bahasa non-formal secara terus-menerus membuat individu menjadi kurang akrab dengan kaidah bahasa baku.",
     ],
     source: {
-      author: "Budiana, N., Safitri, Ratnasari, H., & Mustofa, M.",
-      year: "2025",
-      title: "Fenomena Campur Kode pada Komunikasi Gen Z: Analisis Wacana di Media Sosial TikTok",
-      venue: "ISOLEK: Jurnal Pendidikan, Pengajaran, Bahasa, dan Sastra, 3(2), 56-61",
-      link: "https://doi.org/10.59638/isolek.v3i2.681",
-    },
-  },
-  {
-    id: "igstory",
-    headline: "Satu Story, Dua Bahasa",
-    big: "Campur tanpa sadar",
-    desc: "Studi kasus mengamati unggahan seorang remaja: 'Kemarin hangout bareng temen-temen, dan kita totally have fun! Bener-bener best day ever!' Dalam satu kalimat pendek, empat unsur Inggris menyusup tanpa terasa sebagai pilihan — melainkan sebagai kebiasaan.",
-    chat: [
-      { from: "Juwita", text: "Kemarin {hangout} bareng temen-temen, dan kita {totally have fun}! Bener-bener {best day ever}!", foreign: ["hangout", "totally have fun", "best day ever"] },
-    ],
-    source: {
-      author: "Purba, E. N., Togatorop, D. P., Simbolon, A., & Sari, Y.",
-      year: "2024",
-      title: "Analisis Pengaruh Media Sosial terhadap Keberagaman Bahasa: Campur Kode sebagai Tren Komunikasi Anak Muda",
-      venue: "Atmosfer: Jurnal Pendidikan, Bahasa, Sastra, Seni, Budaya, dan Sosial Humaniora, 2(4)",
-      link: "https://doi.org/10.59024/atmosfer.v2i4.1060",
-    },
-  },
-  {
-    id: "attitude",
-    headline: "Menerima Tapi Belum Paham",
-    big: "72,7% vs 65,5%",
-    desc: "Survei pada mahasiswa kebahasaan menunjukkan penerimaan terhadap campur kode tergolong baik (72,7%), tetapi pemahaman tentang penggunaannya justru berkategori kurang baik (65,5%). Artinya, membiasakan bukan berarti memahami kapan dan mengapa digunakan.",
-    source: {
-      author: "Penulis Argopuro: Jurnal Ilmu Bahasa",
-      year: "2025",
-      title: "Persepsi Mahasiswa Program Studi Pendidikan Bahasa dan Sastra Indonesia Universitas Islam Riau terhadap Penggunaan Campur Kode di Media Sosial",
-      venue: "Argopuro: Jurnal Ilmu Bahasa, 11(3), 91-100",
-      link: "https://cibangsa.com/index.php/argopurojournal",
-    },
-  },
-  {
-    id: "persuasive",
-    headline: "Bukan Gaya-Gayaan Belaka",
-    big: "3 fungsi",
-    desc: "Studi konten TikTok menemukan penyisipan unsur bahasa Inggris berfungsi sebagai strategi persuasif, afektif, dan informatif dalam komunikasi digital — ada alasan komunikatif di baliknya, bukan sekadar tren kosong.",
-    source: {
-      author: "Fauzi, M. R. & Rosalina, S.",
+      author: "INNOVATIVE: Journal of Science Research",
       year: "2023",
-      title: "Analisis Penggunaan Campur Kode dalam Konten wanderlearn pada Akun TikTok eranitri",
-      venue: "Bahtera Indonesia: Jurnal Penelitian Bahasa dan Sastra Indonesia, 8(2), 335-345",
-      link: "https://doi.org/10.31943/bi.v8i2.394",
+      title: "Penguasaan Kosakata Baku Bahasa Indonesia Mahasiswa",
+      venue: "INNOVATIVE: Journal of Science Research",
+      link: "https://j-innovative.org/index.php/Innovative/article/view/14615",
+    },
+  },
+  {
+    id: "stigma",
+    headline: "Stigma Kemuakan dan Anggapan Kaku pada Penggunaan Ragam Bahasa Baku",
+    big: "Stigma & Sikap",
+    desc: "Analisis sosiolinguistik mengenai hambatan psikologis dan sosial generasi muda dalam menggunakan bahasa Indonesia baku di luar situasi formal.",
+    points: [
+      "Ketidaknyamanan Penggunaan Formal: Berdasarkan kajian empiris, penggunaan bahasa Indonesia yang baku di luar situasi resmi sering kali membuat penutur muda merasa tidak nyaman dan kaku.",
+      "Pengaruh Lingkungan Komunikasi: Kebiasaan berinteraksi menggunakan ragam kasual atau bahasa sehari-hari membentuk pola pikir bahwa ragam baku kurang sesuai dengan dinamika pergaulan masa kini.",
+      "Urgensi Pendekatan Kontekstual: Kondisi ini memicu pudarnya keterbiasaan terhadap kaidah bahasa resmi sehingga memerlukan media edukasi agar nilai kebahasaan tetap terjaga.",
+    ],
+    source: {
+      author: "Desi Julianti & Irwan Siagian",
+      year: "2023",
+      title: "Analisis Pengaruh Bahasa Daerah Terhadap Penggunaan Bahasa Indonesia",
+      venue: "Innovative: Journal Of Social Science Research, Vol. 3 No. 2 (2023)",
+      link: "https://j-innovative.org/index.php/Innovative/article/view/956",
+    },
+  },
+  {
+    id: "urgensi",
+    headline: "Urgensi Kesadaran Berbahasa dan Sikap Positif Generasi Muda",
+    big: "Kesadaran Berbahasa",
+    desc: "Analisis peran kesadaran berbahasa (language awareness) dan sikap positif dalam mempertahankan eksistensi serta kualitas penggunaan bahasa Indonesia.",
+    points: [
+      "Peran Kunci Pendidikan: Lembaga pendidikan memegang peranan vital dalam memprioritaskan pemahaman siswa agar senantiasa menggunakan bahasa Indonesia secara baik dan benar sesuai kaidah.",
+      "Tantangan Era Modern: Arus globalisasi serta dinamika perkembangan zaman menjadi faktor utama yang melemahkan tingkat kesadaran berbahasa di ruang publik.",
+      "Dimensi Sikap Positif: Sikap positif terhadap bahasa nasional diwujudkan melalui tiga pilar utama, yaitu kesetiaan berbahasa, kebanggaan berbahasa, serta kesadaran terhadap norma kebahasaan.",
+    ],
+    source: {
+      author: "Adelia Br Aritonang, et al.",
+      year: "2025",
+      title: "Pentingnya Kesadaran Berbahasa: Upaya Meningkatkan Penggunaan Bahasa Indonesia yang Benar di Era Digital",
+      venue: "Guruku: Jurnal Pendidikan dan Sosial Humaniora, Vol. 3 No. 2 (2025)",
+      link: "https://e-journal.poltek-kampar.ac.id/index.php/GURUKU/article/view/957",
     },
   },
 ];

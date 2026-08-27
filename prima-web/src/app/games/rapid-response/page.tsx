@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { gameAudio } from "@/lib/gameAudio";
+import GameBackButton from "@/components/GameBackButton";
 
 interface WordPrompt {
   word: string;
@@ -29,6 +31,8 @@ const XP_PER_WORD = 8;
 
 export default function RapidResponsePage() {
   const router = useRouter();
+
+  useEffect(() => () => gameAudio.stopMusic(), []);
   const [phase, setPhase] = useState<"start" | "play" | "result">("start");
   const [currentQ, setCurrentQ] = useState(0);
   const [score, setScore] = useState(0);
@@ -65,6 +69,7 @@ export default function RapidResponsePage() {
           (r) => r.toLowerCase() === response || response.includes(r.toLowerCase()) || r.toLowerCase().includes(response)
         );
       if (correct) setScore((s) => s + XP_PER_WORD);
+      gameAudio.sfx(correct ? "coin" : "wrong");
       setAnswers((a) => [...a, { word: prompt.word, response: response || "—", correct }]);
       setLastResult(correct ? "correct" : "wrong");
       setUserInput("");
@@ -74,6 +79,7 @@ export default function RapidResponsePage() {
           setCurrentQ((c) => c + 1);
           setTimer(TIMER_SECONDS);
         } else {
+          gameAudio.sfx("win");
           setPhase("result");
         }
       }, 1200);
@@ -88,43 +94,84 @@ export default function RapidResponsePage() {
 
   if (phase === "start") {
     return (
-      <div className="flex min-h-dvh flex-col items-center justify-center px-4">
-        <div className="animate-scale-in w-full max-w-md text-center">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-fuchsia-500 to-rose-600 text-4xl shadow-lg shadow-fuchsia-500/20">
-            ⚡
-          </div>
-          <h1 className="mt-6 text-3xl font-black text-gray-900">⚡ Rapid Response</h1>
-          <p className="mt-3 text-sm text-gray-500">
-            Uji kecepatan berpikir bahasa! Tulis kata asosiasi yang relevan dalam{" "}
-            <span className="font-bold text-fuchsia-700">{TIMER_SECONDS} detik</span>.
-          </p>
-          <div className="mt-6 space-y-2 text-left text-xs text-gray-500">
-            <div className="flex items-start gap-2">
-              <span className="mt-0.5 text-fuchsia-600">●</span>
-              <span>12 kata prompt yang muncul satu per satu</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="mt-0.5 text-fuchsia-600">●</span>
-              <span>Tulis satu kata/frasa asosiasi secepat mungkin</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="mt-0.5 text-fuchsia-600">●</span>
-              <span>Setiap jawaban relevan = +{XP_PER_WORD} XP</span>
-            </div>
-          </div>
-          <button
-            onClick={() => setPhase("play")}
-            className="mt-8 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 to-rose-600 py-4 text-lg font-black text-white shadow-lg shadow-fuchsia-500/20 transition hover:scale-104 active:scale-96"
-          >
-            MULAI ▶
-          </button>
-          <button
-            onClick={() => router.push("/games")}
-            className="mt-3 text-xs font-bold text-gray-500 transition hover:text-gray-700"
-          >
-            ← Kembali ke Arcade
-          </button>
+      <div className="flex min-h-dvh flex-col items-center justify-center px-4 relative overflow-hidden">
+        <GameBackButton />
+        <div className="pointer-events-none absolute inset-0 z-0">
+          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, #1a0520 0%, #2d0a35 50%, #1a0520 100%)" }} />
+          {Array.from({ length: 24 }).map((_, i) => (
+            <div key={i} className="absolute rounded-full" style={{
+              left: `${(i * 17) % 100}%`,
+              top: `${(i * 31) % 100}%`,
+              width: 3 + (i % 4) * 2,
+              height: 3 + (i % 4) * 2,
+              background: ["#e879f9", "#d946ef", "#f472b6", "#facc15", "#a78bfa"][i % 5],
+              boxShadow: `0 0 ${6 + i % 4}px ${["#e879f9", "#d946ef", "#f472b6", "#facc15", "#a78bfa"][i % 5]}`,
+              animation: `gameFloat ${3 + (i % 5) * 0.8}s ${(i % 6) * 0.4}s ease-in-out infinite`,
+            }} />
+          ))}
+          {[0, 1, 2, 3].map((i) => (
+            <div key={`ring${i}`} className="absolute" style={{
+              left: `${20 + i * 20}%`,
+              top: `${15 + i * 18}%`,
+              width: 60 + i * 20,
+              height: 60 + i * 20,
+              borderRadius: "50%",
+              border: `1px solid ${["#e879f922", "#d946ef22", "#f472b622", "#facc1522"][i]}`,
+              animation: `gameSpin ${10 + i * 4}s linear infinite`,
+            }} />
+          ))}
         </div>
+        <div className="animate-scale-in w-full max-w-lg relative z-10">
+          <div
+            className="rounded-[28px] bg-white/95 backdrop-blur-sm p-10 text-center"
+            style={{ border: "5px solid #253057", boxShadow: "0 12px 0 #253057, 0 24px 50px rgba(37,48,87,0.3)" }}
+          >
+            <div
+              className="mx-auto flex h-24 w-24 items-center justify-center rounded-3xl text-5xl"
+              style={{ background: "linear-gradient(135deg, #e879f9, #d946ef)", border: "5px solid #253057", boxShadow: "0 8px 0 #a21caf" }}
+            >
+              ⚡
+            </div>
+            <h1 className="mt-7 font-display text-5xl text-slate-900" style={{ textShadow: "0 2px 0 rgba(37,48,87,0.08)" }}>
+              Rapid Response
+            </h1>
+            <p className="mt-4 font-body text-lg text-slate-600 leading-relaxed">
+              Uji kecepatan berpikir bahasa! Tulis kata asosiasi yang relevan dalam{" "}
+              <span className="font-bold text-fuchsia-700">{TIMER_SECONDS} detik</span>.
+            </p>
+            <div className="mt-7 space-y-3 text-left text-base font-semibold text-slate-600">
+              <div className="flex items-start gap-2.5">
+                <span className="mt-0.5 text-fuchsia-600 text-lg">●</span>
+                <span>12 kata prompt yang muncul satu per satu</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <span className="mt-0.5 text-fuchsia-600 text-lg">●</span>
+                <span>Tulis satu kata/frasa asosiasi secepat mungkin</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <span className="mt-0.5 text-fuchsia-600 text-lg">●</span>
+                <span>Setiap jawaban relevan = +{XP_PER_WORD} XP</span>
+              </div>
+            </div>
+            <button
+              onClick={() => { gameAudio.startMusic("action"); gameAudio.sfx("click"); setPhase("play"); }}
+              className="mt-9 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 to-rose-600 py-5 font-display text-2xl font-black text-white transition hover:scale-104 active:scale-96"
+              style={{ border: "5px solid #253057", boxShadow: "0 8px 0 #a21caf" }}
+            >
+              MULAI ▶
+            </button>
+            <button
+              onClick={() => router.push("/games")}
+              className="mt-5 font-body text-base font-semibold text-slate-500 transition hover:text-slate-700"
+            >
+              ← Kembali ke Arcade
+            </button>
+          </div>
+        </div>
+        <style>{`
+          @keyframes gameFloat { 0%,100% { transform: translateY(0); opacity: 0.15; } 50% { transform: translateY(-20px); opacity: 0.4; } }
+          @keyframes gameSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        `}</style>
       </div>
     );
   }
@@ -132,26 +179,27 @@ export default function RapidResponsePage() {
   if (phase === "result") {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center px-4">
+        <GameBackButton />
         <div className="animate-scale-in w-full max-w-md text-center">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-fuchsia-500/20 to-rose-600/20 text-4xl">
             🏆
           </div>
           <h1 className="mt-6 text-3xl font-black">Selesai!</h1>
-          <p className="mt-2 text-sm text-gray-500">Rapid Response</p>
+          <p className="mt-2 text-base font-semibold text-slate-600">Rapid Response</p>
           <div className="mt-8 grid grid-cols-3 gap-3">
             <div className="rounded-2xl border border-fuchsia-200 bg-fuchsia-50/70 p-4">
               <p className="text-3xl font-black text-fuchsia-700">{xp}</p>
-              <p className="mt-1 text-[11px] text-gray-500">XP Earned</p>
+              <p className="mt-1 text-xs font-bold text-slate-500">XP Earned</p>
             </div>
             <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
               <p className="text-3xl font-black text-emerald-700">{accuracy}%</p>
-              <p className="mt-1 text-[11px] text-gray-500">Akurasi</p>
+              <p className="mt-1 text-xs font-bold text-slate-500">Akurasi</p>
             </div>
             <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
               <p className="text-3xl font-black text-amber-700">
                 {answers.filter((a) => a.correct).length}/{WORD_PROMPTS.length}
               </p>
-                <p className="mt-1 text-[11px] text-gray-500">Relevan</p>
+                <p className="mt-1 text-xs font-bold text-slate-500">Relevan</p>
             </div>
           </div>
 

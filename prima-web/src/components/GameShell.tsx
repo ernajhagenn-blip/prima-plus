@@ -1,139 +1,95 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import { gameAudio } from "@/lib/gameAudio";
+
+const CLOUDS = [
+  { top: "7%", size: 110, dur: 70, delay: 0, o: 0.95 },
+  { top: "16%", size: 70, dur: 95, delay: -25, o: 0.85 },
+  { top: "27%", size: 140, dur: 120, delay: -55, o: 0.9 },
+  { top: "38%", size: 80, dur: 85, delay: -14, o: 0.7 },
+];
 
 export default function GameShell({ children }: { children: React.ReactNode }) {
-  const [muted, setMuted] = useState(true);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    const audio = new Audio();
-    audio.loop = true;
-    audio.volume = 0.3;
-    audioRef.current = audio;
-  }, []);
+  const [muted, setMuted] = useState(gameAudio.muted);
 
   const toggleMusic = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (muted) {
-      audio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
-      audio.play().catch(() => {});
-    } else {
-      audio.pause();
-    }
-    setMuted(!muted);
+    const m = !muted;
+    setMuted(m);
+    gameAudio.setMuted(m);
+    if (!m) gameAudio.resume();
   };
 
   return (
     <div style={{ position: "relative", minHeight: "100vh", width: "100%" }}>
-      {/* Layer 0: Background — fixed, never covers content */}
+      {/* Layer 0: Bright circuit sky — fixed, subtle */}
       <div style={{
         position: "fixed", inset: 0, zIndex: 0, overflow: "hidden",
-        background: "linear-gradient(180deg, #0a0e27 0%, #1a1f4e 30%, #2d1b69 60%, #0a0e27 100%)",
+        background: "linear-gradient(180deg, #4aa8ff 0%, #7cc4ff 40%, #b8e4ff 62%, #d9f1ff 71%, #8ccf96 72.5%, #6cc07b 100%)",
       }}>
-        {/* Animated nebula blobs */}
-        <div className="nebula n1" />
-        <div className="nebula n2" />
-        <div className="nebula n3" />
-
-        {/* Floating stars */}
-        {[...Array(30)].map((_, i) => (
-          <div key={i} className="star-field" style={{
-            left: `${(i * 3.3) % 100}%`,
-            top: `${(i * 7.1) % 100}%`,
-            width: `${2 + (i % 3)}px`,
-            height: `${2 + (i % 3)}px`,
-            animationDelay: `${i * 0.2}s`,
-            animationDuration: `${2 + (i % 4)}s`,
-          }} />
+        {/* Sun — kecil & subtle */}
+        <div style={{
+          position: "absolute", top: "5%", right: "7%", width: 72, height: 72, borderRadius: "50%",
+          background: "radial-gradient(circle, #fff7c2 0%, #FFD34D 60%, rgba(255,211,77,0) 75%)",
+          filter: "drop-shadow(0 0 26px rgba(255,211,77,0.4))",
+        }} />
+        {/* Clouds — lembut */}
+        {CLOUDS.map((c, i) => (
+          <div key={i} style={{
+            position: "absolute", left: 0, top: c.top, opacity: c.o * 0.55,
+            animation: `cloudDrift ${c.dur}s linear infinite`, animationDelay: `${c.delay}s`,
+          }}>
+            <div style={{
+              width: c.size, height: c.size * 0.34, background: "#ffffff", borderRadius: 999,
+              filter: "blur(2px)",
+              boxShadow: `${c.size * 0.22}px ${-c.size * 0.1}px 0 #ffffff, ${-c.size * 0.2}px ${-c.size * 0.06}px 0 rgba(255,255,255,0.9)`,
+            }} />
+          </div>
         ))}
-
-        {/* Shooting stars */}
-        <div className="shooting-star ss1" />
-        <div className="shooting-star ss2" />
-        <div className="shooting-star ss3" />
+        {/* Kart melintas di rumput */}
+        <div style={{ position: "absolute", bottom: "6%", left: 0, fontSize: 58, animation: "shellDrive 15s linear infinite", filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.25))" }}>
+          🏎️
+        </div>
+        <div style={{ position: "absolute", bottom: "22%", left: 0, fontSize: 42, opacity: 0.8, animation: "shellDrive 24s 7s linear infinite", filter: "drop-shadow(0 3px 5px rgba(0,0,0,0.2))" }}>
+          🚙
+        </div>
+        {/* Balon melayang */}
+        <div style={{ position: "absolute", left: "8%", top: "14%", fontSize: 48, animation: "shellBob 9s ease-in-out infinite" }}>🎈</div>
+        <div style={{ position: "absolute", left: "84%", top: "32%", fontSize: 40, animation: "shellBob 12s 3s ease-in-out infinite" }}>🎈</div>
+        {/* Burung */}
+        <div style={{ position: "absolute", left: 0, top: "20%", fontSize: 32, opacity: 0.7, animation: "cloudDrift 38s linear infinite" }}>🕊️</div>
       </div>
 
-      {/* Layer 1: Music button — always on top */}
+      {/* Layer 1: Global music toggle */}
       <button onClick={toggleMusic} style={{
         position: "fixed", top: 12, right: 12, zIndex: 200,
-        width: 44, height: 44, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.15)",
-        background: "rgba(255,255,255,0.08)", backdropFilter: "blur(12px)",
-        fontSize: "1.2rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-        transition: "all 0.2s", boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
+        width: 46, height: 46, borderRadius: "50%", border: "3px solid rgba(255,255,255,0.85)",
+        background: "linear-gradient(180deg, #a855f7, #7c3aed)",
+        fontSize: "1.15rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+        transition: "all 0.15s", boxShadow: "0 4px 0 #4c1d95, 0 8px 18px rgba(124,58,237,0.45)",
       }}
-        onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.15)"; e.currentTarget.style.transform = "scale(1.1)"; }}
-        onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.transform = "scale(1)"; }}
+        onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.08)"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
         title={muted ? "Nyalakan musik" : "Matikan musik"}
       >
         {muted ? "🔇" : "🔊"}
       </button>
 
-      {/* Layer 2: Content — always above everything */}
+      {/* Layer 2: Content */}
       <div style={{ position: "relative", zIndex: 10, minHeight: "100vh", width: "100%" }}>
         {children}
       </div>
 
       <style>{`
-        .nebula {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(80px);
-          opacity: 0.15;
-          animation: nebulaPulse 8s ease-in-out infinite;
+        @keyframes cloudDrift { 0% { transform: translateX(-30vw); } 100% { transform: translateX(130vw); } }
+        @keyframes shellDrive {
+          0% { transform: translateX(-15vw) scaleX(1); }
+          49% { transform: translateX(108vw) scaleX(1); }
+          50% { transform: translateX(108vw) scaleX(-1); }
+          99% { transform: translateX(-15vw) scaleX(-1); }
+          100% { transform: translateX(-15vw) scaleX(1); }
         }
-        .n1 { width: 400px; height: 400px; top: 10%; left: 20%; background: #7c3aed; animation-delay: 0s; }
-        .n2 { width: 350px; height: 350px; top: 50%; right: 10%; background: #ec4899; animation-delay: 3s; }
-        .n3 { width: 300px; height: 300px; bottom: 10%; left: 40%; background: #06b6d4; animation-delay: 5s; }
-
-        @keyframes nebulaPulse {
-          0%, 100% { opacity: 0.1; transform: scale(1); }
-          50% { opacity: 0.2; transform: scale(1.15); }
-        }
-
-        .star-field {
-          position: absolute;
-          background: white;
-          border-radius: 50%;
-          animation: starTwinkle 3s ease-in-out infinite;
-        }
-        @keyframes starTwinkle {
-          0%, 100% { opacity: 0.2; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.5); }
-        }
-
-        .shooting-star {
-          position: absolute;
-          width: 3px;
-          height: 3px;
-          background: white;
-          border-radius: 50%;
-          box-shadow: 0 0 6px 2px rgba(255,255,255,0.6);
-          opacity: 0;
-        }
-        .shooting-star::after {
-          content: "";
-          position: absolute;
-          top: 0;
-          right: 0;
-          width: 60px;
-          height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
-          transform-origin: right center;
-          transform: rotate(0deg);
-        }
-        .ss1 { top: 15%; animation: shoot 4s 1s linear infinite; }
-        .ss2 { top: 35%; animation: shoot 5s 3s linear infinite; }
-        .ss3 { top: 55%; animation: shoot 6s 5s linear infinite; }
-
-        @keyframes shoot {
-          0% { transform: translateX(0) translateY(0); opacity: 0; }
-          5% { opacity: 1; }
-          15% { opacity: 1; }
-          20% { transform: translateX(-300px) translateY(100px); opacity: 0; }
-          100% { opacity: 0; }
-        }
+        @keyframes shellBob { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-22px) rotate(5deg); } }
       `}</style>
     </div>
   );

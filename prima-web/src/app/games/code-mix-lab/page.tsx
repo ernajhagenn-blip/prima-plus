@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { gameAudio } from "@/lib/gameAudio";
+import GameBackButton from "@/components/GameBackButton";
 
 interface Question {
   mixedMessage: string;
@@ -138,6 +140,8 @@ const XP_PER_CORRECT = 12;
 
 export default function CodeMixLabPage() {
   const router = useRouter();
+
+  useEffect(() => () => gameAudio.stopMusic(), []);
   const [phase, setPhase] = useState<"start" | "play" | "result">("start");
   const [currentQ, setCurrentQ] = useState(0);
   const [score, setScore] = useState(0);
@@ -149,6 +153,7 @@ export default function CodeMixLabPage() {
     (answer: string) => {
       const q = QUESTIONS[currentQ];
       const correct = answer === q.correctAnswer;
+      gameAudio.sfx(correct ? "correct" : "wrong");
       if (correct) setScore((s) => s + XP_PER_CORRECT);
       setAnswers((a) => [...a, correct]);
       setSelected(answer);
@@ -159,6 +164,7 @@ export default function CodeMixLabPage() {
           setSelected(null);
           setShowFeedback(false);
         } else {
+          gameAudio.sfx("win");
           setPhase("result");
         }
       }, 2500);
@@ -172,70 +178,95 @@ export default function CodeMixLabPage() {
 
   if (phase === "start") {
     return (
-      <div style={{ minHeight: "100vh", width: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "1.5rem" }}>
-        <div style={{ width: "100%", maxWidth: "28rem", textAlign: "center", animation: "scaleIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both" }}>
-          {/* Animated beaker icon */}
-          <div style={{
-            width: "80px", height: "80px", borderRadius: "24px", margin: "0 auto",
-            background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2.5rem",
-            boxShadow: "0 8px 32px rgba(139,92,246,0.4)", animation: "floatBounce 3s ease-in-out infinite",
-          }}>🧪</div>
+      <div className="flex min-h-dvh flex-col items-center justify-center px-4 relative overflow-hidden">
+        <GameBackButton />
+        <div className="pointer-events-none absolute inset-0 z-0">
+          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, #0f0a1a 0%, #1a1030 50%, #0f0a1a 100%)" }} />
+          {Array.from({ length: 24 }).map((_, i) => (
+            <div key={i} className="absolute rounded-full" style={{
+              left: `${(i * 17) % 100}%`,
+              top: `${(i * 31) % 100}%`,
+              width: 3 + (i % 4) * 2,
+              height: 3 + (i % 4) * 2,
+              background: ["#a78bfa", "#8b5cf6", "#c084fc", "#f472b6", "#38bdf8"][i % 5],
+              boxShadow: `0 0 ${6 + i % 4}px ${["#a78bfa", "#8b5cf6", "#c084fc", "#f472b6", "#38bdf8"][i % 5]}`,
+              animation: `gameFloat ${3 + (i % 5) * 0.8}s ${(i % 6) * 0.4}s ease-in-out infinite`,
+            }} />
+          ))}
+          {[0, 1, 2, 3].map((i) => (
+            <div key={`ring${i}`} className="absolute" style={{
+              left: `${20 + i * 20}%`,
+              top: `${15 + i * 18}%`,
+              width: 60 + i * 20,
+              height: 60 + i * 20,
+              borderRadius: "50%",
+              border: `1px solid ${["#a78bfa22", "#8b5cf622", "#c084fc22", "#f472b622"][i]}`,
+              animation: `gameSpin ${10 + i * 4}s linear infinite`,
+            }} />
+          ))}
+        </div>
+        <div className="animate-scale-in w-full max-w-lg relative z-10">
+          <div
+            className="rounded-[28px] bg-white/95 backdrop-blur-sm p-10 text-center"
+            style={{ border: "5px solid #253057", boxShadow: "0 12px 0 #253057, 0 24px 50px rgba(37,48,87,0.3)" }}
+          >
+            <div
+              className="mx-auto flex items-center justify-center rounded-3xl text-5xl"
+              style={{
+                width: "96px", height: "96px",
+                background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
+                border: "5px solid #253057", boxShadow: "0 8px 0 #6d28d9",
+              }}
+            >🧪</div>
 
-          <h1 style={{
-            fontFamily: "'Righteous', 'Arial Black', Impact, sans-serif",
-            fontSize: "clamp(1.8rem, 6vw, 2.5rem)", fontWeight: 900, color: "white",
-            margin: "20px 0 0", textShadow: "0 2px 8px rgba(0,0,0,0.3)",
-          }}>Code-Mix Lab</h1>
+            <h1 className="font-display text-5xl text-slate-900 mt-7" style={{ textShadow: "0 2px 0 rgba(37,48,87,0.08)" }}>
+              Code-Mix Lab
+            </h1>
 
-          <p style={{
-            fontFamily: "'Nunito', sans-serif", fontSize: "0.85rem", fontWeight: 600,
-            color: "rgba(255,255,255,0.5)", margin: "8px 0 0", lineHeight: 1.6,
-          }}>Analisis fenomena code-mixing dalam percakapan sehari-hari remaja Indonesia.</p>
+            <p className="font-body text-lg text-slate-600 mt-4 leading-relaxed">
+              Analisis fenomena code-mixing dalam percakapan sehari-hari remaja Indonesia.
+            </p>
 
-          {/* Feature cards */}
-          <div style={{ marginTop: "24px", display: "flex", flexDirection: "column", gap: "8px" }}>
-            {[
-              { icon: "🔬", title: "10 Kasus Nyata", desc: "Pesan campuran bahasa Indonesia-Inggris dari percakapan sehari-hari" },
-              { icon: "🧩", title: "Analisis Mendalam", desc: "Identifikasi jenis code-mixing, padanan baku, dan dampak linguistik" },
-              { icon: "⚡", title: "+12 XP per Jawaban", desc: "Setiap analisis benar meningkatkan skor kesadaran bahasamu" },
-            ].map((f, i) => (
-              <div key={i} style={{
-                display: "flex", alignItems: "center", gap: "12px", padding: "12px 14px", borderRadius: "14px",
-                background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", textAlign: "left",
-              }}>
-                <div style={{
-                  width: "40px", height: "40px", borderRadius: "12px", flexShrink: 0,
-                  background: "rgba(139,92,246,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.2rem",
-                }}>{f.icon}</div>
-                <div>
-                  <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.75rem", fontWeight: 800, color: "rgba(255,255,255,0.85)", margin: 0 }}>{f.title}</p>
-                  <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.65rem", fontWeight: 600, color: "rgba(255,255,255,0.4)", margin: "2px 0 0" }}>{f.desc}</p>
+            <div className="mt-7 flex flex-col gap-3">
+              {[
+                { icon: "🔬", title: "10 Kasus Nyata", desc: "Pesan campuran bahasa Indonesia-Inggris dari percakapan sehari-hari" },
+                { icon: "🧩", title: "Analisis Mendalam", desc: "Identifikasi jenis code-mixing, padanan baku, dan dampak linguistik" },
+                { icon: "⚡", title: "+12 XP per Jawaban", desc: "Setiap analisis benar meningkatkan skor kesadaran bahasamu" },
+              ].map((f, i) => (
+                <div key={i} className="flex items-center gap-3 rounded-[14px] bg-white p-4 text-left" style={{ border: "1px solid rgba(37,48,87,0.1)" }}>
+                  <div
+                    className="flex shrink-0 items-center justify-center rounded-xl text-xl"
+                    style={{ width: "48px", height: "48px", background: "rgba(139,92,246,0.15)" }}
+                  >{f.icon}</div>
+                  <div>
+                    <p className="font-body text-base font-semibold text-slate-600 m-0">{f.title}</p>
+                    <p className="font-body text-sm text-slate-500 m-0">{f.desc}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            <button
+              onClick={() => { gameAudio.startMusic("mystery"); gameAudio.sfx("click"); setPhase("play"); }}
+              className="font-display mt-8 w-full cursor-pointer rounded-2xl py-5 text-2xl font-bold tracking-wide text-white transition-all hover:-translate-y-0.5 active:translate-y-0"
+              style={{
+                background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
+                border: "5px solid #253057", boxShadow: "0 8px 0 #6d28d9",
+              }}
+            >
+              MULAI ▶
+            </button>
+            <button
+              onClick={() => router.push("/games")}
+              className="font-body mt-5 text-base font-semibold text-slate-500 transition hover:text-slate-700"
+            >
+              ← Kembali ke Arcade
+            </button>
           </div>
-
-          <button onClick={() => setPhase("play")} style={{
-            marginTop: "24px", width: "100%", padding: "16px", borderRadius: "16px",
-            fontFamily: "'Righteous', 'Arial Black', Impact, sans-serif", fontSize: "1.1rem", fontWeight: 900,
-            color: "white", border: "none", cursor: "pointer", letterSpacing: "0.05em",
-            background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
-            boxShadow: "0 4px 0 #6d28d9, 0 6px 0 #5b21b6, 0 10px 24px rgba(139,92,246,0.4), inset 0 2px 0 rgba(255,255,255,0.2)",
-            transition: "all 0.15s",
-          }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
-          >MULAI ▶</button>
-
-          <button onClick={() => router.push("/games")} style={{
-            marginTop: "12px", fontFamily: "'Nunito', sans-serif", fontSize: "0.7rem", fontWeight: 700,
-            color: "rgba(255,255,255,0.4)", background: "none", border: "none", cursor: "pointer",
-          }}>← Kembali ke Arcade</button>
         </div>
         <style>{`
-          @keyframes scaleIn { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
-          @keyframes floatBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+          @keyframes gameFloat { 0%,100% { transform: translateY(0); opacity: 0.15; } 50% { transform: translateY(-20px); opacity: 0.4; } }
+          @keyframes gameSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         `}</style>
       </div>
     );
@@ -246,8 +277,8 @@ export default function CodeMixLabPage() {
       <div style={{ minHeight: "100vh", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: "1.5rem" }}>
         <div style={{ width: "100%", maxWidth: "28rem", textAlign: "center", animation: "scaleIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both" }}>
           <div style={{ fontSize: "4rem" }}>🏆</div>
-          <h1 style={{ fontFamily: "'Righteous', 'Arial Black', Impact, sans-serif", fontSize: "clamp(1.8rem, 6vw, 2.5rem)", fontWeight: 900, color: "white", margin: "16px 0 0" }}>Selesai!</h1>
-          <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 600, color: "rgba(255,255,255,0.5)", margin: "4px 0 0" }}>Code-Mix Lab</p>
+          <h1 style={{ fontFamily: "'Righteous', 'Arial Black', Impact, sans-serif", fontSize: "clamp(1.8rem, 6vw, 2.5rem)", fontWeight: 900, color: "#1e293b", margin: "16px 0 0" }}>Selesai!</h1>
+          <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "1rem", fontWeight: 700, color: "#64748b", margin: "4px 0 0" }}>Code-Mix Lab</p>
 
           <div style={{ marginTop: "24px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }}>
             {[
@@ -257,7 +288,7 @@ export default function CodeMixLabPage() {
             ].map((s, i) => (
               <div key={i} style={{ padding: "14px 8px", borderRadius: "14px", background: s.bg, border: `1px solid ${s.color}20` }}>
                 <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: "1.5rem", fontWeight: 900, color: s.color, margin: 0 }}>{s.value}</p>
-                <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.6rem", fontWeight: 700, color: "rgba(255,255,255,0.4)", margin: "4px 0 0" }}>{s.label}</p>
+                <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 800, color: "#64748b", margin: "4px 0 0" }}>{s.label}</p>
               </div>
             ))}
           </div>
@@ -265,11 +296,11 @@ export default function CodeMixLabPage() {
           <div style={{ display: "flex", gap: "10px", marginTop: "24px" }}>
             <button onClick={() => { setPhase("play"); setCurrentQ(0); setScore(0); setSelected(null); setShowFeedback(false); setAnswers([]); }} style={{
               flex: 1, padding: "12px", borderRadius: "14px", fontFamily: "'Nunito', sans-serif", fontSize: "0.85rem", fontWeight: 800,
-              color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", cursor: "pointer",
+              color: "#334155", border: "1px solid rgba(255,255,255,0.1)", background: "#ffffff", cursor: "pointer",
             }}>🔄 Main Lagi</button>
             <button onClick={() => router.push("/games")} style={{
               flex: 1, padding: "12px", borderRadius: "14px", fontFamily: "'Nunito', sans-serif", fontSize: "0.85rem", fontWeight: 800,
-              color: "white", border: "none", cursor: "pointer",
+              color: "#1e293b", border: "none", cursor: "pointer",
               background: "linear-gradient(135deg, #8b5cf6, #a855f7)", boxShadow: "0 4px 0 #6d28d9, inset 0 1px 0 rgba(255,255,255,0.2)",
             }}>ke Arcade →</button>
           </div>
@@ -281,15 +312,16 @@ export default function CodeMixLabPage() {
 
   return (
     <div style={{ minHeight: "100vh", width: "100%", display: "flex", flexDirection: "column" }}>
+      <GameBackButton />
       {/* Top bar */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px" }}>
         <button onClick={() => router.push("/games")} style={{
           padding: "6px 12px", borderRadius: "8px", fontFamily: "'Nunito', sans-serif", fontSize: "0.7rem", fontWeight: 700,
-          color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", cursor: "pointer",
+          color: "#64748b", border: "1px solid rgba(255,255,255,0.1)", background: "#ffffff", cursor: "pointer",
         }}>✕</button>
         <div style={{ textAlign: "center" }}>
           <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.55rem", fontWeight: 800, letterSpacing: "0.1em", color: "#a855f7", textTransform: "uppercase", margin: 0 }}>🧪 Code-Mix Lab</p>
-          <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.75rem", fontWeight: 700, color: "rgba(255,255,255,0.7)", margin: "2px 0 0" }}>{currentQ + 1} / {QUESTIONS.length}</p>
+          <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.75rem", fontWeight: 700, color: "#334155", margin: "2px 0 0" }}>{currentQ + 1} / {QUESTIONS.length}</p>
         </div>
         <div style={{
           padding: "6px 12px", borderRadius: "8px",
@@ -304,7 +336,7 @@ export default function CodeMixLabPage() {
           {/* Mixed message card */}
           <div style={{
             padding: "18px", borderRadius: "18px",
-            background: "rgba(255,255,255,0.06)", backdropFilter: "blur(16px)",
+            background: "rgba(255,255,255,0.9)", backdropFilter: "blur(16px)",
             border: "1px solid rgba(139,92,246,0.15)",
           }}>
             <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.6rem", fontWeight: 800, letterSpacing: "0.1em", color: "#a855f7", textTransform: "uppercase", margin: 0 }}>🔬 Pesan campuran</p>
@@ -312,9 +344,9 @@ export default function CodeMixLabPage() {
               marginTop: "10px", padding: "14px", borderRadius: "12px",
               background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.12)",
             }}>
-              <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.85rem", fontWeight: 600, color: "rgba(255,255,255,0.85)", margin: 0, lineHeight: 1.6, fontStyle: "italic" }}>&quot;{q.mixedMessage}&quot;</p>
+              <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "1rem", fontWeight: 700, color: "#1e293b", margin: 0, lineHeight: 1.6, fontStyle: "italic" }}>&quot;{q.mixedMessage}&quot;</p>
             </div>
-            <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.85rem", fontWeight: 700, color: "rgba(255,255,255,0.9)", margin: "14px 0 0", lineHeight: 1.6 }}>{q.question}</p>
+            <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.95rem", fontWeight: 800, color: "#0f172a", margin: "14px 0 0", lineHeight: 1.6 }}>{q.question}</p>
           </div>
 
           {/* Options */}
@@ -322,9 +354,9 @@ export default function CodeMixLabPage() {
             {q.options.map((opt, i) => {
               const isCorrect = opt === q.correctAnswer;
               const isSelected = opt === selected;
-              let border = "1px solid rgba(255,255,255,0.08)";
-              let bg = "rgba(255,255,255,0.03)";
-              let textColor = "rgba(255,255,255,0.75)";
+              let border = "1px solid rgba(30,41,59,0.12)";
+              let bg = "rgba(248,250,252,0.9)";
+              let textColor = "#334155";
               if (showFeedback && isCorrect) { border = "2px solid #10b981"; bg = "rgba(16,185,129,0.12)"; textColor = "#34d399"; }
               else if (showFeedback && isSelected && !isCorrect) { border = "2px solid #f43f5e"; bg = "rgba(244,63,94,0.12)"; textColor = "#fb7185"; }
 
@@ -343,7 +375,7 @@ export default function CodeMixLabPage() {
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontFamily: "'Righteous', sans-serif", fontSize: "0.7rem", fontWeight: 900, color: textColor,
                   }}>{String.fromCharCode(65 + i)}.</span>
-                  <span style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 600, color: textColor, lineHeight: 1.6 }}>{opt}</span>
+                  <span style={{ fontFamily: "'Nunito', sans-serif", fontSize: "1rem", fontWeight: 700, color: textColor, lineHeight: 1.6 }}>{opt}</span>
                 </button>
               );
             })}
@@ -357,7 +389,7 @@ export default function CodeMixLabPage() {
               animation: "fadeIn 0.3s ease-out both",
             }}>
               <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.65rem", fontWeight: 800, color: "#a855f7", margin: 0 }}>💡 Penjelasan:</p>
-              <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 600, color: "rgba(255,255,255,0.65)", margin: "6px 0 0", lineHeight: 1.6 }}>{q.explanation}</p>
+              <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: "1rem", fontWeight: 700, color: "rgba(255,255,255,0.65)", margin: "6px 0 0", lineHeight: 1.6 }}>{q.explanation}</p>
             </div>
           )}
         </div>

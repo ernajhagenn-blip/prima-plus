@@ -11,10 +11,14 @@ const R = 180;
 const W = 64;
 const RI = R - W / 2;
 const RO = R + W / 2;
-const CAMD = 34;
-const CAMH = 17;
+const CAMD = 55;
+const CAMH = 28;
 const MAXBASE = 150;
 const RACE_TIME = 240;
+
+const trackWobble = (a: number) => Math.sin(a * 3) * 26 + Math.cos(a * 5) * 13 + Math.sin(a * 2 + 0.7) * 14;
+const trackR = (a: number) => R + trackWobble(a);
+const trackY = (a: number) => 12 + Math.sin(a * 2) * 8 + Math.sin(a * 3 + 1.2) * 4;
 
 type ItemKind = "mushroom" | "banana" | "green" | "red" | "star";
 const ITEMS: Record<ItemKind, { icon: string }> = {
@@ -127,6 +131,32 @@ function makeCheckerTex(c1: string, c2: string, rep: number) {
   return t;
 }
 
+function buildStrip(
+  a0: number, a1: number, latA: number, latB: number, dyA: number, dyB: number,
+  mat: THREE.Material, segs: number, uvRep: number, uvSwap = false, groundA = false, groundB = false,
+): THREE.Mesh {
+  const pos: number[] = [], uv: number[] = [], idx: number[] = [];
+  for (let i = 0; i <= segs; i++) {
+    const f = i / segs;
+    const a = a0 + (a1 - a0) * f;
+    const r = trackR(a), y = trackY(a);
+    const cx = Math.cos(a), cz = Math.sin(a);
+    const yA = groundA ? 0 : y + dyA;
+    const yB = groundB ? 0 : y + dyB;
+    pos.push(cx * (r + latA), yA, cz * (r + latA));
+    pos.push(cx * (r + latB), yB, cz * (r + latB));
+    if (uvSwap) uv.push(0, f * uvRep, 1, f * uvRep);
+    else uv.push(f * uvRep, 0, f * uvRep, 1);
+    if (i < segs) { const b = i * 2; idx.push(b, b + 1, b + 2, b + 1, b + 3, b + 2); }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx);
+  g.computeVertexNormals();
+  return new THREE.Mesh(g, mat);
+}
+
 function makeTextTex(text: string, bg: string, fg: string) {
   const cv = document.createElement("canvas");
   cv.width = 512; cv.height = 96;
@@ -140,7 +170,7 @@ function makeTextTex(text: string, bg: string, fg: string) {
   return t;
 }
 
-function buildKart(body: string, accent: string, suit: string): THREE.Group {
+function buildKart(body: string, accent: string, suit: string, name?: string): THREE.Group {
   const g = new THREE.Group();
   const mBody = new THREE.MeshStandardMaterial({ color: new THREE.Color(body), roughness: 0.4, metalness: 0.15 });
   const mAcc = new THREE.MeshStandardMaterial({ color: new THREE.Color(accent), roughness: 0.35, metalness: 0.2 });
@@ -166,6 +196,20 @@ function buildKart(body: string, accent: string, suit: string): THREE.Group {
   });
   const torso = new THREE.Mesh(new THREE.CapsuleGeometry(4.6, 4.5, 6, 16), new THREE.MeshStandardMaterial({ color: new THREE.Color(suit), roughness: 0.5 }));
   torso.position.set(0, 14.5, -2); g.add(torso);
+  const armMat = new THREE.MeshStandardMaterial({ color: new THREE.Color(suit), roughness: 0.5 });
+  const armGeo = new THREE.CapsuleGeometry(1.8, 7, 4, 8);
+  const armL = new THREE.Mesh(armGeo, armMat);
+  armL.position.set(-6.5, 13, 4); armL.rotation.z = 0.3; armL.rotation.x = -0.5; g.add(armL);
+  const armR = new THREE.Mesh(armGeo, armMat);
+  armR.position.set(6.5, 13, 4); armR.rotation.z = -0.3; armR.rotation.x = -0.5; g.add(armR);
+  const handGeo = new THREE.SphereGeometry(2, 10, 8);
+  const handL = new THREE.Mesh(handGeo, mSkin);
+  handL.position.set(-8, 10.5, 8); g.add(handL);
+  const handR = new THREE.Mesh(handGeo, mSkin);
+  handR.position.set(8, 10.5, 8); g.add(handR);
+  const wheelGeo = new THREE.TorusGeometry(3.5, 0.6, 8, 24);
+  const steeringWheel = new THREE.Mesh(wheelGeo, new THREE.MeshStandardMaterial({ color: 0x1a1a2e, roughness: 0.3, metalness: 0.5 }));
+  steeringWheel.position.set(0, 11, 10); steeringWheel.rotation.x = -0.4; g.add(steeringWheel);
   const head = new THREE.Mesh(new THREE.SphereGeometry(6.4, 24, 18), mSkin);
   head.position.set(0, 23, -2); head.scale.set(1, 1.06, 1); g.add(head);
   const helmet = new THREE.Mesh(new THREE.SphereGeometry(7.4, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.55), new THREE.MeshStandardMaterial({ color: new THREE.Color(body), roughness: 0.35 }));
@@ -174,6 +218,24 @@ function buildKart(body: string, accent: string, suit: string): THREE.Group {
   visor.position.set(0, 22.5, 3.6); g.add(visor);
   const shadow = new THREE.Mesh(new THREE.CircleGeometry(13, 20), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.3 }));
   shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.06; g.add(shadow);
+  if (name) {
+    const cv = document.createElement("canvas");
+    cv.width = 256; cv.height = 64;
+    const cx = cv.getContext("2d")!;
+    cx.clearRect(0, 0, 256, 64);
+    cx.fillStyle = "rgba(0,0,0,0.55)";
+    cx.beginPath(); cx.roundRect(4, 4, 248, 56, 14); cx.fill();
+    cx.font = "900 36px Arial Black, sans-serif";
+    cx.textAlign = "center"; cx.textBaseline = "middle";
+    cx.fillStyle = "#ffffff";
+    cx.fillText(name, 128, 34);
+    const tex = new THREE.CanvasTexture(cv);
+    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+    const sprite = new THREE.Sprite(mat);
+    sprite.scale.set(12, 3, 1);
+    sprite.position.set(0, 36, -2);
+    g.add(sprite);
+  }
   return g;
 }
 
@@ -244,8 +306,8 @@ export default function KartRace3DWeb({
     started: false, finished: false, paused: false,
     raceTime: 0, usedQ: new Set<number>(),
     audio: new AudioEngine(),
-    camPos: new THREE.Vector3(0, CAMH, R + CAMD),
-    camLook: new THREE.Vector3(0, 3, R),
+    camPos: new THREE.Vector3(0, trackY(Math.PI / 2) + CAMH, trackR(Math.PI / 2) + CAMD),
+    camLook: new THREE.Vector3(0, trackY(Math.PI / 2) + 3, trackR(Math.PI / 2)),
     fov: 62,
     steerVis: 0,
   });
@@ -263,6 +325,7 @@ export default function KartRace3DWeb({
     gateMeshes: THREE.Mesh[];
     sparks: { m: THREE.Mesh; life: number; vy: number }[];
     glbKarts: THREE.Group[];
+    arena?: THREE.Group;
     spawnSpark?: (x: number, z: number, color: string) => void;
     ready: boolean;
   }>({ aiMeshes: [], coinMeshes: [], boxMeshes: [], gateMeshes: [], sparks: [], glbKarts: [], ready: false });
@@ -272,7 +335,7 @@ export default function KartRace3DWeb({
     if (!mount) return;
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x6ec6ff);
-    scene.fog = new THREE.Fog(0xa8ddff, 240, 900);
+    scene.fog = new THREE.Fog(0xa8ddff, 300, 1200);
     const camera = new THREE.PerspectiveCamera(62, mount.clientWidth / mount.clientHeight, 0.1, 2000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -284,36 +347,34 @@ export default function KartRace3DWeb({
     sunL.position.set(120, 220, 80);
     scene.add(sunL);
 
+    const FULL = Math.PI * 2;
     const grass = new THREE.Mesh(new THREE.CircleGeometry(900, 48), new THREE.MeshStandardMaterial({ color: 0x4dbd68, roughness: 1 }));
     grass.rotation.x = -Math.PI / 2; grass.position.y = -0.05;
     scene.add(grass);
-
-    const road = new THREE.Mesh(new THREE.RingGeometry(RI, RO, 128), new THREE.MeshStandardMaterial({ color: 0x414658, roughness: 0.9, side: THREE.DoubleSide }));
-    road.rotation.x = -Math.PI / 2; road.position.y = 0.01;
-    scene.add(road);
-    const curbOut = new THREE.Mesh(new THREE.RingGeometry(RO - 4, RO, 160), new THREE.MeshStandardMaterial({ map: makeCheckerTex("#e74c3c", "#f8f8f8", 64), roughness: 0.7, side: THREE.DoubleSide }));
-    curbOut.rotation.x = -Math.PI / 2; curbOut.position.y = 0.02;
-    scene.add(curbOut);
-    const curbIn = new THREE.Mesh(new THREE.RingGeometry(RI, RI + 4, 160), new THREE.MeshStandardMaterial({ map: makeCheckerTex("#f8f8f8", "#e74c3c", 64), roughness: 0.7, side: THREE.DoubleSide }));
-    curbIn.rotation.x = -Math.PI / 2; curbIn.position.y = 0.02;
-    scene.add(curbIn);
-    const dash = new THREE.Mesh(new THREE.RingGeometry(R - 1.4, R + 1.4, 160), new THREE.MeshBasicMaterial({ map: makeCheckerTex("#e8e8f0", "#414658", 48), side: THREE.DoubleSide }));
-    dash.rotation.x = -Math.PI / 2; dash.position.y = 0.03;
-    scene.add(dash);
-    const startLine = new THREE.Mesh(new THREE.PlaneGeometry(W, 8), new THREE.MeshBasicMaterial({ map: makeCheckerTex("#ffffff", "#1f2430", 8) }));
-    startLine.rotation.x = -Math.PI / 2; startLine.position.set(0, 0.04, R);
-    scene.add(startLine);
+    const roadMat = new THREE.MeshStandardMaterial({ color: 0x414658, roughness: 0.9, side: THREE.DoubleSide });
+    scene.add(buildStrip(0, FULL, -W / 2, W / 2, 0, 0, roadMat, 260, 1));
+    const curbMat = new THREE.MeshStandardMaterial({ map: makeCheckerTex("#e74c3c", "#f8f8f8", 90), roughness: 0.7, side: THREE.DoubleSide });
+    scene.add(buildStrip(0, FULL, -W / 2 - 4.5, -W / 2, 0.08, 0.08, curbMat, 260, 90));
+    scene.add(buildStrip(0, FULL, W / 2, W / 2 + 4.5, 0.08, 0.08, curbMat, 260, 90));
+    const skirtMat = new THREE.MeshStandardMaterial({ color: 0x46b25c, roughness: 1, side: THREE.DoubleSide });
+    scene.add(buildStrip(0, FULL, -W / 2 - 40, -W / 2 - 4.5, 0, 0.02, skirtMat, 200, 1, false, true, false));
+    scene.add(buildStrip(0, FULL, W / 2 + 4.5, W / 2 + 40, 0.02, 0, skirtMat, 200, 1, false, false, true));
+    const dashMat = new THREE.MeshBasicMaterial({ map: makeCheckerTex("#e8e8f0", "#414658", 70), side: THREE.DoubleSide });
+    scene.add(buildStrip(0, FULL, -1.5, 1.5, 0.1, 0.1, dashMat, 260, 70));
+    const startTex = makeCheckerTex("#ffffff", "#1f2430", 10);
+    const startStrip = buildStrip(Math.PI / 2 - 0.026, Math.PI / 2 + 0.026, -W / 2 * 0.96, W / 2 * 0.96, 0.12, 0.12, new THREE.MeshBasicMaterial({ map: startTex, side: THREE.DoubleSide }), 4, 10, true);
+    scene.add(startStrip);
 
     for (let i = 0; i < 26; i++) {
       const ta = (i / 26) * Math.PI * 2 + 0.12;
       const tr = buildTree(i % 3 === 0);
-      tr.position.set(Math.cos(ta) * (RO + 42), 0, Math.sin(ta) * (RO + 42));
+      tr.position.set(Math.cos(ta) * (trackR(ta) + 52), 0, Math.sin(ta) * (trackR(ta) + 52));
       scene.add(tr);
     }
     for (let i = 0; i < 10; i++) {
       const ta = i * 0.63 + 0.3;
       const tr = buildTree(false);
-      tr.position.set(Math.cos(ta) * (RI - 55), 0, Math.sin(ta) * (RI - 55));
+      tr.position.set(Math.cos(ta) * (trackR(ta) - 62), 0, Math.sin(ta) * (trackR(ta) - 62));
       tr.scale.setScalar(0.8);
       scene.add(tr);
     }
@@ -332,12 +393,20 @@ export default function KartRace3DWeb({
     }
     T.current.balloons = balloons;
 
-    const pillarGeo = new THREE.CylinderGeometry(2.5, 2.5, 36, 12);
+    const startA = Math.PI / 2;
+    const bannerGroup = new THREE.Group();
+    const pillarGeo = new THREE.CylinderGeometry(2.5, 2.5, 40, 12);
     const pillarM = new THREE.MeshStandardMaterial({ color: 0xc8ccd8, roughness: 0.5 });
-    const p1 = new THREE.Mesh(pillarGeo, pillarM); p1.position.set(RI - 14, 18, R); scene.add(p1);
-    const p2 = new THREE.Mesh(pillarGeo, pillarM); p2.position.set(RO + 14, 18, R); scene.add(p2);
-    const banner = new THREE.Mesh(new THREE.BoxGeometry(W + 56, 9, 3), new THREE.MeshStandardMaterial({ map: makeTextTex("PRIMA KART", "#1c1f2b", "#FFD34D"), roughness: 0.6 }));
-    banner.position.set(0, 34, R); scene.add(banner);
+    const halfSpan = W / 2 + 16;
+    const pilL = new THREE.Mesh(pillarGeo, pillarM); pilL.position.set(-halfSpan, 20, 0); bannerGroup.add(pilL);
+    const pilR = new THREE.Mesh(pillarGeo, pillarM); pilR.position.set(halfSpan, 20, 0); bannerGroup.add(pilR);
+    const bannerDark = new THREE.MeshStandardMaterial({ color: 0x1c1f2b, roughness: 0.6 });
+    const bannerTex = new THREE.MeshStandardMaterial({ map: makeTextTex("PRIMA KART", "#1c1f2b", "#FFD34D"), roughness: 0.6 });
+    const banner = new THREE.Mesh(new THREE.BoxGeometry(W + 64, 10, 3), [bannerDark, bannerDark, bannerDark, bannerDark, bannerTex, bannerTex]);
+    banner.position.set(0, 38, 0); bannerGroup.add(banner);
+    bannerGroup.position.set(Math.cos(startA) * trackR(startA), trackY(startA), Math.sin(startA) * trackR(startA));
+    bannerGroup.rotation.y = -startA;
+    scene.add(bannerGroup);
 
     const flagCols = [0xef4444, 0xfacc15, 0x3b82f6, 0x22c55e, 0xec4899];
     const flagGeo = new THREE.PlaneGeometry(3.2, 4);
@@ -345,9 +414,10 @@ export default function KartRace3DWeb({
     const poleMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.5 });
     for (let loc = 0; loc < 6; loc++) {
       const baseA = loc * (Math.PI / 3) + 0.5;
-      const r = RO + 30;
-      const pA = new THREE.Vector3(Math.cos(baseA) * r, 13, Math.sin(baseA) * r);
-      const pB = new THREE.Vector3(Math.cos(baseA + 0.16) * r, 13, Math.sin(baseA + 0.16) * r);
+      const r = trackR(baseA) + 34;
+      const baseY = Math.max(trackY(baseA), 0);
+      const pA = new THREE.Vector3(Math.cos(baseA) * r, baseY + 13, Math.sin(baseA) * r);
+      const pB = new THREE.Vector3(Math.cos(baseA + 0.16) * r, baseY + 13, Math.sin(baseA + 0.16) * r);
       const pole1 = new THREE.Mesh(poleGeo, poleMat); pole1.position.copy(pA); scene.add(pole1);
       const pole2 = new THREE.Mesh(poleGeo, poleMat); pole2.position.copy(pB); scene.add(pole2);
       for (let f = 0; f < 9; f++) {
@@ -372,7 +442,7 @@ export default function KartRace3DWeb({
       const halo = new THREE.Mesh(new THREE.RingGeometry(6.4, 7.4, 24), haloMat);
       halo.rotation.x = -Math.PI / 2;
       grp.add(halo);
-      grp.position.set(Math.cos(a) * R, 9, Math.sin(a) * R);
+      grp.position.set(Math.cos(a) * trackR(a), trackY(a) + 9, Math.sin(a) * trackR(a));
       scene.add(grp);
       T.current.boxMeshes.push(grp);
     }
@@ -381,27 +451,29 @@ export default function KartRace3DWeb({
     const coinMat = new THREE.MeshStandardMaterial({ color: 0xffd34d, metalness: 0.7, roughness: 0.25, emissive: 0x8a6508, emissiveIntensity: 0.25 });
     for (let i = 0; i < 16; i++) {
       const a = 0.28 + i * 0.392;
+      const lat = (i % 2 === 0 ? 1 : -1) * W * 0.22;
       const cm = new THREE.Mesh(coinGeo, coinMat);
-      cm.position.set(Math.cos(a) * (R + (i % 2 === 0 ? 1 : -1) * W * 0.22), 6, Math.sin(a) * (R + (i % 2 === 0 ? 1 : -1) * W * 0.22));
+      cm.position.set(Math.cos(a) * (trackR(a) + lat), trackY(a) + 6, Math.sin(a) * (trackR(a) + lat));
       scene.add(cm); T.current.coinMeshes.push(cm);
     }
     const gateMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, emissive: 0xfacc15, emissiveIntensity: 0.5, roughness: 0.3 });
     for (const ga of [2.25, 5.35]) {
       const gm = new THREE.Mesh(new THREE.TorusGeometry(16, 1.6, 12, 36), gateMat);
-      gm.position.set(Math.cos(ga) * R, 8, Math.sin(ga) * R);
-      gm.rotation.y = Math.atan2(-Math.sin(ga), Math.cos(ga));
+      gm.position.set(Math.cos(ga) * trackR(ga), trackY(ga) + 8, Math.sin(ga) * trackR(ga));
+      gm.rotation.y = -ga;
       scene.add(gm); T.current.gateMeshes.push(gm);
     }
     for (let i = 0; i < 3; i++) {
       const pa = [1.2, 3.4, 5.1][i];
       const pad = new THREE.Mesh(new THREE.PlaneGeometry(22, 14), new THREE.MeshStandardMaterial({ color: 0xff9f1a, emissive: 0xff9f1a, emissiveIntensity: 0.35 }));
       pad.rotation.x = -Math.PI / 2; pad.rotation.z = -pa;
-      pad.position.set(Math.cos(pa) * R, 0.05, Math.sin(pa) * R);
+      pad.position.set(Math.cos(pa) * trackR(pa), trackY(pa) + 0.2, Math.sin(pa) * trackR(pa));
       scene.add(pad);
     }
 
-    const player = buildKart(kartBody, kartAccent, "#b91c1c");
-    player.scale.setScalar(1.05);
+    const PLAYER_NAMES = ["Nara", "Raga", "Kira", "Bimo", "Alya", "Dava", "Mira", "Senä"];
+    const player = buildKart(kartBody, kartAccent, "#b91c1c", PLAYER_NAMES[0]);
+    player.scale.setScalar(0.65);
     scene.add(player);
     T.current.player = player;
     const flames: THREE.Mesh[] = [];
@@ -413,8 +485,10 @@ export default function KartRace3DWeb({
     }
     T.current.flames = flames;
 
+    const AI_NAMES = ["Raga", "Kira", "Bimo", "Alya", "Dava", "Mira", "Senä"];
     for (let i = 0; i < 7; i++) {
-      const ak = buildKart(AI_COLORS[i], "#f8fafc", AI_COLORS[i]);
+      const ak = buildKart(AI_COLORS[i], "#f8fafc", AI_COLORS[i], AI_NAMES[i]);
+      ak.scale.setScalar(0.65);
       ak.scale.setScalar(1.05);
       scene.add(ak); T.current.aiMeshes.push(ak);
     }
@@ -458,7 +532,7 @@ export default function KartRace3DWeb({
         const box = new THREE.Box3().setFromObject(model);
         const size = new THREE.Vector3();
         box.getSize(size);
-        model.scale.setScalar(20 / Math.max(size.x, size.z, 0.001));
+        model.scale.setScalar(10 / Math.max(size.x, size.z, 0.001));
         const wrap = new THREE.Group();
         wrap.add(model);
         const box2 = new THREE.Box3().setFromObject(wrap);
@@ -510,7 +584,7 @@ export default function KartRace3DWeb({
 
   useEffect(() => {
     const s = S.current;
-    s.x = 0; s.y = R; s.h = Math.PI; s.v = 0;
+    s.x = 0; s.y = trackR(Math.PI / 2); s.h = Math.PI; s.v = 0;
     s.drifting = false; s.charge = 0; s.boost = 0; s.star = 0; s.spin = 0;
     s.coins = 0; s.quizScore = 0; s.correct = 0; s.lap = 0; s.prevT = Math.PI / 2; s.prog = 0;
     s.item = null; s.raceTime = 0; s.finished = false; s.paused = false; s.usedQ.clear();
@@ -755,24 +829,26 @@ export default function KartRace3DWeb({
           s.x += Math.cos(s.h) * s.v * dt;
           s.y += Math.sin(s.h) * s.v * dt;
 
+          const pAng = Math.atan2(s.y, s.x);
+          const trC = trackR(pAng);
           const dist = Math.hypot(s.x, s.y);
-          const offroad = dist > RO || dist < RI;
+          const offroad = dist > trC + W / 2 || dist < trC - W / 2;
           if (offroad) {
             if (s.v > 62) s.v = Math.max(62, s.v - 260 * dt);
             if (Math.random() < 0.5 && t3.spawnSpark) t3.spawnSpark(s.x + (Math.random() - 0.5) * 10, s.y + (Math.random() - 0.5) * 10, "#7a5a3a");
           }
-          if (dist > RO + 22) {
+          if (dist > trC + W / 2 + 22) {
             const a = Math.atan2(s.y, s.x);
-            s.x = Math.cos(a) * (RO + 22); s.y = Math.sin(a) * (RO + 22);
+            s.x = Math.cos(a) * (trC + W / 2 + 22); s.y = Math.sin(a) * (trC + W / 2 + 22);
             s.v *= 0.45; s.shake = 6; sfxEvent("bump");
           }
-          if (dist < RI - 22) {
+          if (dist < trC - W / 2 - 22) {
             const a = Math.atan2(s.y, s.x);
-            s.x = Math.cos(a) * (RI - 22); s.y = Math.sin(a) * (RI - 22);
+            s.x = Math.cos(a) * (trC - W / 2 - 22); s.y = Math.sin(a) * (trC - W / 2 - 22);
             s.v *= 0.45; s.shake = 6; sfxEvent("bump");
           }
           for (const pad of s.pads) {
-            if (angDiff(Math.atan2(s.y, s.x), pad.a) < 0.045 && dist > RI && dist < RO) {
+            if (angDiff(Math.atan2(s.y, s.x), pad.a) < 0.045 && dist > trC - W / 2 && dist < trC + W / 2) {
               if (s.boost < 40) sfxEvent("boost");
               s.boost = Math.max(s.boost, 50);
             }
@@ -780,7 +856,7 @@ export default function KartRace3DWeb({
           for (let i = 0; i < s.coinsArr.length; i++) {
             const cn = s.coinsArr[i];
             if (cn.taken > 0) { cn.taken--; continue; }
-            const cx2 = Math.cos(cn.a) * (R + cn.lat), cy2 = Math.sin(cn.a) * (R + cn.lat);
+            const cx2 = Math.cos(cn.a) * (trackR(cn.a) + cn.lat), cy2 = Math.sin(cn.a) * (trackR(cn.a) + cn.lat);
             if (Math.hypot(cx2 - s.x, cy2 - s.y) < 14) {
               cn.taken = 900;
               if (s.coins < 10) s.coins += 1;
@@ -792,7 +868,7 @@ export default function KartRace3DWeb({
           for (let i = 0; i < s.boxes.length; i++) {
             const bx = s.boxes[i];
             if (bx.taken > 0) { bx.taken--; continue; }
-            const bx2 = Math.cos(bx.a) * R, by2 = Math.sin(bx.a) * R;
+            const bx2 = Math.cos(bx.a) * trackR(bx.a), by2 = Math.sin(bx.a) * trackR(bx.a);
             if (Math.hypot(bx2 - s.x, by2 - s.y) < 16) { bx.taken = 300; giveItem(); }
           }
           for (let i = s.bananas.length - 1; i >= 0; i--) {
@@ -815,12 +891,16 @@ export default function KartRace3DWeb({
             if (sh.life <= 0) { s.shells.splice(i, 1); continue; }
             sh.x += sh.vx * dt; sh.y += sh.vy * dt;
             const sd = Math.hypot(sh.x, sh.y);
-            if (sd > RO - 4 || sd < RI + 4) {
+            const shA = Math.atan2(sh.y, sh.x);
+            const shTr = trackR(shA);
+            const shInner = shTr - W / 2 + 5, shOuter = shTr + W / 2 - 5;
+            if (sd > shOuter || sd < shInner) {
               const nx = sh.x / sd, ny = sh.y / sd;
               const vn = sh.vx * nx + sh.vy * ny;
               sh.vx -= 2 * vn * nx; sh.vy -= 2 * vn * ny;
-              sh.x = (sd > RO - 4 ? RO - 5 : RI + 5) * nx;
-              sh.y = (sd > RO - 4 ? RO - 5 : RI + 5) * ny;
+              const lim = sd > shOuter ? shOuter - 1 : shInner + 1;
+              sh.x = lim * nx;
+              sh.y = lim * ny;
               sh.bounces++;
               if (sh.bounces > 3) { s.shells.splice(i, 1); continue; }
             }
@@ -890,8 +970,9 @@ export default function KartRace3DWeb({
       // ── SYNC 3D ──
       const px = s.x, pz = s.y;
       const rotY = Math.PI / 2 - s.h;
+      const pBaseY = trackY(Math.atan2(pz, px));
       if (t3.player) {
-        t3.player.position.set(px, s.hop > 0 ? s.hop * 30 : 0, pz);
+        t3.player.position.set(px, pBaseY + (s.hop > 0 ? s.hop * 30 : 0), pz);
         t3.player.rotation.y = rotY + (s.spin > 0 ? now * 0.02 : 0);
         t3.player.rotation.z = -s.steerVis * 0.08;
         if (t3.flames) {
@@ -913,7 +994,7 @@ export default function KartRace3DWeb({
       t3.aiMeshes.forEach((m, i) => {
         const ai = s.ai[i];
         if (!ai) return;
-        m.position.set(Math.cos(ai.a) * (R + ai.lat), 0, Math.sin(ai.a) * (R + ai.lat));
+        m.position.set(Math.cos(ai.a) * (trackR(ai.a) + ai.lat), trackY(ai.a), Math.sin(ai.a) * (trackR(ai.a) + ai.lat));
         m.rotation.y = Math.PI / 2 - ai.a + (ai.spin > 0 ? now * 0.02 : 0);
       });
       t3.coinMeshes.forEach((m, i) => {
@@ -921,7 +1002,7 @@ export default function KartRace3DWeb({
         if (!cn) return;
         m.visible = cn.taken <= 0;
         m.rotation.y = now * 0.003 + i;
-        m.position.y = 6 + Math.sin(now * 0.004 + i) * 1.2;
+        m.position.y = trackY(cn.a) + 6 + Math.sin(now * 0.004 + i) * 1.2;
       });
       t3.boxMeshes.forEach((m, i) => {
         const bx = s.boxes[i];
@@ -929,7 +1010,7 @@ export default function KartRace3DWeb({
         m.visible = bx.taken <= 0;
         m.rotation.y = now * 0.0015 + i;
         m.rotation.x = now * 0.001 + i;
-        m.position.y = 9 + Math.sin(now * 0.003 + i) * 1.5;
+        m.position.y = trackY(bx.a) + 9 + Math.sin(now * 0.003 + i) * 1.5;
       });
       t3.gateMeshes.forEach((m, i) => {
         const mat = m.material as THREE.MeshStandardMaterial;
@@ -947,16 +1028,18 @@ export default function KartRace3DWeb({
       });
 
       if (t3.glbKarts.length === 8) {
-        const procs: (THREE.Group | undefined)[] = [t3.player, ...t3.aiMeshes];
-        procs.forEach((proc, i) => {
+        t3.glbKarts[0].visible = false;
+        for (let i = 1; i < 8; i++) {
+          const proc = t3.aiMeshes[i - 1];
           const g = t3.glbKarts[i];
-          if (!g || !proc) return;
+          if (!g || !proc) continue;
           proc.visible = false;
           g.visible = true;
           g.position.copy(proc.position);
           g.rotation.y = proc.rotation.y;
           g.rotation.z = proc.rotation.z;
-        });
+        }
+        if (t3.player) t3.player.visible = true;
       }
 
       // Camera: spring chase + FOV boost + roll
@@ -964,10 +1047,10 @@ export default function KartRace3DWeb({
       const shake = s.shake > 0 ? s.shake : 0;
       const targetPos = new THREE.Vector3(
         px - dirX * CAMD + (Math.random() - 0.5) * shake,
-        CAMH + (s.hop > 0 ? s.hop * 20 : 0),
+        pBaseY + CAMH + (s.hop > 0 ? s.hop * 20 : 0),
         pz - dirZ * CAMD + (Math.random() - 0.5) * shake
       );
-      const targetLook = new THREE.Vector3(px + dirX * 14, 4, pz + dirZ * 14);
+      const targetLook = new THREE.Vector3(px + dirX * 20, pBaseY + 8, pz + dirZ * 20);
       const lerpK = 1 - Math.exp(-dt * 8);
       s.camPos.lerp(targetPos, lerpK);
       const toCam = new THREE.Vector3(s.camPos.x - px, 0, s.camPos.z - pz);
@@ -1159,17 +1242,41 @@ export default function KartRace3DWeb({
       {quizOpen && ch && (
         <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(8,10,26,0.86)", backdropFilter: "blur(10px)", zIndex: 300, padding: 14 }}>
           <div style={{ padding: "clamp(18px,3.5vmin,28px) clamp(18px,3.5vmin,32px)", borderRadius: 20, background: "rgba(24,26,58,0.97)", border: "2px solid rgba(250,204,21,0.5)", maxWidth: 600, width: "100%", maxHeight: "92vh", overflowY: "auto", animation: "popIn 0.3s both" }}>
+            {/* Timer Bar */}
             <div style={{ width: "100%", height: 5, borderRadius: 3, background: "rgba(255,255,255,0.1)", marginBottom: 16 }}>
               <div style={{ width: `${(quizTimer / 25) * 100}%`, height: "100%", borderRadius: 3, background: quizTimer <= 6 ? "#ef4444" : "#facc15", transition: "width 1s linear" }} />
             </div>
+
+            {/* Character Card */}
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16, padding: "12px 16px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <div style={{ width: 48, height: 48, borderRadius: "50%", flexShrink: 0, background: "linear-gradient(135deg, #7c3aed, #ec4899)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Righteous', sans-serif", fontSize: 18, color: "white", fontWeight: 700, boxShadow: "0 2px 12px rgba(124,58,237,0.4)" }}>
+                {ch.chapter === 1 ? "NA" : ch.chapter === 2 ? "RG" : ch.chapter === 3 ? "KI" : ch.chapter === 4 ? "BI" : "AL"}
+              </div>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 14, color: "white", margin: "0 0 2px" }}>
+                  {ch.chapter === 1 ? "Nara" : ch.chapter === 2 ? "Raga" : ch.chapter === 3 ? "Kira" : ch.chapter === 4 ? "Bimo" : "Alya"}
+                </p>
+                <p style={{ fontFamily: "Arial, sans-serif", fontSize: 11.5, color: "rgba(255,255,255,0.45)", margin: 0, lineHeight: 1.4 }}>
+                  {ch.chapter === 1 ? "Tenang, suka nanya kenapa" : ch.chapter === 2 ? "Cepat ngegas ikut tren" : ch.chapter === 3 ? "Kreator, peduli audiens" : ch.chapter === 4 ? "Pecinta budaya" : "Praktis, tau kapan formal"}
+                </p>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                <span style={{ fontFamily: "'Righteous', sans-serif", fontSize: 18, color: quizTimer <= 6 ? "#ef4444" : "#facc15" }}>{quizTimer}s</span>
+              </div>
+            </div>
+
+            {/* Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                 <span style={{ fontFamily: "'Righteous', sans-serif", fontSize: 13, color: "#facc15", letterSpacing: "0.06em" }}>GERBANG TANTANGAN</span>
                 <span style={{ fontFamily: "'Righteous', sans-serif", fontSize: 9, letterSpacing: "0.12em", color: "#0b0d22", background: "#facc15", borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>{ch.domain.replace(/-/g, " ").toUpperCase()}</span>
               </div>
-              <span style={{ fontFamily: "'Righteous', sans-serif", fontSize: 18, color: quizTimer <= 6 ? "#ef4444" : "#facc15" }}>{quizTimer}s</span>
             </div>
+
+            {/* Question */}
             <p style={{ fontFamily: "'Righteous', 'Arial Black', sans-serif", fontSize: "clamp(15px,2.8vmin,19px)", color: "white", margin: "0 0 18px", lineHeight: 1.45 }}>{ch.context}</p>
+
+            {/* Choices */}
             <div style={{ display: "grid", gap: 9 }}>
               {ch.choices.map((opt, i) => {
                 let bg = "rgba(255,255,255,0.06)";
@@ -1192,6 +1299,8 @@ export default function KartRace3DWeb({
                 );
               })}
             </div>
+
+            {/* Feedback */}
             {quizAnswered && quizSelected >= 0 && (
               <>
                 <div style={{ marginTop: 15, padding: "13px 16px", borderRadius: 12, background: "rgba(124,58,237,0.1)", border: "1px solid rgba(168,85,247,0.4)" }}>

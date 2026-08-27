@@ -1,15 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
+import { gameAudio } from "@/lib/gameAudio";
 
 const MINI_GAMES = [
   {
     href: "/games/context-match",
     name: "Context Match",
     icon: "🎯",
-    desc: "Pilih ragam bahasa yang pas buat tiap situasi.",
-    gradient: "from-cyan-500 to-blue-600",
-    glow: "rgba(6,182,212,0.35)",
+    desc: "Pilih ragam bahasa yang tepat untuk setiap situasi — formal, informal, casual, atau akademik. Uji kepekaanmu membaca konteks dan menempatkan bahasa sesuai audiens!",
+    gradient: "linear-gradient(135deg, #22d3ee, #3b82f6)",
+    shadow: "#1d4ed8",
     difficulty: 3,
     zone: "PRIMA CIRCUIT",
   },
@@ -17,9 +19,9 @@ const MINI_GAMES = [
     href: "/games/chat-repair",
     name: "Chat Repair",
     icon: "💬",
-    desc: "Perbaiki chat yang canggung biar jelas dan enak dibaca.",
-    gradient: "from-rose-500 to-pink-600",
-    glow: "rgba(244,63,94,0.35)",
+    desc: "Perbaiki chat yang canggung agar jelas, sopan, dan enak dibaca. Latih kemampuan menyesuaikan bahasa dengan situasi — dari obrolan santai hingga pesan formal.",
+    gradient: "linear-gradient(135deg, #fb7185, #ec4899)",
+    shadow: "#be185d",
     difficulty: 2,
     zone: "PRIMA CIRCUIT",
   },
@@ -27,9 +29,9 @@ const MINI_GAMES = [
     href: "/games/word-switch",
     name: "Word Switch",
     icon: "🔤",
-    desc: "Ganti kata yang salah dengan padanan yang bener.",
-    gradient: "from-amber-500 to-orange-600",
-    glow: "rgba(245,158,11,0.35)",
+    desc: "Ganti kata asing dengan padanan Bahasa Indonesia yang tepat. Asah kosakatamu, temukan keindahan bahasa sendiri, dan buktikan bahwa bahasa Indonesia itu kaya!",
+    gradient: "linear-gradient(135deg, #fbbf24, #f97316)",
+    shadow: "#c2410c",
     difficulty: 2,
     zone: "MEDIA LAB",
   },
@@ -37,9 +39,9 @@ const MINI_GAMES = [
     href: "/games/code-mix-lab",
     name: "Code-Mix Lab",
     icon: "🧪",
-    desc: "Bedah campuran bahasa Indonesia dan Inggris.",
-    gradient: "from-violet-500 to-purple-600",
-    glow: "rgba(139,92,246,0.35)",
+    desc: "Bedah campuran bahasa Indonesia dan Inggris dalam percakapan sehari-hari. Pahami kapan campuran itu tepat digunakan dan kapan sebaiknya tidak — jadi penutur yang kritis!",
+    gradient: "linear-gradient(135deg, #a78bfa, #8b5cf6)",
+    shadow: "#6d28d9",
     difficulty: 4,
     zone: "PRIMA CIRCUIT",
   },
@@ -47,9 +49,9 @@ const MINI_GAMES = [
     href: "/games/language-detective",
     name: "Language Detective",
     icon: "🔍",
-    desc: "Cari dan koreksi kesalahan bahasa yang tersembunyi.",
-    gradient: "from-emerald-500 to-teal-600",
-    glow: "rgba(16,185,129,0.35)",
+    desc: "Cari dan koreksi kesalahan bahasa yang tersembunyi dalam teks. Latih ketelitianmu membedah ejaan, struktur kalimat, dan tata bahasa Indonesia yang benar!",
+    gradient: "linear-gradient(135deg, #34d399, #10b981)",
+    shadow: "#047857",
     difficulty: 3,
     zone: "SOCIAL STREET",
   },
@@ -57,130 +59,154 @@ const MINI_GAMES = [
     href: "/games/rapid-response",
     name: "Rapid Response",
     icon: "⚡",
-    desc: "Asosiasi kata dalam 5 detik. Cepat atau gagal!",
-    gradient: "from-fuchsia-500 to-rose-600",
-    glow: "rgba(217,70,239,0.35)",
+    desc: "Asosiasi kata dalam 5 detik! Sebutkan padanan Indonesia secepat mungkin sebelum waktu habis. Cepat, seru, dan penuh tantangan — adu kecepatan berpikirmu!",
+    gradient: "linear-gradient(135deg, #e879f9, #d946ef)",
+    shadow: "#a21caf",
     difficulty: 5,
     zone: "PRIMA CIRCUIT",
   },
 ];
 
-function DifficultyStars({ count }: { count: number }) {
+const NAVY = "#253057";
+
+function Stars({ count }: { count: number }) {
   return (
-    <div className="flex gap-0.5">
+    <div className="flex gap-0.5 text-2xl leading-none">
       {Array.from({ length: 5 }).map((_, i) => (
-        <div
-          key={i}
-          className={`h-1.5 w-1.5 rounded-full ${
-            i < count ? "bg-yellow-400" : "bg-gray-200"
-          }`}
-        />
+        <span key={i} style={{ filter: i < count ? "none" : "grayscale(1)", opacity: i < count ? 1 : 0.35 }}>
+          ⭐
+        </span>
       ))}
     </div>
   );
 }
 
 export default function GamesPage() {
-  return (
-    <div className="relative min-h-dvh overflow-hidden text-gray-800">
-      {/* Background orbs */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-1/4 left-1/5 h-80 w-80 rounded-full bg-cyan-300/10 blur-[140px]" />
-        <div className="absolute bottom-1/3 right-1/4 h-72 w-72 rounded-full bg-violet-300/10 blur-[120px]" />
-        <div className="absolute top-2/3 left-1/2 h-60 w-60 rounded-full bg-rose-300/10 blur-[100px]" />
-      </div>
+  useEffect(() => {
+    const kick = () => {
+      gameAudio.startMusic("arcade");
+      window.removeEventListener("pointerdown", kick);
+      window.removeEventListener("keydown", kick);
+    };
+    window.addEventListener("pointerdown", kick);
+    window.addEventListener("keydown", kick);
+    return () => {
+      window.removeEventListener("pointerdown", kick);
+      window.removeEventListener("keydown", kick);
+      gameAudio.stopMusic();
+    };
+  }, []);
 
-      <div className="relative mx-auto max-w-5xl px-4 pb-16 pt-6">
+  return (
+    <div className="relative min-h-dvh w-full font-body text-slate-800">
+      <div className="flex min-h-dvh w-full flex-col px-5 py-7 sm:px-10 lg:px-14">
         {/* Header */}
-        <div
-          className="animate-slide-down flex items-center justify-between"
-        >
-          <div>
-            <Link
-              href="/world"
-              className="text-xs font-semibold text-blue-400 transition hover:text-blue-600"
+        <div className="animate-slide-down flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-5">
+            <div
+              className="flex h-20 w-20 items-center justify-center rounded-3xl text-5xl"
+              style={{
+                background: "linear-gradient(135deg,#7c3aed,#ec4899)",
+                border: `5px solid ${NAVY}`,
+                boxShadow: `0 8px 0 ${NAVY}`,
+              }}
             >
-              ← PRIMA CITY
-            </Link>
-            <h1 className="mt-2 text-3xl font-black text-gray-900 sm:text-4xl">
-              Mini Game{" "}
-              <span className="bg-gradient-to-r from-cyan-500 to-violet-500 bg-clip-text text-transparent">
-                Arcade
-              </span>
-            </h1>
-            <p className="mt-1.5 text-sm text-gray-500">
-              6 game seru buat ngasah otak bahasa.
-            </p>
+              🎮
+            </div>
+            <div>
+              <Link
+                href="/world"
+                className="text-sm font-extrabold uppercase tracking-widest text-blue-800 underline-offset-2 transition hover:text-blue-950 hover:underline"
+              >
+                ← Prima City
+              </Link>
+              <h1
+                className="font-display text-4xl leading-tight sm:text-5xl"
+                style={{
+                  background: "linear-gradient(135deg, #7c3aed, #ec4899, #f97316)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  filter: "drop-shadow(0 3px 0 rgba(37,48,87,0.3))",
+                }}
+              >
+                Mini Game Arcade
+              </h1>
+            </div>
           </div>
-          <div className="hidden h-16 w-16 items-center justify-center rounded-2xl border border-gray-200 bg-white/70 text-3xl backdrop-blur-md sm:flex shadow-sm">
-            🎮
+          <div
+            className="rounded-2xl bg-white px-5 py-3 text-base font-semibold text-slate-600"
+            style={{ border: `3px solid ${NAVY}`, boxShadow: `0 5px 0 ${NAVY}` }}
+          >
+            6 game seru buat ngasah otak bahasa!
           </div>
         </div>
 
-        {/* Game Grid */}
-        <div
-          className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
-        >
+        {/* Grid */}
+        <div className="mt-10 grid flex-1 grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr pb-3">
           {MINI_GAMES.map((game, i) => (
-            <div key={game.href} className="animate-slide-up" style={{ animationDelay: `${i * 70}ms` }}>
+            <div key={game.href} className="animate-slide-up h-full" style={{ animationDelay: `${i * 60}ms` }}>
               <Link
                 href={game.href}
-                className="group relative block overflow-hidden rounded-2xl border border-gray-200 bg-white/70 backdrop-blur-md transition-all duration-300 hover:border-gray-300 hover:shadow-lg"
+                onClick={() => gameAudio.sfx("click")}
+                className="group flex h-full flex-col rounded-[28px] bg-white p-8 transition-all duration-200 hover:-translate-y-2"
+                style={{
+                  border: `5px solid ${NAVY}`,
+                  boxShadow: `0 10px 0 ${NAVY}, 0 18px 30px rgba(37,48,87,0.25)`,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = `0 14px 0 ${NAVY}, 0 24px 40px rgba(37,48,87,0.3)`; }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = `0 10px 0 ${NAVY}, 0 18px 30px rgba(37,48,87,0.25)`; }}
               >
-                {/* Glossy top edge */}
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
-
-                {/* Hover glow */}
-                <div
-                  className="absolute -inset-1 rounded-2xl opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100"
-                  style={{ background: game.glow }}
-                />
-
-                <div className="relative p-6">
-                  <div className="flex items-start justify-between">
-                    <div
-                      className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${game.gradient} text-2xl shadow-lg`}
-                      style={{ boxShadow: `0 8px 24px -4px ${game.glow}` }}
-                    >
-                      {game.icon}
-                    </div>
-                    <div className="text-right">
-                      <span className="rounded-md bg-gray-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-gray-400">
-                        {game.zone}
-                      </span>
-                      <div className="mt-1.5">
-                        <DifficultyStars count={game.difficulty} />
-                      </div>
-                    </div>
+                <div className="flex items-start justify-between gap-3">
+                  <div
+                    className="flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl text-5xl transition-transform duration-200 group-hover:scale-110 group-hover:-rotate-6"
+                    style={{
+                      background: game.gradient,
+                      border: `5px solid ${NAVY}`,
+                      boxShadow: `0 7px 0 ${game.shadow}, inset 0 4px 0 rgba(255,255,255,0.45)`,
+                    }}
+                  >
+                    {game.icon}
                   </div>
-
-                  <h2 className="mt-5 text-lg font-bold text-gray-800 transition-colors group-hover:text-blue-600">
-                    {game.name}
-                  </h2>
-                  <p className="mt-2 text-[13px] leading-relaxed text-gray-500">
-                    {game.desc}
-                  </p>
-
-                  <div className="mt-5 flex items-center gap-2 text-[11px] font-semibold text-gray-400 transition-colors group-hover:text-blue-500">
-                    <span>Mainkan</span>
-                    <span className="transition-transform group-hover:translate-x-1.5">→</span>
-                  </div>
+                  <Stars count={game.difficulty} />
                 </div>
 
-                {/* Bottom accent line */}
-                <div
-                  className={`absolute bottom-0 left-0 h-[2px] w-0 bg-gradient-to-r ${game.gradient} transition-all duration-600 group-hover:w-full`}
-                />
+                <h2
+                  className="mt-11 font-display text-[1.85rem] leading-tight text-slate-800"
+                  style={{ textShadow: "0 2px 0 rgba(37,48,87,0.08)" }}
+                >
+                  {game.name}
+                </h2>
+                <span
+                  className="mt-3 w-fit rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-widest text-white"
+                  style={{ background: game.gradient, border: `3px solid ${NAVY}` }}
+                >
+                  {game.zone}
+                </span>
+
+                <p className="mt-5 flex-1 font-body text-[0.95rem] leading-relaxed text-slate-700">
+                  {game.desc}
+                </p>
+
+                <button
+                  className="mt-7 w-full rounded-2xl py-4 font-display text-xl text-white transition-all duration-150 group-hover:brightness-110 active:translate-y-1.5"
+                  style={{
+                    background: game.gradient,
+                    border: `5px solid ${NAVY}`,
+                    boxShadow: `0 7px 0 ${game.shadow}`,
+                  }}
+                  tabIndex={-1}
+                >
+                  MAINKAN ▶
+                </button>
               </Link>
             </div>
           ))}
         </div>
 
         <p
-          className="mt-10 animate-fade-in text-center text-[11px] text-gray-400"
-          style={{ animationDelay: "800ms" }}
+          className="mt-7 text-center font-body text-base text-slate-600"
         >
-          Skor tersimpan otomatis. Main kapan aja, urutan bebas.
+          Skor tersimpan otomatis · Main kapan aja, urutan bebas
         </p>
       </div>
     </div>
