@@ -438,34 +438,34 @@ export default function CinematicOpening() {
       <div style={{
         position: "absolute", left: 0, right: 0, bottom: 0, textAlign: "center", zIndex: 10,
         opacity: ready ? 1 : 0, transform: ready ? "translateY(0) scale(1)" : "translateY(26px) scale(0.94)",
-        transition: "opacity 0.7s ease, transform 0.7s cubic-bezier(0.34,1.56,0.64,1)", padding: "0 14px",
+        transition: "opacity 0.7s ease, transform 0.7s cubic-bezier(0.34,1.56,0.64,1)", padding: "0 12px",
       }}>
         <div style={{
           display: "inline-block", background: "rgba(22,16,48,0.72)", backdropFilter: "blur(10px)",
-          borderRadius: 20, padding: "clamp(12px,3vw,20px) clamp(14px,4vw,34px) clamp(14px,3vw,22px)", border: "2px solid rgba(255,255,255,0.2)",
-          boxShadow: "0 10px 0 rgba(12,8,32,0.4), 0 20px 40px rgba(10,8,30,0.35)", maxWidth: "92vw",
+          borderRadius: 16, padding: "10px 16px 12px", border: "2px solid rgba(255,255,255,0.2)",
+          boxShadow: "0 8px 0 rgba(12,8,32,0.4), 0 16px 30px rgba(10,8,30,0.35)", maxWidth: "88vw",
         }}>
-          <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: "clamp(14px, 3.2vmin, 24px)", color: "#ffffff", margin: "0 0 6px", fontStyle: "italic", textShadow: "0 2px 8px rgba(0,0,0,0.6)", lineHeight: 1.3 }}>
+          <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: "clamp(12px, 2.8vmin, 18px)", color: "#ffffff", margin: "0 0 4px", fontStyle: "italic", textShadow: "0 2px 8px rgba(0,0,0,0.6)", lineHeight: 1.3 }}>
             Berakar pada Aksara, Setia pada Nusantara.
           </p>
-          <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: "clamp(15px, 3.6vmin, 28px)", color: "#FFD34D", margin: "0 0 18px", fontWeight: 700, textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}>
+          <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: "clamp(13px, 3vmin, 20px)", color: "#FFD34D", margin: "0 0 10px", fontWeight: 700, textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}>
             Bahasa Kita, Identitas Kita!
           </p>
           <button
             onClick={go}
             style={{
-              padding: "clamp(12px,2.5vmin,18px) clamp(28px,8vw,60px)", borderRadius: 999, border: "3px solid rgba(255,255,255,0.9)",
+              padding: "10px 32px", borderRadius: 999, border: "3px solid rgba(255,255,255,0.9)",
               background: "linear-gradient(180deg, #a855f7 0%, #7c3aed 55%, #6d28d9 100%)",
               color: "white", fontFamily: "'Righteous', 'Arial Black', sans-serif",
-              fontSize: "clamp(16px, 3.5vmin, 26px)", fontWeight: 900, letterSpacing: "0.06em",
+              fontSize: "clamp(13px, 2.6vmin, 18px)", fontWeight: 900, letterSpacing: "0.06em",
               cursor: "pointer",
-              boxShadow: "0 8px 0 #4c1d95, 0 16px 30px rgba(124,58,237,0.5), inset 0 2px 0 rgba(255,255,255,0.45)",
+              boxShadow: "0 6px 0 #4c1d95, 0 12px 24px rgba(124,58,237,0.5), inset 0 2px 0 rgba(255,255,255,0.45)",
               transition: "transform 0.1s ease, box-shadow 0.1s ease",
             }}
-            onPointerDown={(e) => { e.currentTarget.style.transform = "translateY(4px)"; e.currentTarget.style.boxShadow = "0 2px 0 #4c1d95, 0 6px 14px rgba(124,58,237,0.5)"; }}
-            onPointerUp={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 8px 0 #4c1d95, 0 16px 30px rgba(124,58,237,0.5), inset 0 2px 0 rgba(255,255,255,0.45)"; }}
+            onPointerDown={(e) => { e.currentTarget.style.transform = "translateY(3px)"; e.currentTarget.style.boxShadow = "0 2px 0 #4c1d95, 0 4px 10px rgba(124,58,237,0.5)"; }}
+            onPointerUp={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 6px 0 #4c1d95, 0 12px 24px rgba(124,58,237,0.5), inset 0 2px 0 rgba(255,255,255,0.45)"; }}
           >
-            MULAI PETUALANGAN ▶
+            MULAI ▶
           </button>
         </div>
       </div>
