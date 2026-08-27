@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { gameAudio } from "@/lib/gameAudio";
+import InstallPrompt from "@/components/InstallPrompt";
 
 const CLOUDS = [
   { top: "7%", size: 110, dur: 70, delay: 0, o: 0.95 },
@@ -79,6 +80,8 @@ export default function GameShell({ children }: { children: React.ReactNode }) {
       <div style={{ position: "relative", zIndex: 10, minHeight: "100vh", width: "100%" }}>
         {children}
       </div>
+
+      <InstallPrompt />
 
       <style>{`
         @keyframes cloudDrift { 0% { transform: translateX(-30vw); } 100% { transform: translateX(130vw); } }
