@@ -29,7 +29,7 @@ export default async function ProfilePage() {
     );
   }
 
-  const prog = getWorldProgress(p.id);
+  const prog = await getWorldProgress(p.id);
   const ownedSkills = new Set(prog.skills);
   const ownedCards = new Set(prog.cards);
   const eps = new Set(prog.episodesDone);

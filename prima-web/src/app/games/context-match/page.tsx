@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { gameAudio } from "@/lib/gameAudio";
 import GameBackButton from "@/components/GameBackButton";
+import { useLogGameResult } from "@/lib/useLogGameResult";
 
 interface Question {
   scenario: string;
@@ -100,6 +101,7 @@ export default function ContextMatchPage() {
   const [selected, setSelected] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [answers, setAnswers] = useState<boolean[]>([]);
+  const [startTime, setStartTime] = useState<number>(() => Date.now());
 
   useEffect(() => {
     if (phase !== "play" || showFeedback) return;
@@ -139,6 +141,20 @@ export default function ContextMatchPage() {
   const timerPct = (timer / TIMER_SECONDS) * 100;
   const xp = score;
   const accuracy = answers.length > 0 ? Math.round((answers.filter(Boolean).length / answers.length) * 100) : 0;
+
+  useLogGameResult(
+    "context-match",
+    "mini_game",
+    phase === "result",
+    {
+      score: xp,
+      accuracy,
+      correct: answers.filter(Boolean).length,
+      total: QUESTIONS.length,
+      duration_ms: Date.now() - startTime,
+      detail: { correctRegister: QUESTIONS.map((x) => x.correctRegister) },
+    },
+  );
 
   if (phase === "start") {
     return (

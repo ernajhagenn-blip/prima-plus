@@ -1,20 +1,19 @@
-# Credential & auth tokens — NEVER commit
+# Secrets (CLAUDE.md: never commit)
+.env
+.env.*
+!.env.example
 credentials.json
 drive_token.json
 
-# Node runtime / locally-managed tooling
-node_modules/
+# Supabase CLI cache
+supabase/.temp/
 
-# Python bytecode
+# Node
+node_modules/
 __pycache__/
 *.pyc
 
-# Word lock files
+# OS / editor
+.DS_Store
+Thumbs.db
 ~$*.docx
-
-# Machine-specific agent tooling & skills
-.agents/
-.opencode/
-.codex/
-.claude/
-skill-runs/

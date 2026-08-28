@@ -6,7 +6,7 @@ import { QuestionnaireForm } from "@/components/QuestionnaireForm";
 
 export default async function PretestPage() {
   const p = await requireParticipantAt("/pretest");
-  const items = getPretestItems();
+  const items = await getPretestItems();
 
   return (
     <div style={{ minHeight: "100vh", width: "100%", padding: "1.5rem", boxSizing: "border-box" as const }}>

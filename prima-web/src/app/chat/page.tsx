@@ -6,6 +6,7 @@ import FunBackground from "@/components/FunBackground";
 import { SCENARIOS } from "@/lib/chatChapters";
 import { gameAudio } from "@/lib/gameAudio";
 import GameBackButton from "@/components/GameBackButton";
+import { logActivity } from "@/lib/logActivity";
 
 interface Choice { text: string; fb: string; tone: "good" | "mid" | "bad"; }
 
@@ -80,6 +81,16 @@ export default function ChatPage() {
     gameAudio.sfx("dialog");
     const tone = s.choices[i]?.tone;
     gameAudio.sfx(tone === "good" ? "correct" : tone === "bad" ? "wrong" : "click");
+    // simpan hasil skenario ini
+    const chosenChoice = s.choices[i];
+    void logActivity("chat", {
+      scenario_index: stage,
+      scenario_title: s.title,
+      domain: s.domain ?? null,
+      chosen_text: chosenChoice?.text ?? null,
+      tone: chosenChoice?.tone ?? null,
+      is_correct: chosenChoice?.tone === "good" ? 1 : 0,
+    });
   };
 
   useEffect(() => {
@@ -256,7 +267,18 @@ export default function ChatPage() {
           </div>
 
           <button
-            onClick={() => router.push("/world")}
+            onClick={async () => {
+              if (!allReflected) return;
+              await logActivity("chat", {
+                scenario_index: -1,
+                scenario_title: "Refleksi Diri",
+                chosen_text: null,
+                tone: null,
+                is_correct: 0,
+                reflections: answers.map((a, i) => ({ q: REFLECTIONS[i]?.q ?? "", answer: a })),
+              });
+              router.push("/world");
+            }}
             disabled={!allReflected}
             style={{ marginTop: "auto", padding: "16px 0", borderRadius: 14, background: allReflected ? "linear-gradient(135deg,#16a34a,#4ade80)" : "rgba(255,255,255,0.06)", border: "none", color: allReflected ? "white" : "rgba(255,255,255,0.35)", fontFamily: "'Righteous','Arial Black',sans-serif", fontSize: 17, fontWeight: 900, cursor: allReflected ? "pointer" : "default", transition: "all 0.3s", boxShadow: allReflected ? "0 4px 20px rgba(74,222,128,0.3)" : "none" }}
           >

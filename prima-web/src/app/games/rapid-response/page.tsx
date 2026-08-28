@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { gameAudio } from "@/lib/gameAudio";
 import GameBackButton from "@/components/GameBackButton";
+import { useLogGameResult } from "@/lib/useLogGameResult";
 
 interface WordPrompt {
   word: string;
@@ -91,6 +92,14 @@ export default function RapidResponsePage() {
   const timerPct = (timer / TIMER_SECONDS) * 100;
   const xp = score;
   const accuracy = answers.length > 0 ? Math.round((answers.filter((a) => a.correct).length / answers.length) * 100) : 0;
+
+  useLogGameResult("rapid-response", "mini_game", phase === "result", {
+    score: xp,
+    accuracy,
+    correct: answers.filter((a) => a.correct).length,
+    total: WORD_PROMPTS.length,
+    detail: { answers },
+  });
 
   if (phase === "start") {
     return (

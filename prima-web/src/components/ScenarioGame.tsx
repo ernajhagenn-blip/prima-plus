@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { recordGameAction } from "@/app/actions";
+import { logActivity } from "@/lib/logActivity";
 import type { Scenario } from "@/lib/data";
 
 export default function ScenarioGame({
@@ -38,6 +39,15 @@ export default function ScenarioGame({
   function next() {
     if (isLast) {
       setDone(true);
+      void logActivity("activity", {
+        activity_key: gameKey,
+        activity_type: "mini_game",
+        score: correctCount,
+        accuracy: scenarios.length > 0 ? Math.round((correctCount / scenarios.length) * 100) : 0,
+        correct: correctCount,
+        total: scenarios.length,
+        detail: { title, subtitle },
+      });
       return;
     }
     setIdx((i) => i + 1);

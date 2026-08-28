@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -22,5 +23,18 @@ export const createClient = (cookieStore: Awaited<ReturnType<typeof cookies>>) =
         }
       },
     },
+  });
+};
+
+// SERVER-ONLY. Bypasses RLS. Untuk admin read/export & write ke tabel terproteksi.
+// Jangan import di client component. SUPABASE_SERVICE_ROLE_KEY tidak NEXT_PUBLIC_.
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+export const createServiceClient = () => {
+  if (!serviceKey) {
+    throw new Error("SUPABASE_SERVICE_ROLE_KEY belum diset (server env).");
+  }
+  return createSupabaseClient(supabaseUrl!, serviceKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
   });
 };

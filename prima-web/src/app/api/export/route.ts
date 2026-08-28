@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { isAdminAuthed } from "@/lib/session";
-import { getDb } from "@/lib/db";
+import { fetchRows, DATASET_KEYS, type DatasetKey } from "@/lib/exportData";
 
 function csvEscape(value: unknown): string {
   const s = String(value ?? "");
@@ -20,36 +20,21 @@ function toCsv(rows: Record<string, unknown>[]): string {
   return lines.join("\n") + "\n";
 }
 
-const DATASETS = {
-  participants: `SELECT p.id, p.code, p.name, p.kelas, p.stage, p.pretest_total, p.posttest_total, p.game_score, p.game_max, p.reflection, p.created_at
-    FROM participants p ORDER BY p.id`,
-  pretest: `SELECT p.code, p.name, p.kelas, a.item_id, a.dimension, a.answer, a.score
-    FROM pretest_answers a JOIN participants p ON p.id = a.participant_id ORDER BY a.participant_id, a.item_id`,
-  game: `SELECT p.code, p.name, p.kelas, a.scenario_id, a.construct, a.chosen, a.is_correct
-    FROM game_answers a JOIN participants p ON p.id = a.participant_id ORDER BY a.participant_id, a.scenario_id`,
-  posttest: `SELECT p.code, p.name, p.kelas, a.item_id, a.dimension, a.answer, a.score
-    FROM posttest_answers a JOIN participants p ON p.id = a.participant_id ORDER BY a.participant_id, a.item_id`,
-  respons: `SELECT p.code, p.name, p.kelas, a.item_id, a.answer, a.score
-    FROM response_answers a JOIN participants p ON p.id = a.participant_id ORDER BY a.participant_id, a.item_id`,
-} as const;
-
 export async function GET(req: NextRequest) {
   if (!(await isAdminAuthed())) {
     return Response.json({ error: "Tidak berwenang" }, { status: 401 });
   }
 
-  const dataset = req.nextUrl.searchParams.get("dataset") as keyof typeof DATASETS | null;
-  const sql = dataset && dataset in DATASETS ? DATASETS[dataset] : DATASETS.participants;
+  const dataset = (req.nextUrl.searchParams.get("dataset") as DatasetKey | null) ?? "participants";
+  const key: DatasetKey = DATASET_KEYS.includes(dataset) ? dataset : "participants";
 
-  const rows = getDb().prepare(sql).all() as Record<string, unknown>[];
-
-  const filename = dataset && dataset in DATASETS ? dataset : "participants";
-  const body = "\uFEFF" + toCsv(rows);
+  const rows = await fetchRows(key);
+  const body = "﻿" + toCsv(rows);
 
   return new Response(body, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="prima_${filename}.csv"`,
+      "Content-Disposition": `attachment; filename="prima_${key}.csv"`,
     },
   });
 }

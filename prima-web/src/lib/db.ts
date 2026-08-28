@@ -1,5 +1,4 @@
-import fs from "node:fs";
-import path from "node:path";
+import { createServiceClient } from "@/utils/supabase/server";
 import {
   EDU_SEED,
   LOYALTY_ITEMS,
@@ -9,23 +8,10 @@ import {
 } from "@/lib/data";
 import type { Scenario, ScenarioOption } from "@/lib/data";
 
-// Vercel serverless: only /tmp is writable. Local dev: project root.
-const PRIMA_ROOT = process.env.VERCEL ? "/tmp" : (process.env.PRIMA_ROOT || process.cwd());
-const DATA_DIR = path.join(PRIMA_ROOT, "data");
-const DB_PATH = path.join(DATA_DIR, "prima.db");
-
-function ensureDir() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
-}
-
-function toPlainList<T>(rows: any[]): T[] {
-  return rows.map((r) => ({ ...r })) as T[];
-}
-function toPlainOne<T>(row: any): T {
-  return row ? ({ ...row } as T) : (row as T);
-}
+// Semua akses data lewat Supabase (server-only). Tidak ada lagi SQLite lokal.
+// Siswa submit via publishable (anon) key (insert). Admin/read/export via service role.
+// Fungsi content getter tetap return konstanta data.ts sebagai fallback defensif
+// bila env Supabase belum diset (dev tanpa koneksi), agar UI tetap jalan.
 
 export type Stage =
   | "registered"
@@ -35,166 +21,9 @@ export type Stage =
   | "posttest_done"
   | "done";
 
-function createTables(db: any) {
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS participants (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      code TEXT UNIQUE NOT NULL,
-      name TEXT NOT NULL,
-      kelas TEXT NOT NULL,
-      stage TEXT NOT NULL DEFAULT 'registered',
-      pretest_total INTEGER,
-      posttest_total INTEGER,
-      game_score INTEGER,
-      game_max INTEGER,
-      reflection TEXT,
-      created_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
-    );
-
-    CREATE TABLE IF NOT EXISTS world_progress (
-      participant_id INTEGER PRIMARY KEY,
-      episodes_done TEXT NOT NULL DEFAULT '[]',
-      cards TEXT NOT NULL DEFAULT '[]',
-      skills TEXT NOT NULL DEFAULT '[]',
-      game_scores TEXT NOT NULL DEFAULT '{}',
-      boss_defeated INTEGER NOT NULL DEFAULT 0,
-      FOREIGN KEY (participant_id) REFERENCES participants(id)
-    );
-
-    CREATE TABLE IF NOT EXISTS pretest_answers (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      participant_id INTEGER NOT NULL,
-      item_id INTEGER NOT NULL,
-      dimension TEXT NOT NULL,
-      answer TEXT NOT NULL,
-      score INTEGER NOT NULL,
-      FOREIGN KEY (participant_id) REFERENCES participants(id)
-    );
-
-    CREATE TABLE IF NOT EXISTS game_answers (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      participant_id INTEGER NOT NULL,
-      scenario_id INTEGER NOT NULL,
-      construct TEXT NOT NULL,
-      chosen TEXT,
-      is_correct INTEGER,
-      FOREIGN KEY (participant_id) REFERENCES participants(id)
-    );
-
-    CREATE TABLE IF NOT EXISTS posttest_answers (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      participant_id INTEGER NOT NULL,
-      item_id INTEGER NOT NULL,
-      dimension TEXT NOT NULL,
-      answer TEXT NOT NULL,
-      score INTEGER NOT NULL,
-      FOREIGN KEY (participant_id) REFERENCES participants(id)
-    );
-
-    CREATE TABLE IF NOT EXISTS response_answers (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      participant_id INTEGER NOT NULL,
-      item_id INTEGER NOT NULL,
-      answer TEXT NOT NULL,
-      score INTEGER NOT NULL,
-      FOREIGN KEY (participant_id) REFERENCES participants(id)
-    );
-
-    CREATE TABLE IF NOT EXISTS edu_modules (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      sort_order INTEGER NOT NULL DEFAULT 0,
-      title TEXT NOT NULL,
-      dimension TEXT NOT NULL DEFAULT '',
-      body TEXT NOT NULL
-    );
-
-    CREATE TABLE IF NOT EXISTS pretest_items (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      sort_order INTEGER NOT NULL DEFAULT 0,
-      dimension TEXT NOT NULL,
-      statement TEXT NOT NULL
-    );
-
-    CREATE TABLE IF NOT EXISTS game_scenarios (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      sort_order INTEGER NOT NULL DEFAULT 0,
-      construct TEXT NOT NULL,
-      case_type TEXT NOT NULL,
-      task TEXT NOT NULL,
-      situation TEXT NOT NULL,
-      options_json TEXT NOT NULL,
-      feedback TEXT NOT NULL
-    );
-
-    CREATE TABLE IF NOT EXISTS game_reflection_questions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      sort_order INTEGER NOT NULL DEFAULT 0,
-      question TEXT NOT NULL
-    );
-
-    CREATE TABLE IF NOT EXISTS response_items (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      sort_order INTEGER NOT NULL DEFAULT 0,
-      statement TEXT NOT NULL
-    );
-  `);
-}
-
-function seedEduModules(db: any) {
-  const { n } = db.prepare("SELECT COUNT(*) AS n FROM edu_modules").get() as { n: number };
-  if (n > 0) return;
-  const ins = db.prepare(
-    "INSERT INTO edu_modules (sort_order, title, dimension, body) VALUES (?, ?, ?, ?)",
-  );
-  EDU_SEED.forEach((m, i) => ins.run(i + 1, m.title, m.dimension, m.body));
-}
-
-function seedContentTables(db: any) {
-  if ((db.prepare("SELECT COUNT(*) AS n FROM pretest_items").get() as { n: number }).n === 0) {
-    const ins = db.prepare("INSERT INTO pretest_items (sort_order, dimension, statement) VALUES (?, ?, ?)");
-    LOYALTY_ITEMS.forEach((it, i) => ins.run(i + 1, it.dimension, it.statement));
-  }
-  if ((db.prepare("SELECT COUNT(*) AS n FROM game_scenarios").get() as { n: number }).n === 0) {
-    const ins = db.prepare(
-      "INSERT INTO game_scenarios (sort_order, construct, case_type, task, situation, options_json, feedback) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    );
-    SCENARIOS.forEach((s, i) =>
-      ins.run(i + 1, s.construct, s.caseType, s.task, s.situation, JSON.stringify(s.options), s.feedback),
-    );
-  }
-  if ((db.prepare("SELECT COUNT(*) AS n FROM game_reflection_questions").get() as { n: number }).n === 0) {
-    const ins = db.prepare("INSERT INTO game_reflection_questions (sort_order, question) VALUES (?, ?)");
-    GAME_REFLECTION_QUESTIONS.forEach((q, i) => ins.run(i + 1, q));
-  }
-  if ((db.prepare("SELECT COUNT(*) AS n FROM response_items").get() as { n: number }).n === 0) {
-    const ins = db.prepare("INSERT INTO response_items (sort_order, statement) VALUES (?, ?)");
-    RESPONSE_ITEMS.forEach((it, i) => ins.run(i + 1, it.statement));
-  }
-}
-
-let db: any = null;
-let sqliteFailed = false;
-
-export function getDb() {
-  if (sqliteFailed) return null;
-  if (!db) {
-    try {
-      const { DatabaseSync } = require("node:sqlite");
-      ensureDir();
-      db = new DatabaseSync(DB_PATH);
-      db.exec("PRAGMA journal_mode = WAL;");
-      db.exec("PRAGMA foreign_keys = ON;");
-      createTables(db);
-      seedEduModules(db);
-      seedContentTables(db);
-    } catch (e) {
-      console.warn("node:sqlite unavailable, running without local DB:", e);
-      sqliteFailed = true;
-      return null;
-    }
-  }
-  return db;
-}
+// ---------------------------------------------------------------------------
+// CONTENT — edu modules, pretest/posttest items, game scenarios, reflection, respons
+// ---------------------------------------------------------------------------
 
 export interface EduModuleRow {
   id: number;
@@ -204,77 +33,96 @@ export interface EduModuleRow {
   body: string;
 }
 
-export function getEduModules(): EduModuleRow[] {
-  const d = getDb();
-  if (!d) {
-    return EDU_SEED.map((m, i) => ({ id: i + 1, sort_order: i + 1, title: m.title, dimension: m.dimension, body: m.body }));
+export async function getEduModules(): Promise<EduModuleRow[]> {
+  try {
+    const sb = createServiceClient();
+    const { data, error } = await sb
+      .from("edu_modules")
+      .select("id, sort_order, title, dimension, body")
+      .order("sort_order")
+      .order("id");
+    if (error) throw error;
+    if (data && data.length > 0) {
+      return data as EduModuleRow[];
+    }
+  } catch {
+    // fallback konstanta
   }
-  return toPlainList<EduModuleRow>(
-    d.prepare("SELECT id, sort_order, title, dimension, body FROM edu_modules ORDER BY sort_order, id")
-      .all() as any,
-  );
+  return EDU_SEED.map((m, i) => ({ id: i + 1, sort_order: i + 1, title: m.title, dimension: m.dimension, body: m.body }));
 }
 
-export function getEduModule(id: number): EduModuleRow | undefined {
-  const d = getDb();
-  if (!d) {
-    const m = EDU_SEED[id - 1];
-    return m ? { id, sort_order: id, title: m.title, dimension: m.dimension, body: m.body } : undefined;
-  }
-  return toPlainOne<EduModuleRow | undefined>(
-    d.prepare("SELECT id, sort_order, title, dimension, body FROM edu_modules WHERE id = ?")
-      .get(id) as any,
-  );
+export async function getEduModule(id: number): Promise<EduModuleRow | undefined> {
+  const rows = await getEduModules();
+  return rows.find((r) => r.id === id);
 }
 
-export function createEduModule(title: string, dimension: string, body: string): number {
-  const info = getDb()
-    .prepare("INSERT INTO edu_modules (sort_order, title, dimension, body) VALUES ((SELECT COALESCE(MAX(sort_order),0)+1 FROM edu_modules), ?, ?, ?)")
-    .run(title, dimension, body);
-  return Number(info.lastInsertRowid);
+export async function createEduModule(title: string, dimension: string, body: string): Promise<number> {
+  const sb = createServiceClient();
+  const { data, error } = await sb
+    .from("edu_modules")
+    .insert({ title, dimension, body })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return Number((data as { id: number }).id);
 }
 
-export function updateEduModule(id: number, title: string, dimension: string, body: string): void {
-  getDb()
-    .prepare("UPDATE edu_modules SET title = ?, dimension = ?, body = ? WHERE id = ?")
-    .run(title, dimension, body, id);
+export async function updateEduModule(id: number, title: string, dimension: string, body: string): Promise<void> {
+  const sb = createServiceClient();
+  const { error } = await sb.from("edu_modules").update({ title, dimension, body }).eq("id", id);
+  if (error) throw error;
 }
 
-export function deleteEduModule(id: number): void {
-  getDb().prepare("DELETE FROM edu_modules WHERE id = ?").run(id);
+export async function deleteEduModule(id: number): Promise<void> {
+  const sb = createServiceClient();
+  const { error } = await sb.from("edu_modules").delete().eq("id", id);
+  if (error) throw error;
 }
 
-// ---- Pretest / posttest items (instrumen Likert, dipakai pretest & posttest) ----
+// ---- Pretest / posttest items (instrumen Likert) ----
 export interface PretestItemRow {
   id: number;
   sort_order: number;
   dimension: string;
   statement: string;
 }
-export function getPretestItems(): PretestItemRow[] {
-  const d = getDb();
-  if (!d) {
-    return LOYALTY_ITEMS.map((it, i) => ({ id: i + 1, sort_order: i + 1, dimension: it.dimension, statement: it.statement }));
+
+export async function getPretestItems(): Promise<PretestItemRow[]> {
+  try {
+    const sb = createServiceClient();
+    const { data, error } = await sb
+      .from("pretest_items")
+      .select("id, sort_order, dimension, statement")
+      .order("sort_order")
+      .order("id");
+    if (error) throw error;
+    if (data && data.length > 0) return data as PretestItemRow[];
+  } catch {
+    // fallback
   }
-  return toPlainList<PretestItemRow>(
-    d.prepare("SELECT id, sort_order, dimension, statement FROM pretest_items ORDER BY sort_order, id")
-      .all() as any,
-  );
-}
-export function createPretestItem(dimension: string, statement: string): number {
-  const info = getDb()
-    .prepare("INSERT INTO pretest_items (sort_order, dimension, statement) VALUES ((SELECT COALESCE(MAX(sort_order),0)+1 FROM pretest_items), ?, ?)")
-    .run(dimension, statement);
-  return Number(info.lastInsertRowid);
-}
-export function updatePretestItem(id: number, dimension: string, statement: string): void {
-  getDb().prepare("UPDATE pretest_items SET dimension = ?, statement = ? WHERE id = ?").run(dimension, statement, id);
-}
-export function deletePretestItem(id: number): void {
-  getDb().prepare("DELETE FROM pretest_items WHERE id = ?").run(id);
+  return LOYALTY_ITEMS.map((it, i) => ({ id: i + 1, sort_order: i + 1, dimension: it.dimension, statement: it.statement }));
 }
 
-// ---- Game scenarios (CHOOSE) ----
+export async function createPretestItem(dimension: string, statement: string): Promise<number> {
+  const sb = createServiceClient();
+  const { data, error } = await sb.from("pretest_items").insert({ dimension, statement }).select("id").single();
+  if (error) throw error;
+  return Number((data as { id: number }).id);
+}
+
+export async function updatePretestItem(id: number, dimension: string, statement: string): Promise<void> {
+  const sb = createServiceClient();
+  const { error } = await sb.from("pretest_items").update({ dimension, statement }).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deletePretestItem(id: number): Promise<void> {
+  const sb = createServiceClient();
+  const { error } = await sb.from("pretest_items").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// ---- Game scenarios ----
 export interface GameScenarioRow {
   id: number;
   sort_order: number;
@@ -285,9 +133,16 @@ export interface GameScenarioRow {
   options: ScenarioOption[];
   feedback: string;
 }
-export function gameOptionsToText(options: ScenarioOption[]): string {
+
+export async function gameOptionsToText(options: ScenarioOption[]): Promise<string> {
   return options.map((o) => `${o.key}|${o.text}|${o.correct}`).join("\n");
 }
+
+// synchronous helper (pure) — tetap dipakai oleh actions.ts textToGameOptions
+export function gameOptionsToTextSync(options: ScenarioOption[]): string {
+  return options.map((o) => `${o.key}|${o.text}|${o.correct}`).join("\n");
+}
+
 export function textToGameOptions(text: string): ScenarioOption[] {
   return text
     .split("\n")
@@ -302,38 +157,54 @@ export function textToGameOptions(text: string): ScenarioOption[] {
       return { key, text: body, correct: correct === "true" };
     });
 }
-export function getGameScenarios(): Scenario[] {
-  const d = getDb();
-  if (!d) {
-    return SCENARIOS.map((s, i) => ({ id: i + 1, construct: s.construct, caseType: s.caseType, task: s.task, situation: s.situation, options: s.options, feedback: s.feedback }));
+
+export async function getGameScenarios(): Promise<Scenario[]> {
+  try {
+    const sb = createServiceClient();
+    const { data, error } = await sb
+      .from("game_scenarios")
+      .select("id, sort_order, construct, case_type, task, situation, options_json, feedback")
+      .order("sort_order")
+      .order("id");
+    if (error) throw error;
+    if (data && data.length > 0) {
+      return (data as unknown as { id: number; sort_order: number; construct: string; case_type: string; task: string; situation: string; options_json: string; feedback: string }[]).map(
+        (r) => ({
+          id: r.id,
+          construct: r.construct,
+          caseType: r.case_type,
+          task: r.task,
+          situation: r.situation,
+          options: JSON.parse(r.options_json) as ScenarioOption[],
+          feedback: r.feedback,
+        }),
+      );
+    }
+  } catch {
+    // fallback
   }
-  const rows = d
-    .prepare("SELECT id, sort_order, construct, case_type, task, situation, options_json, feedback FROM game_scenarios ORDER BY sort_order, id")
-    .all() as unknown as { id: number; sort_order: number; construct: string; case_type: string; task: string; situation: string; options_json: string; feedback: string }[];
-  return rows.map((r) => ({
-    id: r.id,
-    construct: r.construct,
-    caseType: r.case_type,
-    task: r.task,
-    situation: r.situation,
-    options: JSON.parse(r.options_json) as ScenarioOption[],
-    feedback: r.feedback,
-  }));
+  return SCENARIOS.map((s, i) => ({ id: i + 1, construct: s.construct, caseType: s.caseType, task: s.task, situation: s.situation, options: s.options, feedback: s.feedback }));
 }
-export function createGameScenario(
+
+export async function createGameScenario(
   construct: string,
   case_type: string,
   task: string,
   situation: string,
   options: ScenarioOption[],
   feedback: string,
-): number {
-  const info = getDb()
-    .prepare("INSERT INTO game_scenarios (sort_order, construct, case_type, task, situation, options_json, feedback) VALUES ((SELECT COALESCE(MAX(sort_order),0)+1 FROM game_scenarios), ?, ?, ?, ?, ?, ?)")
-    .run(construct, case_type, task, situation, JSON.stringify(options), feedback);
-  return Number(info.lastInsertRowid);
+): Promise<number> {
+  const sb = createServiceClient();
+  const { data, error } = await sb
+    .from("game_scenarios")
+    .insert({ construct, case_type, task, situation, options_json: JSON.stringify(options), feedback })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return Number((data as { id: number }).id);
 }
-export function updateGameScenario(
+
+export async function updateGameScenario(
   id: number,
   construct: string,
   case_type: string,
@@ -341,42 +212,61 @@ export function updateGameScenario(
   situation: string,
   options: ScenarioOption[],
   feedback: string,
-): void {
-  getDb()
-    .prepare("UPDATE game_scenarios SET construct = ?, case_type = ?, task = ?, situation = ?, options_json = ?, feedback = ? WHERE id = ?")
-    .run(construct, case_type, task, situation, JSON.stringify(options), feedback, id);
-}
-export function deleteGameScenario(id: number): void {
-  getDb().prepare("DELETE FROM game_scenarios WHERE id = ?").run(id);
+): Promise<void> {
+  const sb = createServiceClient();
+  const { error } = await sb
+    .from("game_scenarios")
+    .update({ construct, case_type, task, situation, options_json: JSON.stringify(options), feedback })
+    .eq("id", id);
+  if (error) throw error;
 }
 
-// ---- Game reflection questions (D.6) ----
+export async function deleteGameScenario(id: number): Promise<void> {
+  const sb = createServiceClient();
+  const { error } = await sb.from("game_scenarios").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// ---- Game reflection questions ----
 export interface ReflectionQuestionRow {
   id: number;
   sort_order: number;
   question: string;
 }
-export function getGameReflectionQuestions(): ReflectionQuestionRow[] {
-  const d = getDb();
-  if (!d) {
-    return GAME_REFLECTION_QUESTIONS.map((q, i) => ({ id: i + 1, sort_order: i + 1, question: q }));
+
+export async function getGameReflectionQuestions(): Promise<ReflectionQuestionRow[]> {
+  try {
+    const sb = createServiceClient();
+    const { data, error } = await sb
+      .from("game_reflection_questions")
+      .select("id, sort_order, question")
+      .order("sort_order")
+      .order("id");
+    if (error) throw error;
+    if (data && data.length > 0) return data as ReflectionQuestionRow[];
+  } catch {
+    // fallback
   }
-  return toPlainList<ReflectionQuestionRow>(
-    d.prepare("SELECT id, sort_order, question FROM game_reflection_questions ORDER BY sort_order, id")
-      .all() as any,
-  );
+  return GAME_REFLECTION_QUESTIONS.map((q, i) => ({ id: i + 1, sort_order: i + 1, question: q }));
 }
-export function createReflectionQuestion(question: string): number {
-  const info = getDb()
-    .prepare("INSERT INTO game_reflection_questions (sort_order, question) VALUES ((SELECT COALESCE(MAX(sort_order),0)+1 FROM game_reflection_questions), ?)")
-    .run(question);
-  return Number(info.lastInsertRowid);
+
+export async function createReflectionQuestion(question: string): Promise<number> {
+  const sb = createServiceClient();
+  const { data, error } = await sb.from("game_reflection_questions").insert({ question }).select("id").single();
+  if (error) throw error;
+  return Number((data as { id: number }).id);
 }
-export function updateReflectionQuestion(id: number, question: string): void {
-  getDb().prepare("UPDATE game_reflection_questions SET question = ? WHERE id = ?").run(question, id);
+
+export async function updateReflectionQuestion(id: number, question: string): Promise<void> {
+  const sb = createServiceClient();
+  const { error } = await sb.from("game_reflection_questions").update({ question }).eq("id", id);
+  if (error) throw error;
 }
-export function deleteReflectionQuestion(id: number): void {
-  getDb().prepare("DELETE FROM game_reflection_questions WHERE id = ?").run(id);
+
+export async function deleteReflectionQuestion(id: number): Promise<void> {
+  const sb = createServiceClient();
+  const { error } = await sb.from("game_reflection_questions").delete().eq("id", id);
+  if (error) throw error;
 }
 
 // ---- Response items (angket respons) ----
@@ -385,60 +275,70 @@ export interface ResponseItemRow {
   sort_order: number;
   statement: string;
 }
-export function getResponseItems(): ResponseItemRow[] {
-  const d = getDb();
-  if (!d) {
-    return RESPONSE_ITEMS.map((it, i) => ({ id: i + 1, sort_order: i + 1, statement: it.statement }));
-  }
-  return toPlainList<ResponseItemRow>(
-    d.prepare("SELECT id, sort_order, statement FROM response_items ORDER BY sort_order, id")
-      .all() as any,
-  );
-}
-export function createResponseItem(statement: string): number {
-  const info = getDb()
-    .prepare("INSERT INTO response_items (sort_order, statement) VALUES ((SELECT COALESCE(MAX(sort_order),0)+1 FROM response_items), ?)")
-    .run(statement);
-  return Number(info.lastInsertRowid);
-}
-export function updateResponseItem(id: number, statement: string): void {
-  getDb().prepare("UPDATE response_items SET statement = ? WHERE id = ?").run(statement, id);
-}
-export function deleteResponseItem(id: number): void {
-  getDb().prepare("DELETE FROM response_items WHERE id = ?").run(id);
-}
 
-export function getParticipant(id: number) {
-  const row = getDb()
-    .prepare("SELECT * FROM participants WHERE id = ?")
-    .get(id);
-  return toPlainOne<Record<string, unknown> | undefined>(row as any);
-}
-
-export function getParticipantByCode(code: string) {
-  const row = getDb()
-    .prepare("SELECT * FROM participants WHERE code = ?")
-    .get(code);
-  return toPlainOne<Record<string, unknown> | undefined>(row as any);
-}
-
-export function runTx(db: any, fn: () => void) {
-  db.exec("BEGIN");
+export async function getResponseItems(): Promise<ResponseItemRow[]> {
   try {
-    fn();
-    db.exec("COMMIT");
-  } catch (err) {
-    db.exec("ROLLBACK");
-    throw err;
+    const sb = createServiceClient();
+    const { data, error } = await sb
+      .from("response_items")
+      .select("id, sort_order, statement")
+      .order("sort_order")
+      .order("id");
+    if (error) throw error;
+    if (data && data.length > 0) return data as ResponseItemRow[];
+  } catch {
+    // fallback
   }
+  return RESPONSE_ITEMS.map((it, i) => ({ id: i + 1, sort_order: i + 1, statement: it.statement }));
 }
 
-export function resetDb() {
-  if (db) {
-    db.close();
-    db = null;
-  }
+export async function createResponseItem(statement: string): Promise<number> {
+  const sb = createServiceClient();
+  const { data, error } = await sb.from("response_items").insert({ statement }).select("id").single();
+  if (error) throw error;
+  return Number((data as { id: number }).id);
 }
+
+export async function updateResponseItem(id: number, statement: string): Promise<void> {
+  const sb = createServiceClient();
+  const { error } = await sb.from("response_items").update({ statement }).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteResponseItem(id: number): Promise<void> {
+  const sb = createServiceClient();
+  const { error } = await sb.from("response_items").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// ---------------------------------------------------------------------------
+// PARTICIPANTS (research data)
+// ---------------------------------------------------------------------------
+
+export async function getParticipant(id: number): Promise<Record<string, unknown> | undefined> {
+  const sb = createServiceClient();
+  const { data, error } = await sb.from("participants").select("*").eq("id", id).maybeSingle();
+  if (error) throw error;
+  return data ?? undefined;
+}
+
+export async function getParticipants(): Promise<Record<string, unknown>[]> {
+  const sb = createServiceClient();
+  const { data, error } = await sb.from("participants").select("*").order("id");
+  if (error) throw error;
+  return (data ?? []) as Record<string, unknown>[];
+}
+
+export async function getParticipantCount(): Promise<number> {
+  const sb = createServiceClient();
+  const { count, error } = await sb.from("participants").select("*", { count: "exact", head: true });
+  if (error) throw error;
+  return count ?? 0;
+}
+
+// ---------------------------------------------------------------------------
+// WORLD PROGRESS (PRIMA CITY) — JSONB
+// ---------------------------------------------------------------------------
 
 export interface WorldProgress {
   participantId: number;
@@ -449,20 +349,26 @@ export interface WorldProgress {
   bossDefeated: boolean;
 }
 
-export function getWorldProgress(pid: number): WorldProgress {
-  const row = getDb()
-    .prepare("SELECT episodes_done, cards, skills, game_scores, boss_defeated FROM world_progress WHERE participant_id = ?")
-    .get(pid) as
-    | { episodes_done: string; cards: string; skills: string; game_scores: string; boss_defeated: number }
-    | undefined;
-  if (!row) {
-    getDb()
-      .prepare("INSERT OR IGNORE INTO world_progress (participant_id) VALUES (?)")
-      .run(pid);
+export async function getWorldProgress(pid: number): Promise<WorldProgress> {
+  const sb = createServiceClient();
+  const { data, error } = await sb.from("world_progress").select("*").eq("participant_id", pid).maybeSingle();
+  if (error) throw error;
+  if (!data) {
     return { participantId: pid, episodesDone: [], cards: [], skills: [], gameScores: {}, bossDefeated: false };
   }
-  const j = (s: string, d: unknown) => {
-    try { return JSON.parse(s); } catch { return d; }
+  const j = (s: unknown, d: unknown) => {
+    try {
+      return typeof s === "string" ? JSON.parse(s) : s;
+    } catch {
+      return d;
+    }
+  };
+  const row = data as {
+    episodes_done: unknown;
+    cards: unknown;
+    skills: unknown;
+    game_scores: unknown;
+    boss_defeated: boolean;
   };
   return {
     participantId: pid,
@@ -470,41 +376,48 @@ export function getWorldProgress(pid: number): WorldProgress {
     cards: j(row.cards, []) as string[],
     skills: j(row.skills, []) as string[],
     gameScores: j(row.game_scores, {}) as Record<string, number>,
-    bossDefeated: row.boss_defeated === 1,
+    bossDefeated: row.boss_defeated === true,
   };
 }
 
-function saveProgress(p: WorldProgress) {
-  getDb()
-    .prepare(
-      "INSERT INTO world_progress (participant_id, episodes_done, cards, skills, game_scores, boss_defeated) VALUES (?, ?, ?, ?, ?, ?) " +
-        "ON CONFLICT(participant_id) DO UPDATE SET episodes_done=excluded.episodes_done, cards=excluded.cards, skills=excluded.skills, game_scores=excluded.game_scores, boss_defeated=excluded.boss_defeated",
-    )
-    .run(p.participantId, JSON.stringify(p.episodesDone), JSON.stringify(p.cards), JSON.stringify(p.skills), JSON.stringify(p.gameScores), p.bossDefeated ? 1 : 0);
+async function saveProgress(p: WorldProgress): Promise<void> {
+  const sb = createServiceClient();
+  const { error } = await sb.from("world_progress").upsert(
+    {
+      participant_id: p.participantId,
+      episodes_done: JSON.stringify(p.episodesDone),
+      cards: JSON.stringify(p.cards),
+      skills: JSON.stringify(p.skills),
+      game_scores: JSON.stringify(p.gameScores),
+      boss_defeated: p.bossDefeated,
+    },
+    { onConflict: "participant_id" },
+  );
+  if (error) throw error;
 }
 
-export function awardEpisode(pid: number, episodeId: number, card: string, skill: string) {
-  const p = getWorldProgress(pid);
+export async function awardEpisode(pid: number, episodeId: number, card: string, skill: string): Promise<void> {
+  const p = await getWorldProgress(pid);
   if (!p.episodesDone.includes(episodeId)) p.episodesDone.push(episodeId);
   if (card && !p.cards.includes(card)) p.cards.push(card);
   if (skill && !p.skills.includes(skill)) p.skills.push(skill);
-  saveProgress(p);
+  await saveProgress(p);
 }
 
-export function awardCard(pid: number, card: string) {
-  const p = getWorldProgress(pid);
+export async function awardCard(pid: number, card: string): Promise<void> {
+  const p = await getWorldProgress(pid);
   if (card && !p.cards.includes(card)) p.cards.push(card);
-  saveProgress(p);
+  await saveProgress(p);
 }
 
-export function recordGameScore(pid: number, game: string, score: number) {
-  const p = getWorldProgress(pid);
+export async function recordGameScore(pid: number, game: string, score: number): Promise<void> {
+  const p = await getWorldProgress(pid);
   p.gameScores[game] = Math.max(p.gameScores[game] ?? 0, score);
-  saveProgress(p);
+  await saveProgress(p);
 }
 
-export function setBossDefeated(pid: number, defeated = true) {
-  const p = getWorldProgress(pid);
+export async function setBossDefeated(pid: number, defeated = true): Promise<void> {
+  const p = await getWorldProgress(pid);
   p.bossDefeated = defeated;
-  saveProgress(p);
+  await saveProgress(p);
 }

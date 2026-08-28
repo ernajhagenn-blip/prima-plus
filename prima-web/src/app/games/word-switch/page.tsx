@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { gameAudio } from "@/lib/gameAudio";
 import GameBackButton from "@/components/GameBackButton";
+import { useLogGameResult } from "@/lib/useLogGameResult";
 
 interface Question {
   sentence: string;
@@ -139,6 +140,14 @@ export default function WordSwitchPage() {
   const q = QUESTIONS[currentQ];
   const xp = score;
   const accuracy = answers.length > 0 ? Math.round((answers.filter(Boolean).length / answers.length) * 100) : 0;
+
+  useLogGameResult("word-switch", "mini_game", phase === "result", {
+    score: xp,
+    accuracy,
+    correct: answers.filter(Boolean).length,
+    total: QUESTIONS.length,
+    detail: { answers },
+  });
 
   if (phase === "start") {
     return (

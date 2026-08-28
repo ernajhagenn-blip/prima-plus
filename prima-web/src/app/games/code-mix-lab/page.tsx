@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { gameAudio } from "@/lib/gameAudio";
 import GameBackButton from "@/components/GameBackButton";
+import { useLogGameResult } from "@/lib/useLogGameResult";
 
 interface Question {
   mixedMessage: string;
@@ -175,6 +176,14 @@ export default function CodeMixLabPage() {
   const q = QUESTIONS[currentQ];
   const xp = score;
   const accuracy = answers.length > 0 ? Math.round((answers.filter(Boolean).length / answers.length) * 100) : 0;
+
+  useLogGameResult("code-mix-lab", "mini_game", phase === "result", {
+    score: xp,
+    accuracy,
+    correct: answers.filter(Boolean).length,
+    total: QUESTIONS.length,
+    detail: { answers },
+  });
 
   if (phase === "start") {
     return (

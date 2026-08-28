@@ -4,8 +4,8 @@ import { GameForm } from "@/components/GameForm";
 
 export default async function GamePage() {
   const p = await requireParticipantAt("/game");
-  const scenarios = getGameScenarios();
-  const reflectionQuestions = getGameReflectionQuestions().map((r) => r.question);
+  const scenarios = await getGameScenarios();
+  const reflectionQuestions = (await getGameReflectionQuestions()).map((r) => r.question);
 
   return (
     <div style={{ minHeight: "100vh", width: "100%", padding: "1.5rem", boxSizing: "border-box" as const }}>

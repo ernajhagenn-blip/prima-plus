@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { submitFinalQuiz } from "@/app/actions";
+import { useLogGameResult } from "@/lib/useLogGameResult";
 
 type Q = {
   type: string;
@@ -79,6 +80,14 @@ export default function QuizPage() {
   const [score, setScore] = useState(0);
   const q = QUIZ[idx];
   const isLast = idx === QUIZ.length - 1;
+
+  useLogGameResult("final-quiz", "quiz", isLast && picked !== null, {
+    score,
+    accuracy: QUIZ.length > 0 ? Math.round((score / QUIZ.length) * 100) : 0,
+    correct: score,
+    total: QUIZ.length,
+    detail: { options: QUIZ.map((x) => x.options.map((o) => ({ key: o.key, correct: o.correct }))) },
+  });
 
   function choose(k: string) {
     if (picked) return;

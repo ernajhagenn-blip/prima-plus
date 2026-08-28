@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
+import { useLogGameResult } from "@/lib/useLogGameResult";
 
 const FLOORS = [
   {
@@ -313,6 +314,19 @@ export default function ChallengeTowerPage() {
 
   const totalScore = floorScores.reduce((a, b) => a + b, 0);
   const maxScore = totalQuestions;
+
+  useLogGameResult(
+    "challenge-tower",
+    "mini_game",
+    gameComplete,
+    {
+      score: totalScore,
+      accuracy: maxScore > 0 ? Math.round((totalScore / maxScore) * 100) : 0,
+      correct: totalScore,
+      total: maxScore,
+      detail: { floorScores },
+    },
+  );
 
   if (gameComplete) {
     return (

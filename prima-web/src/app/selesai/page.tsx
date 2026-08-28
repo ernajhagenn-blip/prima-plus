@@ -3,7 +3,7 @@ import { getParticipant } from "@/lib/db";
 
 export default async function SelesaiPage() {
   const p = await requireParticipantAt("/selesai");
-  const full = getParticipant(p.id) as unknown as {
+  const full = await getParticipant(p.id) as unknown as {
     code: string;
     pretest_total: number | null;
     posttest_total: number | null;

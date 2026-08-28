@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { recordGameAction } from "@/app/actions";
+import { logActivity } from "@/lib/logActivity";
 import { useJourney } from "@/lib/store";
 import { KARTS } from "@/components/game/karts";
 import KartRace3DWeb from "@/components/games/KartRace3DWeb";
@@ -50,7 +51,14 @@ export default function LanguageKartPage() {
             <input type="hidden" name="game" value="language_kart" />
             <input type="hidden" name="score" value={finalScore} />
             <input type="hidden" name="card" value="Pengendali Kata" />
-            <button type="submit" style={{ width: "100%", padding: "13px 0", borderRadius: 12, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "white", fontFamily: "'Righteous', 'Arial Black', sans-serif", fontSize: 15, fontWeight: 900, cursor: "pointer" }}>
+            <button type="submit" onClick={() => void logActivity("activity", {
+              activity_key: "language-kart",
+              activity_type: "kart",
+              score: finalScore,
+              correct: finalCorrect,
+              total: finalCorrect,
+              detail: { position: finalPosition },
+            })} style={{ width: "100%", padding: "13px 0", borderRadius: 12, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "white", fontFamily: "'Righteous', 'Arial Black', sans-serif", fontSize: 15, fontWeight: 900, cursor: "pointer" }}>
               Simpan & Kembali
             </button>
           </form>

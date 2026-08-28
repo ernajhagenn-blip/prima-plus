@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { logActivity } from "@/lib/logActivity";
 
 const PARTS = ["edukasi", "kart", "mini game", "quiz", "karakter", "visual"];
 
@@ -63,7 +64,10 @@ export default function FeedbackPage() {
             </div>
 
             <button
-              onClick={() => setStep(2)}
+              onClick={() => {
+                void logActivity("feedback", { message: saran, favorite_part: fav });
+                setStep(2);
+              }}
               className="mt-5 w-full rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 py-3 text-sm font-black text-white shadow-lg transition hover:shadow-xl active:scale-[0.98]"
               style={{ boxShadow: "0 4px 0 #0277BD, inset 0 2px 0 rgba(255,255,255,0.3)" }}
             >
