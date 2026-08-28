@@ -303,9 +303,11 @@ export async function submitGame(formData: FormData) {
     max,
     answers: rows.map((r) => ({
       scenario_id: r.scenario_id,
+      construct: r.construct,
       chosen: r.chosen || "",
       correct: r.is_correct === 1,
     })),
+    reflection,
     timestamp: new Date().toISOString(),
   });
 

@@ -52,13 +52,14 @@ export async function logGame(data: {
   kelas: string;
   score: number;
   max: number;
-  answers: { scenario_id: number; chosen: string; correct: boolean }[];
+  answers: { scenario_id: number; construct: string; chosen: string; correct: boolean }[];
+  reflection: string;
   timestamp: string;
 }) {
-  const answerCols = data.answers.map((a) => `Q${a.scenario_id}: ${a.correct ? "✓" : "✗"} (${a.chosen})`);
+  const answerCols = data.answers.map((a) => `Q${a.scenario_id} (${a.construct}): ${a.correct ? "✓" : "✗"} → ${a.chosen}`);
   await sendToGoogleSheets({
     sheet: "Game PRIMA",
-    data: [data.timestamp, data.code, data.name, data.kelas, data.score, data.max, ...answerCols],
+    data: [data.timestamp, data.code, data.name, data.kelas, data.score, data.max, ...answerCols, `Refleksi: ${data.reflection}`],
   });
 }
 
