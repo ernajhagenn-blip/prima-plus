@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { getParticipant } from "@/lib/db";
+import { getParticipant, getDb } from "@/lib/db";
 import { ADMIN_COOKIE, PARTICIPANT_COOKIE } from "@/lib/constants";
 
 export interface SessionParticipant {
@@ -12,7 +12,20 @@ export interface SessionParticipant {
 
 export async function currentParticipant(): Promise<SessionParticipant | null> {
   const cookieStore = await cookies();
-  const id = Number(cookieStore.get(PARTICIPANT_COOKIE)?.value ?? 0);
+  const raw = cookieStore.get(PARTICIPANT_COOKIE)?.value ?? "";
+  if (!raw) return null;
+
+  // Fallback mode: cookie contains JSON participant data
+  if (raw.startsWith("{")) {
+    try {
+      return JSON.parse(raw) as SessionParticipant;
+    } catch {
+      return null;
+    }
+  }
+
+  // DB mode: cookie contains participant ID
+  const id = Number(raw);
   if (id <= 0) return null;
   const row = getParticipant(id);
   if (!row) return null;

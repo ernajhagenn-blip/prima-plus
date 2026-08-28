@@ -39,7 +39,20 @@ import { logRegistration, logPretest, logGame, logPosttest, logRespons } from "@
 
 async function requireParticipant() {
   const cookieStore = await cookies();
-  const id = Number(cookieStore.get(PARTICIPANT_COOKIE)?.value ?? 0);
+  const raw = cookieStore.get(PARTICIPANT_COOKIE)?.value ?? "";
+  if (!raw) return null;
+
+  // Fallback mode: cookie contains JSON
+  if (raw.startsWith("{")) {
+    try {
+      return JSON.parse(raw) as { id: number; code: string; name: string; kelas: string; stage: Stage };
+    } catch {
+      return null;
+    }
+  }
+
+  // DB mode
+  const id = Number(raw);
   const p = id > 0 ? getParticipant(id) : undefined;
   if (!p) return null;
   return p as { id: number; code: string; name: string; kelas: string; stage: Stage };
@@ -60,25 +73,44 @@ export async function registerParticipant(prevState: unknown, formData: FormData
   }
 
   const db = getDb();
-  const count = (
-    db.prepare("SELECT COUNT(*) AS n FROM participants").get() as { n: number }
-  ).n;
-  const code = `PRIMA-${String(count + 1).padStart(3, "0")}`;
+  let code: string;
+  let participantId: number;
+  let participantObj: Record<string, unknown>;
 
-  const info = db
-    .prepare(
-      "INSERT INTO participants (code, name, kelas, stage) VALUES (?, ?, ?, 'registered')",
-    )
-    .run(code, name, kelas);
-  const id = Number(info.lastInsertRowid);
+  if (db) {
+    const count = (
+      db.prepare("SELECT COUNT(*) AS n FROM participants").get() as { n: number }
+    ).n;
+    code = `PRIMA-${String(count + 1).padStart(3, "0")}`;
+    const info = db
+      .prepare(
+        "INSERT INTO participants (code, name, kelas, stage) VALUES (?, ?, ?, 'registered')",
+      )
+      .run(code, name, kelas);
+    participantId = Number(info.lastInsertRowid);
+    participantObj = { id: participantId, code, name, kelas, stage: "registered" };
+  } else {
+    code = `PRIMA-${String(Math.floor(Math.random() * 900) + 100)}`;
+    participantId = Date.now();
+    participantObj = { id: participantId, code, name, kelas, stage: "registered" };
+  }
 
   const cookieStore = await cookies();
-  cookieStore.set(PARTICIPANT_COOKIE, String(id), {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 14,
-  });
+  if (db) {
+    cookieStore.set(PARTICIPANT_COOKIE, String(participantId), {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 14,
+    });
+  } else {
+    cookieStore.set(PARTICIPANT_COOKIE, JSON.stringify(participantObj), {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 14,
+    });
+  }
 
   redirect("/");
 }
@@ -91,20 +123,42 @@ export async function startJourney(prevState: unknown, formData: FormData) {
   }
 
   const db = getDb();
-  const count = (db.prepare("SELECT COUNT(*) AS n FROM participants").get() as { n: number }).n;
-  const code = `PRIMA-${String(count + 1).padStart(3, "0")}`;
-  const info = db
-    .prepare("INSERT INTO participants (code, name, kelas, stage) VALUES (?, ?, ?, 'registered')")
-    .run(code, name, kelas);
-  const id = Number(info.lastInsertRowid);
+  let code: string;
+  let participantId: number;
+  let participantObj: Record<string, unknown>;
+
+  if (db) {
+    const count = (db.prepare("SELECT COUNT(*) AS n FROM participants").get() as { n: number }).n;
+    code = `PRIMA-${String(count + 1).padStart(3, "0")}`;
+    const info = db
+      .prepare("INSERT INTO participants (code, name, kelas, stage) VALUES (?, ?, ?, 'registered')")
+      .run(code, name, kelas);
+    participantId = Number(info.lastInsertRowid);
+    participantObj = { id: participantId, code, name, kelas, stage: "registered" };
+  } else {
+    // No SQLite: generate random code, store in cookie as JSON
+    code = `PRIMA-${String(Math.floor(Math.random() * 900) + 100)}`;
+    participantId = Date.now();
+    participantObj = { id: participantId, code, name, kelas, stage: "registered" };
+  }
 
   const cookieStore = await cookies();
-  cookieStore.set(PARTICIPANT_COOKIE, String(id), {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 14,
-  });
+  if (db) {
+    cookieStore.set(PARTICIPANT_COOKIE, String(participantId), {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 14,
+    });
+  } else {
+    // Store full participant data as JSON in cookie
+    cookieStore.set(PARTICIPANT_COOKIE, JSON.stringify(participantObj), {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 14,
+    });
+  }
 
   logRegistration({
     code,
@@ -136,26 +190,38 @@ export async function submitPretest(prevState: unknown, formData: FormData) {
   }
 
   const db = getDb();
-  const existing = db
-    .prepare("SELECT COUNT(*) AS n FROM pretest_answers WHERE participant_id = ?")
-    .get(p.id) as { n: number };
-  if (existing.n > 0) {
-    return { error: "Pretest sudah dikerjakan." };
-  }
-
-  const insert = db.prepare(
-    "INSERT INTO pretest_answers (participant_id, item_id, dimension, answer, score) VALUES (?, ?, ?, ?, ?)",
-  );
-  runTx(db, () => {
-    for (const a of answers) {
-      insert.run(p.id, a.item_id, a.dimension, a.answer, a.score);
+  if (db) {
+    const existing = db
+      .prepare("SELECT COUNT(*) AS n FROM pretest_answers WHERE participant_id = ?")
+      .get(p.id) as { n: number };
+    if (existing.n > 0) {
+      return { error: "Pretest sudah dikerjakan." };
     }
-    const total = answers.reduce((s, a) => s + a.score, 0);
-    db.prepare("UPDATE participants SET stage = 'pretest_done', pretest_total = ? WHERE id = ?").run(
-      total,
-      p.id,
+
+    const insert = db.prepare(
+      "INSERT INTO pretest_answers (participant_id, item_id, dimension, answer, score) VALUES (?, ?, ?, ?, ?)",
     );
-  });
+    runTx(db, () => {
+      for (const a of answers) {
+        insert.run(p.id, a.item_id, a.dimension, a.answer, a.score);
+      }
+      const total = answers.reduce((s, a) => s + a.score, 0);
+      db.prepare("UPDATE participants SET stage = 'pretest_done', pretest_total = ? WHERE id = ?").run(
+        total,
+        p.id,
+      );
+    });
+  } else {
+    // Update cookie stage to pretest_done
+    const updated = { ...p, stage: "pretest_done" as Stage };
+    const cookieStore = await cookies();
+    cookieStore.set(PARTICIPANT_COOKIE, JSON.stringify(updated), {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 14,
+    });
+  }
 
   logPretest({
     code: p.code,
@@ -172,14 +238,6 @@ export async function submitPretest(prevState: unknown, formData: FormData) {
 export async function submitGame(formData: FormData) {
   const p = await requireParticipant();
   if (!p) return { error: "Sesi tidak ditemukan. Silakan daftar ulang." };
-
-  const db = getDb();
-  const existing = db
-    .prepare("SELECT COUNT(*) AS n FROM game_answers WHERE participant_id = ?")
-    .get(p.id) as { n: number };
-  if (existing.n > 0) {
-    return { error: "Kuis PRIMA+ sudah dikerjakan." };
-  }
 
   let score = 0;
   const scenarios = getGameScenarios();
@@ -206,17 +264,36 @@ export async function submitGame(formData: FormData) {
     return { error: "Refleksi pada kasus terakhir wajib diisi." };
   }
 
-  const insert = db.prepare(
-    "INSERT INTO game_answers (participant_id, scenario_id, construct, chosen, is_correct) VALUES (?, ?, ?, ?, ?)",
-  );
-  runTx(db, () => {
-    for (const r of rows) {
-      insert.run(p.id, r.scenario_id, r.construct, r.chosen, r.is_correct);
+  const db = getDb();
+  if (db) {
+    const existing = db
+      .prepare("SELECT COUNT(*) AS n FROM game_answers WHERE participant_id = ?")
+      .get(p.id) as { n: number };
+    if (existing.n > 0) {
+      return { error: "Kuis PRIMA+ sudah dikerjakan." };
     }
-    db.prepare(
-      "UPDATE participants SET stage = 'game_done', game_score = ?, game_max = ?, reflection = ? WHERE id = ?",
-    ).run(score, max, reflection, p.id);
-  });
+
+    const insert = db.prepare(
+      "INSERT INTO game_answers (participant_id, scenario_id, construct, chosen, is_correct) VALUES (?, ?, ?, ?, ?)",
+    );
+    runTx(db, () => {
+      for (const r of rows) {
+        insert.run(p.id, r.scenario_id, r.construct, r.chosen, r.is_correct);
+      }
+      db.prepare(
+        "UPDATE participants SET stage = 'game_done', game_score = ?, game_max = ?, reflection = ? WHERE id = ?",
+      ).run(score, max, reflection, p.id);
+    });
+  } else {
+    const updated = { ...p, stage: "game_done" as Stage, game_score: score, game_max: max, reflection };
+    const cookieStore = await cookies();
+    cookieStore.set(PARTICIPANT_COOKIE, JSON.stringify(updated), {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 14,
+    });
+  }
 
   logGame({
     code: p.code,
@@ -255,25 +332,36 @@ export async function submitPosttest(prevState: unknown, formData: FormData) {
   }
 
   const db = getDb();
-  const existing = db
-    .prepare("SELECT COUNT(*) AS n FROM posttest_answers WHERE participant_id = ?")
-    .get(p.id) as { n: number };
-  if (existing.n > 0) {
-    return { error: "Posttest sudah dikerjakan." };
-  }
-
-  const insert = db.prepare(
-    "INSERT INTO posttest_answers (participant_id, item_id, dimension, answer, score) VALUES (?, ?, ?, ?, ?)",
-  );
-  runTx(db, () => {
-    for (const a of answers) {
-      insert.run(p.id, a.item_id, a.dimension, a.answer, a.score);
+  if (db) {
+    const existing = db
+      .prepare("SELECT COUNT(*) AS n FROM posttest_answers WHERE participant_id = ?")
+      .get(p.id) as { n: number };
+    if (existing.n > 0) {
+      return { error: "Posttest sudah dikerjakan." };
     }
-    const total = answers.reduce((s, a) => s + a.score, 0);
-    db.prepare(
-      "UPDATE participants SET stage = 'posttest_done', posttest_total = ? WHERE id = ?",
-    ).run(total, p.id);
-  });
+
+    const insert = db.prepare(
+      "INSERT INTO posttest_answers (participant_id, item_id, dimension, answer, score) VALUES (?, ?, ?, ?, ?)",
+    );
+    runTx(db, () => {
+      for (const a of answers) {
+        insert.run(p.id, a.item_id, a.dimension, a.answer, a.score);
+      }
+      const total = answers.reduce((s, a) => s + a.score, 0);
+      db.prepare(
+        "UPDATE participants SET stage = 'posttest_done', posttest_total = ? WHERE id = ?",
+      ).run(total, p.id);
+    });
+  } else {
+    const updated = { ...p, stage: "posttest_done" as Stage };
+    const cookieStore = await cookies();
+    cookieStore.set(PARTICIPANT_COOKIE, JSON.stringify(updated), {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 14,
+    });
+  }
 
   logPosttest({
     code: p.code,
@@ -304,22 +392,33 @@ export async function submitRespons(prevState: unknown, formData: FormData) {
   }
 
   const db = getDb();
-  const existing = db
-    .prepare("SELECT COUNT(*) AS n FROM response_answers WHERE participant_id = ?")
-    .get(p.id) as { n: number };
-  if (existing.n > 0) {
-    return { error: "Angket respons sudah dikerjakan." };
-  }
-
-  const insert = db.prepare(
-    "INSERT INTO response_answers (participant_id, item_id, answer, score) VALUES (?, ?, ?, ?)",
-  );
-  runTx(db, () => {
-    for (const a of answers) {
-      insert.run(p.id, a.item_id, a.answer, a.score);
+  if (db) {
+    const existing = db
+      .prepare("SELECT COUNT(*) AS n FROM response_answers WHERE participant_id = ?")
+      .get(p.id) as { n: number };
+    if (existing.n > 0) {
+      return { error: "Angket respons sudah dikerjakan." };
     }
-    db.prepare("UPDATE participants SET stage = 'done' WHERE id = ?").run(p.id);
-  });
+
+    const insert = db.prepare(
+      "INSERT INTO response_answers (participant_id, item_id, answer, score) VALUES (?, ?, ?, ?)",
+    );
+    runTx(db, () => {
+      for (const a of answers) {
+        insert.run(p.id, a.item_id, a.answer, a.score);
+      }
+      db.prepare("UPDATE participants SET stage = 'done' WHERE id = ?").run(p.id);
+    });
+  } else {
+    const updated = { ...p, stage: "done" as Stage };
+    const cookieStore = await cookies();
+    cookieStore.set(PARTICIPANT_COOKIE, JSON.stringify(updated), {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 14,
+    });
+  }
 
   logRespons({
     code: p.code,
@@ -363,7 +462,20 @@ export async function completeEdu(_formData: FormData) {
   const p = await requireParticipant();
   if (!p) redirect("/");
   if (p.stage !== "pretest_done") redirect(pageForStage(p.stage));
-  getDb().prepare("UPDATE participants SET stage = 'educated' WHERE id = ?").run(p.id);
+
+  const db = getDb();
+  if (db) {
+    db.prepare("UPDATE participants SET stage = 'educated' WHERE id = ?").run(p.id);
+  } else {
+    const updated = { ...p, stage: "educated" as Stage };
+    const cookieStore = await cookies();
+    cookieStore.set(PARTICIPANT_COOKIE, JSON.stringify(updated), {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 14,
+    });
+  }
   redirect("/game");
 }
 

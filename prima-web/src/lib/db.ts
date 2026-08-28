@@ -173,17 +173,25 @@ function seedContentTables(db: any) {
 }
 
 let db: any = null;
+let sqliteFailed = false;
 
 export function getDb() {
+  if (sqliteFailed) return null;
   if (!db) {
-    const { DatabaseSync } = require("node:sqlite");
-    ensureDir();
-    db = new DatabaseSync(DB_PATH);
-    db.exec("PRAGMA journal_mode = WAL;");
-    db.exec("PRAGMA foreign_keys = ON;");
-    createTables(db);
-    seedEduModules(db);
-    seedContentTables(db);
+    try {
+      const { DatabaseSync } = require("node:sqlite");
+      ensureDir();
+      db = new DatabaseSync(DB_PATH);
+      db.exec("PRAGMA journal_mode = WAL;");
+      db.exec("PRAGMA foreign_keys = ON;");
+      createTables(db);
+      seedEduModules(db);
+      seedContentTables(db);
+    } catch (e) {
+      console.warn("node:sqlite unavailable, running without local DB:", e);
+      sqliteFailed = true;
+      return null;
+    }
   }
   return db;
 }
@@ -197,17 +205,24 @@ export interface EduModuleRow {
 }
 
 export function getEduModules(): EduModuleRow[] {
+  const d = getDb();
+  if (!d) {
+    return EDU_SEED.map((m, i) => ({ id: i + 1, sort_order: i + 1, title: m.title, dimension: m.dimension, body: m.body }));
+  }
   return toPlainList<EduModuleRow>(
-    getDb()
-      .prepare("SELECT id, sort_order, title, dimension, body FROM edu_modules ORDER BY sort_order, id")
+    d.prepare("SELECT id, sort_order, title, dimension, body FROM edu_modules ORDER BY sort_order, id")
       .all() as any,
   );
 }
 
 export function getEduModule(id: number): EduModuleRow | undefined {
+  const d = getDb();
+  if (!d) {
+    const m = EDU_SEED[id - 1];
+    return m ? { id, sort_order: id, title: m.title, dimension: m.dimension, body: m.body } : undefined;
+  }
   return toPlainOne<EduModuleRow | undefined>(
-    getDb()
-      .prepare("SELECT id, sort_order, title, dimension, body FROM edu_modules WHERE id = ?")
+    d.prepare("SELECT id, sort_order, title, dimension, body FROM edu_modules WHERE id = ?")
       .get(id) as any,
   );
 }
@@ -237,9 +252,12 @@ export interface PretestItemRow {
   statement: string;
 }
 export function getPretestItems(): PretestItemRow[] {
+  const d = getDb();
+  if (!d) {
+    return LOYALTY_ITEMS.map((it, i) => ({ id: i + 1, sort_order: i + 1, dimension: it.dimension, statement: it.statement }));
+  }
   return toPlainList<PretestItemRow>(
-    getDb()
-      .prepare("SELECT id, sort_order, dimension, statement FROM pretest_items ORDER BY sort_order, id")
+    d.prepare("SELECT id, sort_order, dimension, statement FROM pretest_items ORDER BY sort_order, id")
       .all() as any,
   );
 }
@@ -285,7 +303,11 @@ export function textToGameOptions(text: string): ScenarioOption[] {
     });
 }
 export function getGameScenarios(): Scenario[] {
-  const rows = getDb()
+  const d = getDb();
+  if (!d) {
+    return SCENARIOS.map((s, i) => ({ id: i + 1, construct: s.construct, caseType: s.caseType, task: s.task, situation: s.situation, options: s.options, feedback: s.feedback }));
+  }
+  const rows = d
     .prepare("SELECT id, sort_order, construct, case_type, task, situation, options_json, feedback FROM game_scenarios ORDER BY sort_order, id")
     .all() as unknown as { id: number; sort_order: number; construct: string; case_type: string; task: string; situation: string; options_json: string; feedback: string }[];
   return rows.map((r) => ({
@@ -335,9 +357,12 @@ export interface ReflectionQuestionRow {
   question: string;
 }
 export function getGameReflectionQuestions(): ReflectionQuestionRow[] {
+  const d = getDb();
+  if (!d) {
+    return GAME_REFLECTION_QUESTIONS.map((q, i) => ({ id: i + 1, sort_order: i + 1, question: q }));
+  }
   return toPlainList<ReflectionQuestionRow>(
-    getDb()
-      .prepare("SELECT id, sort_order, question FROM game_reflection_questions ORDER BY sort_order, id")
+    d.prepare("SELECT id, sort_order, question FROM game_reflection_questions ORDER BY sort_order, id")
       .all() as any,
   );
 }
@@ -361,9 +386,12 @@ export interface ResponseItemRow {
   statement: string;
 }
 export function getResponseItems(): ResponseItemRow[] {
+  const d = getDb();
+  if (!d) {
+    return RESPONSE_ITEMS.map((it, i) => ({ id: i + 1, sort_order: i + 1, statement: it.statement }));
+  }
   return toPlainList<ResponseItemRow>(
-    getDb()
-      .prepare("SELECT id, sort_order, statement FROM response_items ORDER BY sort_order, id")
+    d.prepare("SELECT id, sort_order, statement FROM response_items ORDER BY sort_order, id")
       .all() as any,
   );
 }
