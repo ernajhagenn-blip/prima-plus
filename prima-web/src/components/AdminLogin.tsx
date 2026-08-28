@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { adminLogin } from "@/app/actions";
+import { adminLogin } from "@/app/actions-admin";
 import { SubmitButton } from "@/components/SubmitButton";
 
 export function AdminLogin() {
