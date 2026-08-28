@@ -1,4 +1,3 @@
-import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import path from "node:path";
 import {
@@ -36,7 +35,7 @@ export type Stage =
   | "posttest_done"
   | "done";
 
-function createTables(db: DatabaseSync) {
+function createTables(db: any) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS participants (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -141,7 +140,7 @@ function createTables(db: DatabaseSync) {
   `);
 }
 
-function seedEduModules(db: DatabaseSync) {
+function seedEduModules(db: any) {
   const { n } = db.prepare("SELECT COUNT(*) AS n FROM edu_modules").get() as { n: number };
   if (n > 0) return;
   const ins = db.prepare(
@@ -150,7 +149,7 @@ function seedEduModules(db: DatabaseSync) {
   EDU_SEED.forEach((m, i) => ins.run(i + 1, m.title, m.dimension, m.body));
 }
 
-function seedContentTables(db: DatabaseSync) {
+function seedContentTables(db: any) {
   if ((db.prepare("SELECT COUNT(*) AS n FROM pretest_items").get() as { n: number }).n === 0) {
     const ins = db.prepare("INSERT INTO pretest_items (sort_order, dimension, statement) VALUES (?, ?, ?)");
     LOYALTY_ITEMS.forEach((it, i) => ins.run(i + 1, it.dimension, it.statement));
@@ -173,10 +172,11 @@ function seedContentTables(db: DatabaseSync) {
   }
 }
 
-let db: DatabaseSync | null = null;
+let db: any = null;
 
-export function getDb(): DatabaseSync {
+export function getDb() {
   if (!db) {
+    const { DatabaseSync } = require("node:sqlite");
     ensureDir();
     db = new DatabaseSync(DB_PATH);
     db.exec("PRAGMA journal_mode = WAL;");
@@ -394,7 +394,7 @@ export function getParticipantByCode(code: string) {
   return toPlainOne<Record<string, unknown> | undefined>(row as any);
 }
 
-export function runTx(db: DatabaseSync, fn: () => void) {
+export function runTx(db: any, fn: () => void) {
   db.exec("BEGIN");
   try {
     fn();

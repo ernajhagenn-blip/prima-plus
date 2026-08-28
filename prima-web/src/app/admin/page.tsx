@@ -1,21 +1,8 @@
 import { isAdminAuthed } from "@/lib/session";
-import { getDb, getEduModules, getPretestItems, getGameScenarios, getGameReflectionQuestions, getResponseItems } from "@/lib/db";
 import { AdminLogin } from "@/components/AdminLogin";
-import {
-  adminLogout,
-  createEduModule,
-  updateEduModule,
-  createPretestItem,
-  updatePretestItem,
-  createGameScenario,
-  updateGameScenario,
-  createReflectionQuestion,
-  updateReflectionQuestion,
-  createResponseItem,
-  updateResponseItem,
-  adminDelete,
-} from "@/app/actions";
-import { GAME_CONSTRUCTS, LOYALTY_DIMENSIONS } from "@/lib/data";
+
+export const metadata = { title: "Admin PRIMA+" };
+export const dynamic = "force-dynamic";
 
 const STAGE_LABEL: Record<string, string> = {
   registered: "Baru daftar",
@@ -25,8 +12,6 @@ const STAGE_LABEL: Record<string, string> = {
   posttest_done: "Posttest selesai",
   done: "Selesai",
 };
-
-export const metadata = { title: "Admin PRIMA+" };
 
 export default async function AdminPage() {
   const authed = await isAdminAuthed();
@@ -39,27 +24,49 @@ export default async function AdminPage() {
     );
   }
 
-  const db = getDb();
-  const rows = db
-    .prepare(
-      `SELECT id, code, name, kelas, stage, pretest_total, posttest_total, game_score, game_max, created_at
-       FROM participants ORDER BY id`,
-    )
-    .all() as Record<string, unknown>[];
+  try {
+    const dbModule = await import("@/lib/db");
+    const actionsModule = await import("@/app/actions");
+    const dataModule = await import("@/lib/data");
 
-  const summary = db
-    .prepare(
-      `SELECT
-         COUNT(*) AS total,
-         SUM(CASE WHEN stage = 'done' THEN 1 ELSE 0 END) AS selesai,
-         AVG(pretest_total) AS avg_pre,
-         AVG(posttest_total) AS avg_post
-       FROM participants`,
-    )
-    .get() as Record<string, unknown>;
+    const { getDb, getEduModules, getPretestItems, getGameScenarios, getGameReflectionQuestions, getResponseItems } = dbModule;
+    const {
+      adminLogout,
+      createEduModule,
+      updateEduModule,
+      createPretestItem,
+      updatePretestItem,
+      createGameScenario,
+      updateGameScenario,
+      createReflectionQuestion,
+      updateReflectionQuestion,
+      createResponseItem,
+      updateResponseItem,
+      adminDelete,
+    } = actionsModule;
+    const { GAME_CONSTRUCTS, LOYALTY_DIMENSIONS } = dataModule;
 
-  return (
-    <div className="mx-auto max-w-5xl px-4 py-10">
+    const db = getDb();
+    const rows = db
+      .prepare(
+        `SELECT id, code, name, kelas, stage, pretest_total, posttest_total, game_score, game_max, created_at
+         FROM participants ORDER BY id`,
+      )
+      .all() as Record<string, unknown>[];
+
+    const summary = db
+      .prepare(
+        `SELECT
+           COUNT(*) AS total,
+           SUM(CASE WHEN stage = 'done' THEN 1 ELSE 0 END) AS selesai,
+           AVG(pretest_total) AS avg_pre,
+           AVG(posttest_total) AS avg_post
+         FROM participants`,
+      )
+      .get() as Record<string, unknown>;
+
+    return (
+      <div className="mx-auto max-w-5xl px-4 py-10">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-black text-gray-900">Panel Admin PRIMA+</h1>
@@ -629,5 +636,18 @@ export default async function AdminPage() {
         </table>
       </div>
     </div>
-  );
+    );
+  } catch (e: any) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-10">
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
+          <h2 className="text-lg font-bold text-red-800">Admin tidak tersedia di Vercel</h2>
+          <p className="mt-2 text-sm text-red-700">
+            Panel admin membutuhkan SQLite yang hanya tersedia di lingkungan local development.
+          </p>
+          <p className="mt-1 text-xs text-red-500">{e?.message}</p>
+        </div>
+      </div>
+    );
+  }
 }
