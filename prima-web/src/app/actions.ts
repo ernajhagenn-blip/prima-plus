@@ -43,11 +43,26 @@ async function requireParticipant() {
   const cookieStore = await cookies();
   const raw = cookieStore.get(PARTICIPANT_COOKIE)?.value ?? "";
   if (!raw) return null;
+
+  // Fallback mode: cookie contains JSON
+  if (raw.startsWith("{")) {
+    try {
+      return JSON.parse(raw) as { id: number; code: string; name: string; kelas: string; stage: string };
+    } catch {
+      return null;
+    }
+  }
+
+  // DB mode
   const id = Number(raw);
   if (!Number.isFinite(id) || id <= 0) return null;
-  const p = await getParticipant(id);
-  if (!p) return null;
-  return p as { id: number; code: string; name: string; kelas: string; stage: string };
+  try {
+    const p = await getParticipant(id);
+    if (!p) return null;
+    return p as { id: number; code: string; name: string; kelas: string; stage: string };
+  } catch {
+    return null;
+  }
 }
 
 function scoreValue(answer: string | null): number {
@@ -98,24 +113,38 @@ export async function startJourney(prevState: unknown, formData: FormData) {
     return { error: "Nama dan kelas wajib diisi." };
   }
 
-  const code = await nextParticipantCode();
-  const { data, error } = await svc()
-    .from("participants")
-    .insert({ code, name, kelas, stage: "registered" })
-    .select("id, code")
-    .single();
-  if (error) return { error: "Gagal menyimpan peserta: " + error.message };
+  let participantId: number;
+  let code: string;
 
-  const row = data as { id: number; code: string };
+  try {
+    code = await nextParticipantCode();
+    const { data, error } = await svc()
+      .from("participants")
+      .insert({ code, name, kelas, stage: "registered" })
+      .select("id, code")
+      .single();
+    if (error) throw error;
+    participantId = Number((data as { id: number; code: string }).id);
+    code = (data as { code: string }).code;
+  } catch (e) {
+    // Fallback: no Supabase, store in cookie as JSON
+    code = `PRIMA-${String(Math.floor(Math.random() * 900) + 100)}`;
+    participantId = Date.now();
+    const participantObj = { id: participantId, code, name, kelas, stage: "registered" };
+    const cookieStore = await cookies();
+    cookieStore.set(PARTICIPANT_COOKIE, JSON.stringify(participantObj), {
+      httpOnly: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 14,
+    });
+    logRegistration({ code, name, kelas, timestamp: new Date().toISOString() });
+    redirect("/story");
+  }
+
   const cookieStore = await cookies();
-  cookieStore.set(PARTICIPANT_COOKIE, String(row.id), {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 14,
+  cookieStore.set(PARTICIPANT_COOKIE, String(participantId), {
+    httpOnly: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 14,
   });
 
-  logRegistration({ code: row.code, name, kelas, timestamp: new Date().toISOString() });
+  logRegistration({ code, name, kelas, timestamp: new Date().toISOString() });
   redirect("/story");
 }
 
@@ -131,18 +160,28 @@ export async function submitPretest(prevState: unknown, formData: FormData) {
     answers.push({ item_id: item.id, dimension: item.dimension, answer: value, score: scoreValue(value) });
   }
 
-  const sb = svc();
-  const { count } = await sb.from("pretest_answers").select("*", { count: "exact", head: true }).eq("participant_id", p.id);
-  if (count && count > 0) return { error: "Pretest sudah dikerjakan." };
-
-  const { error: insErr } = await sb.from("pretest_answers").insert(
-    answers.map((a) => ({ participant_id: p.id, item_id: a.item_id, dimension: a.dimension, answer: a.answer, score: a.score })),
-  );
-  if (insErr) return { error: "Gagal menyimpan pretest: " + insErr.message };
-
   const total = answers.reduce((s, a) => s + a.score, 0);
-  const { error: updErr } = await sb.from("participants").update({ stage: "pretest_done", pretest_total: total }).eq("id", p.id);
-  if (updErr) return { error: "Gagal update status: " + updErr.message };
+
+  try {
+    const sb = svc();
+    const { count } = await sb.from("pretest_answers").select("*", { count: "exact", head: true }).eq("participant_id", p.id);
+    if (count && count > 0) return { error: "Pretest sudah dikerjakan." };
+
+    const { error: insErr } = await sb.from("pretest_answers").insert(
+      answers.map((a) => ({ participant_id: p.id, item_id: a.item_id, dimension: a.dimension, answer: a.answer, score: a.score })),
+    );
+    if (insErr) return { error: "Gagal menyimpan pretest: " + insErr.message };
+
+    const { error: updErr } = await sb.from("participants").update({ stage: "pretest_done", pretest_total: total }).eq("id", p.id);
+    if (updErr) return { error: "Gagal update status: " + updErr.message };
+  } catch {
+    // Fallback: update cookie stage
+    const updated = { ...p, stage: "pretest_done" };
+    const cookieStore = await cookies();
+    cookieStore.set(PARTICIPANT_COOKIE, JSON.stringify(updated), {
+      httpOnly: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 14,
+    });
+  }
 
   logPretest({ code: p.code, name: p.name, kelas: p.kelas, total, answers, timestamp: new Date().toISOString() });
   redirect("/edukasi");
@@ -173,20 +212,29 @@ export async function submitGame(formData: FormData) {
   if (!reflection) return { error: "Refleksi pada kasus terakhir wajib diisi." };
 
   const score = rows.filter((r) => r.is_correct === 1).length;
-  const sb = svc();
-  const { count } = await sb.from("game_answers").select("*", { count: "exact", head: true }).eq("participant_id", p.id);
-  if (count && count > 0) return { error: "Kuis PRIMA+ sudah dikerjakan." };
 
-  const { error: insErr } = await sb.from("game_answers").insert(
-    rows.map((r) => ({ participant_id: p.id, scenario_id: r.scenario_id, construct: r.construct, chosen: r.chosen, is_correct: r.is_correct })),
-  );
-  if (insErr) return { error: "Gagal menyimpan kuis: " + insErr.message };
+  try {
+    const sb = svc();
+    const { count } = await sb.from("game_answers").select("*", { count: "exact", head: true }).eq("participant_id", p.id);
+    if (count && count > 0) return { error: "Kuis PRIMA+ sudah dikerjakan." };
 
-  const { error: updErr } = await sb
-    .from("participants")
-    .update({ stage: "game_done", game_score: score, game_max: max, reflection })
-    .eq("id", p.id);
-  if (updErr) return { error: "Gagal update status: " + updErr.message };
+    const { error: insErr } = await sb.from("game_answers").insert(
+      rows.map((r) => ({ participant_id: p.id, scenario_id: r.scenario_id, construct: r.construct, chosen: r.chosen, is_correct: r.is_correct })),
+    );
+    if (insErr) return { error: "Gagal menyimpan kuis: " + insErr.message };
+
+    const { error: updErr } = await sb
+      .from("participants")
+      .update({ stage: "game_done", game_score: score, game_max: max, reflection })
+      .eq("id", p.id);
+    if (updErr) return { error: "Gagal update status: " + updErr.message };
+  } catch {
+    const updated = { ...p, stage: "game_done", game_score: score, game_max: max, reflection };
+    const cookieStore = await cookies();
+    cookieStore.set(PARTICIPANT_COOKIE, JSON.stringify(updated), {
+      httpOnly: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 14,
+    });
+  }
 
   logGame({
     code: p.code, name: p.name, kelas: p.kelas, score, max,
@@ -208,18 +256,27 @@ export async function submitPosttest(prevState: unknown, formData: FormData) {
     answers.push({ item_id: item.id, dimension: item.dimension, answer: value, score: scoreValue(value) });
   }
 
-  const sb = svc();
-  const { count } = await sb.from("posttest_answers").select("*", { count: "exact", head: true }).eq("participant_id", p.id);
-  if (count && count > 0) return { error: "Posttest sudah dikerjakan." };
-
-  const { error: insErr } = await sb.from("posttest_answers").insert(
-    answers.map((a) => ({ participant_id: p.id, item_id: a.item_id, dimension: a.dimension, answer: a.answer, score: a.score })),
-  );
-  if (insErr) return { error: "Gagal menyimpan posttest: " + insErr.message };
-
   const total = answers.reduce((s, a) => s + a.score, 0);
-  const { error: updErr } = await sb.from("participants").update({ stage: "posttest_done", posttest_total: total }).eq("id", p.id);
-  if (updErr) return { error: "Gagal update status: " + updErr.message };
+
+  try {
+    const sb = svc();
+    const { count } = await sb.from("posttest_answers").select("*", { count: "exact", head: true }).eq("participant_id", p.id);
+    if (count && count > 0) return { error: "Posttest sudah dikerjakan." };
+
+    const { error: insErr } = await sb.from("posttest_answers").insert(
+      answers.map((a) => ({ participant_id: p.id, item_id: a.item_id, dimension: a.dimension, answer: a.answer, score: a.score })),
+    );
+    if (insErr) return { error: "Gagal menyimpan posttest: " + insErr.message };
+
+    const { error: updErr } = await sb.from("participants").update({ stage: "posttest_done", posttest_total: total }).eq("id", p.id);
+    if (updErr) return { error: "Gagal update status: " + updErr.message };
+  } catch {
+    const updated = { ...p, stage: "posttest_done" };
+    const cookieStore = await cookies();
+    cookieStore.set(PARTICIPANT_COOKIE, JSON.stringify(updated), {
+      httpOnly: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 14,
+    });
+  }
 
   logPosttest({ code: p.code, name: p.name, kelas: p.kelas, total, answers, timestamp: new Date().toISOString() });
   redirect("/respons");
@@ -238,17 +295,25 @@ export async function submitRespons(prevState: unknown, formData: FormData) {
     answers.push({ item_id: item.id, answer: value, score });
   }
 
-  const sb = svc();
-  const { count } = await sb.from("response_answers").select("*", { count: "exact", head: true }).eq("participant_id", p.id);
-  if (count && count > 0) return { error: "Angket respons sudah dikerjakan." };
+  try {
+    const sb = svc();
+    const { count } = await sb.from("response_answers").select("*", { count: "exact", head: true }).eq("participant_id", p.id);
+    if (count && count > 0) return { error: "Angket respons sudah dikerjakan." };
 
-  const { error: insErr } = await sb.from("response_answers").insert(
-    answers.map((a) => ({ participant_id: p.id, item_id: a.item_id, answer: a.answer, score: a.score })),
-  );
-  if (insErr) return { error: "Gagal menyimpan angket: " + insErr.message };
+    const { error: insErr } = await sb.from("response_answers").insert(
+      answers.map((a) => ({ participant_id: p.id, item_id: a.item_id, answer: a.answer, score: a.score })),
+    );
+    if (insErr) return { error: "Gagal menyimpan angket: " + insErr.message };
 
-  const { error: updErr } = await sb.from("participants").update({ stage: "done" }).eq("id", p.id);
-  if (updErr) return { error: "Gagal update status: " + updErr.message };
+    const { error: updErr } = await sb.from("participants").update({ stage: "done" }).eq("id", p.id);
+    if (updErr) return { error: "Gagal update status: " + updErr.message };
+  } catch {
+    const updated = { ...p, stage: "done" };
+    const cookieStore = await cookies();
+    cookieStore.set(PARTICIPANT_COOKIE, JSON.stringify(updated), {
+      httpOnly: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 14,
+    });
+  }
 
   logRespons({
     code: p.code, name: p.name, kelas: p.kelas,
@@ -280,9 +345,17 @@ export async function completeEdu(_formData: FormData) {
   const p = await requireParticipant();
   if (!p) redirect("/");
   if (p.stage !== "pretest_done") redirect(pageForStage(p.stage));
-  const sb = svc();
-  const { error } = await sb.from("participants").update({ stage: "educated" }).eq("id", p.id);
-  if (error) redirect(pageForStage(p.stage));
+  try {
+    const sb = svc();
+    const { error } = await sb.from("participants").update({ stage: "educated" }).eq("id", p.id);
+    if (error) throw error;
+  } catch {
+    const updated = { ...p, stage: "educated" };
+    const cookieStore = await cookies();
+    cookieStore.set(PARTICIPANT_COOKIE, JSON.stringify(updated), {
+      httpOnly: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 14,
+    });
+  }
   redirect("/game");
 }
 

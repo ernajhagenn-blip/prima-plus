@@ -15,12 +15,25 @@ export async function currentParticipant(): Promise<SessionParticipant | null> {
   const raw = cookieStore.get(PARTICIPANT_COOKIE)?.value ?? "";
   if (!raw) return null;
 
-  // Cookie contains participant ID (Supabase row id)
+  // Fallback mode: cookie contains JSON participant data
+  if (raw.startsWith("{")) {
+    try {
+      return JSON.parse(raw) as SessionParticipant;
+    } catch {
+      return null;
+    }
+  }
+
+  // Supabase mode: cookie contains participant ID
   const id = Number(raw);
   if (!Number.isFinite(id) || id <= 0) return null;
-  const row = await getParticipant(id);
-  if (!row) return null;
-  return row as unknown as SessionParticipant;
+  try {
+    const row = await getParticipant(id);
+    if (!row) return null;
+    return row as unknown as SessionParticipant;
+  } catch {
+    return null;
+  }
 }
 
 export async function isAdminAuthed(): Promise<boolean> {
