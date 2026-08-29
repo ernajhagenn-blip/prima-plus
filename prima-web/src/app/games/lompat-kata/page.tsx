@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import PlatformerGame from "@/components/games/PlatformerGame";
 import { recordGameAction } from "@/app/actions";
-import { logActivity } from "@/lib/logActivity";
 
 export default function LompatKataPage() {
   const [done, setDone] = useState(false);
@@ -37,13 +36,7 @@ export default function LompatKataPage() {
               <input type="hidden" name="game" value="lompat_kata" />
               <input type="hidden" name="score" value={score} />
               <input type="hidden" name="card" value="Pelompat Kata" />
-              <button type="submit" onClick={() => void logActivity("activity", {
-                activity_key: "lompat-kata",
-                activity_type: "mini_game",
-                score,
-                total: score,
-                detail: {},
-              })} className="w-full rounded-xl bg-cyan-400 py-3 text-sm font-bold text-[#0a0f2c]">
+              <button type="submit" className="w-full rounded-xl bg-cyan-400 py-3 text-sm font-bold text-[#0a0f2c]">
                 Simpan & Balik ke PRIMA CITY
               </button>
             </form>

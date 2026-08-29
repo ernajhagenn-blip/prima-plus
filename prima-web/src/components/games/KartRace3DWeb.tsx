@@ -346,6 +346,7 @@ export default function KartRace3DWeb({
       renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(mount.clientWidth, mount.clientHeight);
+    renderer.domElement.style.pointerEvents = "none";
     mount.appendChild(renderer.domElement);
 
     scene.add(new THREE.HemisphereLight(0xcfeaff, 0x3f7d52, 1.05));
