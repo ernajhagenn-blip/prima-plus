@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { createServiceClient } from "@/utils/supabase/server";
 import { PARTICIPANT_COOKIE } from "@/lib/constants";
+
+// Menerima hasil aktivitas siswa (chat, mini-game, kart, quiz, feedback) dari
+// client component dan menyimpannya ke Supabase via service-role client (server-only).
+// Body: { kind: "chat"|"activity"|"feedback", payload: {...} }
+// participant_id diambil dari cookie httpOnly (server-side, tidak bisa dibaca JS)
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +28,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "partisipan tidak terdaftar" }, { status: 401 });
   }
 
-  // Handle JSON cookie (Supabase unavailable fallback mode)
   let pid: number | null = null;
   if (pidVal.startsWith("{")) {
     try {
@@ -37,20 +42,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "partisipan tidak terdaftar" }, { status: 401 });
   }
 
-  // Try Supabase if configured
+  const sb = createServiceClient();
+
+  // pastikan partisipan benar-benar ada (cegah spoofing id dari client)
+  const { data: pRow, error: pErr } = await sb
+    .from("participants")
+    .select("id")
+    .eq("id", pid)
+    .maybeSingle();
+  if (pErr || !pRow) {
+    return NextResponse.json({ ok: false, error: "partisipan tidak ditemukan" }, { status: 401 });
+  }
+
   try {
-    const { createServiceClient } = await import("@/utils/supabase/server");
-    const sb = createServiceClient();
-
-    const { data: pRow, error: pErr } = await sb
-      .from("participants")
-      .select("id")
-      .eq("id", pid)
-      .maybeSingle();
-    if (pErr || !pRow) {
-      return NextResponse.json({ ok: false, error: "partisipan tidak ditemukan" }, { status: 401 });
-    }
-
     if (kind === "chat") {
       const { error } = await sb.from("chat_answers").insert({
         participant_id: pid,
@@ -93,8 +97,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ ok: false, error: "kind tidak dikenali" }, { status: 400 });
-  } catch {
-    // Supabase not configured — silently succeed (data logged to Google Sheets instead)
-    return NextResponse.json({ ok: true });
+  } catch (e: any) {
+    return NextResponse.json({ ok: false, error: e?.message ?? "server error" }, { status: 500 });
   }
 }
