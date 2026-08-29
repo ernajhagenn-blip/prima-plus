@@ -32,7 +32,7 @@ import { PARTICIPANT_COOKIE, ADMIN_COOKIE } from "@/lib/constants";
 import { LIKERT_OPTIONS } from "@/lib/data";
 import { pageForStage } from "@/lib/flow";
 import { isAdminAuthed } from "@/lib/session";
-import { logRegistration, logPretest, logGame, logPosttest, logRespons } from "@/lib/googleSheets";
+import { logRegistration, logPretest, logGame, logPosttest, logRespons, logKartQuiz } from "@/lib/googleSheets";
 
 // SERVER-ONLY. Semua tulis data lewat Server Action → pakai service role
 // (bypass RLS). Siswa anonim (cookie), tidak pakai Supabase Auth.
@@ -536,6 +536,16 @@ export async function recordGameAction(formData: FormData): Promise<void> {
   const game = String(formData.get("game") ?? "");
   const score = Number(formData.get("score") ?? 0);
   const card = String(formData.get("card") ?? "");
+  let quizDetails: { domain: string; indicator: string; question: string; chosen: string; chosenText: string; isCorrect: boolean; feedback: string }[] = [];
+  try {
+    quizDetails = JSON.parse(String(formData.get("quizDetails") ?? "[]"));
+  } catch {}
+
+  // Send detailed quiz data to Google Sheets
+  if (quizDetails.length > 0) {
+    logKartQuiz({ code: p.code, name: p.name, kelas: p.kelas, score, card, quizDetails, timestamp: new Date().toISOString() });
+  }
+
   try {
     if (game) await recordGameScoreDb(p.id, game, score);
     if (card) await awardCardDb(p.id, card);

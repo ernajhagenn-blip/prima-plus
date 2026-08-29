@@ -91,3 +91,21 @@ export async function logRespons(data: {
     data: [data.timestamp, data.code, data.name, data.kelas, ...answerCols],
   });
 }
+
+export async function logKartQuiz(data: {
+  code: string;
+  name: string;
+  kelas: string;
+  score: number;
+  card: string;
+  quizDetails: { domain: string; indicator: string; question: string; chosen: string; chosenText: string; isCorrect: boolean; feedback: string }[];
+  timestamp: string;
+}) {
+  const quizCols = data.quizDetails.map((q, i) =>
+    `Q${i + 1} [${q.domain}] | Indikator: ${q.indicator} | Kasus: ${q.question} | Jawaban: ${q.chosen}. ${q.chosenText} (${q.isCorrect ? "BENAR" : "SALAH"}) | Feedback: ${q.feedback}`
+  );
+  await sendToGoogleSheets({
+    sheet: "Kart Race Quiz",
+    data: [data.timestamp, data.code, data.name, data.kelas, data.score, data.card, ...quizCols],
+  });
+}

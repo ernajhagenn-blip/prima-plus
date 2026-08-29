@@ -15,11 +15,14 @@ function posLabel(n: number) {
   return String(n);
 }
 
+type QuizDetail = { domain: string; indicator: string; question: string; chosen: string; chosenText: string; isCorrect: boolean; feedback: string };
+
 export default function LanguageKartPage() {
   const [done, setDone] = useState(false);
   const [finalScore, setFinalScore] = useState(0);
   const [finalCorrect, setFinalCorrect] = useState(0);
   const [finalPosition, setFinalPosition] = useState(8);
+  const [quizDetails, setQuizDetails] = useState<QuizDetail[]>([]);
   const kartKey = useJourney((s) => s.kartKey);
   const kart = KARTS.find((k) => k.key === kartKey) ?? KARTS[0];
 
@@ -51,13 +54,14 @@ export default function LanguageKartPage() {
             <input type="hidden" name="game" value="language_kart" />
             <input type="hidden" name="score" value={finalScore} />
             <input type="hidden" name="card" value="Pengendali Kata" />
+            <input type="hidden" name="quizDetails" value={JSON.stringify(quizDetails)} />
             <button type="submit" onClick={() => void logActivity("activity", {
               activity_key: "language-kart",
               activity_type: "kart",
               score: finalScore,
               correct: finalCorrect,
               total: finalCorrect,
-              detail: { position: finalPosition },
+              detail: { position: finalPosition, quizDetails },
             })} style={{ width: "100%", padding: "13px 0", borderRadius: 12, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "white", fontFamily: "'Righteous', 'Arial Black', sans-serif", fontSize: 15, fontWeight: 900, cursor: "pointer" }}>
               Simpan & Kembali
             </button>
@@ -73,10 +77,11 @@ export default function LanguageKartPage() {
   return (
     <main style={{ width: "100vw", height: "100vh", margin: 0, padding: 0, overflow: "hidden", background: "#0b0d22" }}>
       <KartRace3DWeb
-        onComplete={(score, correct, position) => {
+        onComplete={(score, correct, position, details) => {
           setFinalScore(score);
           setFinalCorrect(correct);
           setFinalPosition(position);
+          setQuizDetails(details);
           setDone(true);
         }}
         kartBody={kart.body}

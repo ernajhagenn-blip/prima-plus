@@ -256,7 +256,7 @@ export default function KartRace3DWeb({
   kartBody = "#ef4444",
   kartAccent = "#fbbf24",
 }: {
-  onComplete: (score: number, correct: number, position: number) => void;
+  onComplete: (score: number, correct: number, position: number, quizDetails: { domain: string; indicator: string; question: string; chosen: string; chosenText: string; isCorrect: boolean; feedback: string }[]) => void;
   kartBody?: string;
   kartAccent?: string;
 }) {
@@ -278,6 +278,7 @@ export default function KartRace3DWeb({
   const [correctCount, setCorrectCount] = useState(0);
   const [quizScore, setQuizScore] = useState(0);
   const [result, setResult] = useState({ score: 0, correct: 0, position: 8, coins: 0 });
+  const [quizDetails, setQuizDetails] = useState<{ domain: string; indicator: string; question: string; chosen: string; chosenText: string; isCorrect: boolean; feedback: string }[]>([]);
   const [popupMsg, setPopupMsg] = useState<{ text: string; color: string; key: number } | null>(null);
 
   useEffect(() => {
@@ -600,7 +601,7 @@ export default function KartRace3DWeb({
         <div>
           <p style={{ fontFamily: "'Righteous', sans-serif", fontSize: 22, color: "#FFD34D", margin: "0 0 12px" }}>Mode 3D tidak dapat dimuat</p>
           <p style={{ fontFamily: "Arial, sans-serif", fontSize: 13, color: "rgba(255,255,255,0.7)", margin: "0 0 18px" }}>{fatal3D}</p>
-          <button onClick={() => onComplete(0, 0, 8)} style={{ padding: "12px 24px", borderRadius: 12, background: "linear-gradient(135deg,#7c3aed,#a855f7)", border: "none", color: "white", fontFamily: "'Righteous', sans-serif", fontSize: 14, fontWeight: 900, cursor: "pointer" }}>LEWATI & KEMBALI</button>
+          <button onClick={() => onComplete(0, 0, 8, [])} style={{ padding: "12px 24px", borderRadius: 12, background: "linear-gradient(135deg,#7c3aed,#a855f7)", border: "none", color: "white", fontFamily: "'Righteous', sans-serif", fontSize: 14, fontWeight: 900, cursor: "pointer" }}>LEWATI & KEMBALI</button>
         </div>
       </div>
     );
@@ -719,10 +720,30 @@ export default function KartRace3DWeb({
     const c = CHALLENGES[quizIdx];
     if (opt < 0) {
       s.quizScore = Math.max(0, s.quizScore - 5); setQuizScore(s.quizScore);
+      setQuizDetails((prev) => [...prev, {
+        domain: c.domain,
+        indicator: c.loyaltyIndicator,
+        question: c.context,
+        chosen: "TIMEOUT",
+        chosenText: "Waktu habis",
+        isCorrect: false,
+        feedback: "Tidak menjawab dalam waktu yang ditentukan",
+      }]);
       addPopup("WAKTU HABIS", "#f43f5e"); sfxEvent("wrong"); return;
     }
-    const eff = c.choices[opt]?.consequence.gameEffect ?? "slowdown";
+    const choice = c.choices[opt];
+    const eff = choice?.consequence.gameEffect ?? "slowdown";
     const q = eff === "boost" ? "best" : eff === "neutral" ? "ok" : "poor";
+    const isCorrect = q === "best";
+    setQuizDetails((prev) => [...prev, {
+      domain: c.domain,
+      indicator: c.loyaltyIndicator,
+      question: c.context,
+      chosen: choice?.id ?? "?",
+      chosenText: choice?.text ?? "",
+      isCorrect,
+      feedback: choice?.consequence.feedback ?? "",
+    }]);
     if (q === "best") {
       s.correct += 1; s.quizScore += 25; s.boost = Math.max(s.boost, 60);
       setCorrectCount(s.correct); setQuizScore(s.quizScore);
@@ -1393,7 +1414,7 @@ export default function KartRace3DWeb({
                   ? "Hebat! Sedikit lagi menuju puncak. Terus asah kepekaan berbahasamu."
                   : "Proses yang baik. Setiap tantangan yang kamu jawab membuatmu makin teliti dalam berbahasa."}
             </p>
-            <button onClick={() => onComplete(result.score, result.correct, result.position)} style={{ width: "100%", padding: "15px 0", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "white", fontFamily: "'Righteous', sans-serif", fontSize: 16, fontWeight: 900, cursor: "pointer", letterSpacing: "0.04em" }}>
+            <button onClick={() => onComplete(result.score, result.correct, result.position, quizDetails)} style={{ width: "100%", padding: "15px 0", borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #a855f7)", border: "none", color: "white", fontFamily: "'Righteous', sans-serif", fontSize: 16, fontWeight: 900, cursor: "pointer", letterSpacing: "0.04em" }}>
               SIMPAN HASIL
             </button>
           </div>
