@@ -1,9 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { createClient } from "@/utils/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
-  const response = createClient(request);
-  return response;
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+    const { createClient } = await import("@/utils/supabase/middleware");
+    return createClient(request);
+  }
+  return NextResponse.next();
 }
 
 export const config = {
