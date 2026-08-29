@@ -1,15 +1,7 @@
 import { requireParticipantAt } from "@/lib/flow";
-import { getParticipant } from "@/lib/db";
 
 export default async function SelesaiPage() {
   const p = await requireParticipantAt("/selesai");
-  const full = await getParticipant(p.id) as unknown as {
-    code: string;
-    pretest_total: number | null;
-    posttest_total: number | null;
-    game_score: number | null;
-    game_max: number | null;
-  } | null;
 
   return (
     <div style={{ minHeight: "100vh", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: "1.5rem" }}>
@@ -34,14 +26,14 @@ export default async function SelesaiPage() {
           fontFamily: "'Nunito', sans-serif", fontSize: "0.8rem", fontWeight: 600,
           color: "rgba(255,255,255,0.6)", margin: "8px 0 0",
         }}>
-          Semua skor udah tersimpan. Kode: <span style={{ color: "#c084fc", fontWeight: 800 }}>{full?.code}</span>
+          Semua skor udah tersimpan. Kode: <span style={{ color: "#c084fc", fontWeight: 800 }}>{p.code}</span>
         </p>
 
         <div style={{ marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "8px" }}>
           {[
-            { icon: "🎯", label: "Pretest", value: `${full?.pretest_total ?? "-"}`, gradient: "linear-gradient(135deg, #06b6d4, #3b82f6)" },
-            { icon: "⚔️", label: "Kuis PRIMA+", value: `${full?.game_score ?? "-"} / ${full?.game_max ?? "-"}`, gradient: "linear-gradient(135deg, #8b5cf6, #c084fc)" },
-            { icon: "🔥", label: "Posttest", value: `${full?.posttest_total ?? "-"}`, gradient: "linear-gradient(135deg, #f97316, #ef4444)" },
+            { icon: "🎯", label: "Pretest", gradient: "linear-gradient(135deg, #06b6d4, #3b82f6)" },
+            { icon: "⚔️", label: "Kuis PRIMA+", gradient: "linear-gradient(135deg, #8b5cf6, #c084fc)" },
+            { icon: "🔥", label: "Posttest", gradient: "linear-gradient(135deg, #f97316, #ef4444)" },
           ].map((item) => (
             <div key={item.label} style={{
               display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -56,7 +48,7 @@ export default async function SelesaiPage() {
                 }}>{item.icon}</div>
                 <span style={{ fontFamily: "'Nunito', sans-serif", fontSize: "0.75rem", fontWeight: 700, color: "rgba(255,255,255,0.6)" }}>{item.label}</span>
               </div>
-              <span style={{ fontFamily: "'Righteous', sans-serif", fontSize: "1rem", fontWeight: 900, color: "white" }}>{item.value}</span>
+              <span style={{ fontFamily: "'Righteous', sans-serif", fontSize: "1rem", fontWeight: 900, color: "white" }}>✓</span>
             </div>
           ))}
         </div>

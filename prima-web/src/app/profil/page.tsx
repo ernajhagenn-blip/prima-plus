@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { currentParticipant } from "@/lib/session";
-import { getWorldProgress } from "@/lib/db";
 import { SKILLS, EPISODES, LANGUAGE_CARDS } from "@/lib/data";
 import { RegisterForm } from "@/components/RegisterForm";
 
@@ -29,7 +28,11 @@ export default async function ProfilePage() {
     );
   }
 
-  const prog = await getWorldProgress(p.id);
+  let prog = { episodesDone: [] as number[], cards: [] as string[], skills: [] as string[], gameScores: {} as Record<string, number>, bossDefeated: false };
+  try {
+    const { getWorldProgress } = await import("@/lib/db");
+    prog = await getWorldProgress(p.id);
+  } catch {}
   const ownedSkills = new Set(prog.skills);
   const ownedCards = new Set(prog.cards);
   const eps = new Set(prog.episodesDone);
@@ -118,23 +121,17 @@ export default async function ProfilePage() {
 
       <div className="mt-6 flex flex-wrap gap-2">
         <Link
-          href="/episode/1"
+          href="/games/language-kart"
           className="rounded-xl bg-gradient-to-r from-red-500 to-pink-500 px-4 py-2 text-xs font-black text-white shadow-md transition hover:shadow-lg"
           style={{ boxShadow: "0 3px 0 #B71C1C, inset 0 2px 0 rgba(255,255,255,0.3)" }}
-        >
-          Lanjut Episode
-        </Link>
-        <Link
-          href="/games/language-kart"
-          className="rounded-xl border-2 border-red-400 bg-white/60 px-4 py-2 text-xs font-bold text-red-500 backdrop-blur-sm transition hover:bg-white/80"
         >
           Main Game
         </Link>
         <Link
-          href="/boss"
+          href="/world"
           className="rounded-xl border-2 border-purple-300 bg-white/60 px-4 py-2 text-xs font-bold text-purple-500 backdrop-blur-sm transition hover:bg-white/80"
         >
-          Tantang Boss
+          PRIMA CITY
         </Link>
       </div>
     </div>

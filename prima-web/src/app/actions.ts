@@ -7,7 +7,6 @@ import {
   getPretestItems,
   getGameScenarios,
   getResponseItems,
-  gameOptionsToTextSync,
   textToGameOptions,
 } from "@/lib/db";
 import {

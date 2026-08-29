@@ -1,13 +1,18 @@
 import Link from "next/link";
 import { currentParticipant } from "@/lib/session";
-import { getWorldProgress } from "@/lib/db";
 import { LANGUAGE_CARDS } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
 export default async function CardsPage() {
   const p = await currentParticipant();
-  const progress = p ? await getWorldProgress(p.id) : null;
+  let progress: { cards: string[] } | null = null;
+  if (p) {
+    try {
+      const { getWorldProgress } = await import("@/lib/db");
+      progress = await getWorldProgress(p.id);
+    } catch {}
+  }
   const owned = new Set(progress?.cards ?? []);
 
   const byCat = new Map<string, typeof LANGUAGE_CARDS>();
