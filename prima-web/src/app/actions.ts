@@ -446,8 +446,12 @@ export async function awardEpisodeAction(formData: FormData): Promise<void> {
   const epId = Number(formData.get("episodeId") ?? 0);
   const card = String(formData.get("card") ?? "");
   const skill = String(formData.get("skill") ?? "");
-  await awardEpisodeDb(p.id, epId, card, skill);
-  if (card) await awardCardDb(p.id, card);
+  try {
+    await awardEpisodeDb(p.id, epId, card, skill);
+    if (card) await awardCardDb(p.id, card);
+  } catch (e) {
+    console.error("awardEpisodeAction DB error (skipped):", e);
+  }
   const next = EPISODES.find((e) => e.id === epId + 1);
   if (next) redirect(`/journey/${next.id}`);
   redirect("/world");
@@ -459,16 +463,24 @@ export async function recordGameAction(formData: FormData): Promise<void> {
   const game = String(formData.get("game") ?? "");
   const score = Number(formData.get("score") ?? 0);
   const card = String(formData.get("card") ?? "");
-  if (game) await recordGameScoreDb(p.id, game, score);
-  if (card) await awardCardDb(p.id, card);
+  try {
+    if (game) await recordGameScoreDb(p.id, game, score);
+    if (card) await awardCardDb(p.id, card);
+  } catch (e) {
+    console.error("recordGameAction DB error (skipped):", e);
+  }
   redirect("/world");
 }
 
 export async function defeatBossAction(formData: FormData): Promise<void> {
   const p = await requireParticipant();
   if (!p) redirect("/intro");
-  await setBossDefeatedDb(p.id, true);
-  await awardCardDb(p.id, "Bahasa sebagai Jembatan");
+  try {
+    await setBossDefeatedDb(p.id, true);
+    await awardCardDb(p.id, "Bahasa sebagai Jembatan");
+  } catch (e) {
+    console.error("defeatBossAction DB error (skipped):", e);
+  }
   redirect("/world");
 }
 
@@ -476,6 +488,10 @@ export async function submitFinalQuiz(formData: FormData): Promise<void> {
   const p = await requireParticipant();
   if (!p) redirect("/world");
   const score = Number(formData.get("score") ?? 0);
-  await recordGameScoreDb(p.id, "final_quiz", score);
+  try {
+    await recordGameScoreDb(p.id, "final_quiz", score);
+  } catch (e) {
+    console.error("submitFinalQuiz DB error (skipped):", e);
+  }
   redirect("/feedback");
 }
